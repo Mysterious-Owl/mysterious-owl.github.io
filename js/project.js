@@ -5,7 +5,7 @@ xhttp.onreadystatechange = function() {
   load_content(this);
   }
 };
-xhttp.open("GET", "/xml/projects.xml", true);
+xhttp.open("GET", "/projects/projects.xml", true);
 xhttp.send();
 
 function load_content(xml) {
