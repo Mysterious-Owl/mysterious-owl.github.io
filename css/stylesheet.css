@@ -140,11 +140,11 @@ p{
   box-sizing: border-box;
   background: #0f0090;
   color: rgba(222, 222, 222);
-  box-shadow: 5px 5px 3px 0px rgb(15 0 144 / 50%);
+  box-shadow: 0px 3px 4px 1px rgb(15 0 144 / 98%), 3px 0px 4px 1px rgb(15 0 144 / 98%);
   width: 23%;
   padding: 1px 5px;
   margin-inline-end:2%;
-  border-radius:20% 80% 90% 10% / 15% 30% 20% 10%;
+  border-radius:5% 20% 40% 20%/5% 20% 40% 20%;
   /*50% 20% / 10% 40%*/
   text-align: center;
   vertical-align: top;
