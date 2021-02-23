@@ -1,0 +1,176 @@
+body{
+  font-family: Lato,Helvetica,sans-serif;
+  text-align: center;
+  background-color: #212121;
+  color: #dedede;
+}
+a{
+  text-decoration: none;
+  color: inherit;
+}
+a:hover{
+  color: red;
+}
+h1{
+  font-size: min(2.3rem,6vmin);
+  margin-block-start: 2vh;
+  margin-block-end: 2vh;
+}
+h2{
+  font-size: min(1.8rem,4vmin);
+  margin-block-start: 2vh;
+  margin-block-end: 2vh;
+}
+p{
+  margin: 2vh 0;
+}
+/*main page*/
+.header{
+  position: absolute;
+  top: 2%;
+  width: 93%;
+  left: 50%;
+  -ms-transform: translate(-50%, -0%);
+  transform: translate(-50%, -0%);
+}
+.header-text{
+  text-transform: uppercase;
+  font-size: min(4.5vmin, 1.1rem);
+  float: left;
+  letter-spacing: 0.09rem;
+}
+.header-btn{
+  height: min(4.5vmin, 1.5rem);
+  width: min(4.5vmin, 1.5rem);
+  background-color: #dedede;
+  border-radius: 50%;
+  float: right;
+}
+.header-btn-out{
+  width:50%;
+  overflow:hidden;
+  height:inherit;
+}
+.header-btn-in{
+  position:relative;
+  top:12.5%;
+  left:25%;
+  height:75%;
+  width:150%;
+  border-radius:50%;
+  background-color:#212121;
+}
+.avatar{
+  cursor: pointer;
+  background-color: #a80000;
+  border-radius: 50%;
+  font-size: min(16rem,40vmin);
+  width: min(16rem,40vmin);
+  height: min(16rem,40vmin);
+  overflow: hidden;
+  margin: auto;
+  color: white;
+}
+.avatertxt{
+  position: relative;
+  bottom: min(3.8rem,9vmin);
+  font-size: 100%;
+}
+.content{
+  position: absolute;
+  top: 50%;
+  width: fit-content;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.icon{
+  font-size: min(2.7rem,7vmin);
+  margin-inline-end: min(2rem,3vmin);
+}
+.remmar{
+  margin-inline-end: 0px;
+}
+.fa-envelope{
+  font-size:min(2.5rem,6vmin);
+  position:relative;
+  bottom:min(0.2rem,0.52vmin);
+}
+.footer{
+  position: absolute;
+  line-height: 1.5;
+  bottom: -1%;
+  width: fit-content;
+  left: 50%;
+  -ms-transform: translate(-50%, -100%);
+  transform: translate(-50%, -100%);
+}
+/*about page*/
+.about{
+  font-family: Merriweather;
+  font-size: min(1.4rem,3.7vmin);
+  text-align: justify;
+  width: 90%;
+  max-width: 1300px;
+  line-height: 1.5;
+  margin: auto;
+}
+.about-head{
+  text-align:left;
+  font-family:monospace;
+  font-size: min(3rem,7vmin);
+  margin-block-end: -1vh;
+}
+.about-list{
+  list-style-type: circle;
+}
+/*error*/
+.error{
+  text-align: center;
+  line-height: 1.5;
+}
+/*projects*/
+.row{
+  margin-inline-start:5vw;
+  margin-inline-end:5vw;
+  border-spacing: 2vw;
+}
+.row td{
+  position: relative;
+  box-sizing: border-box;
+  background: #0f0090;
+  color: rgba(222, 222, 222);
+  box-shadow: 5px 5px 3px 0px rgb(15 0 144 / 50%);
+  width: 23%;
+  padding: 1px 5px;
+  margin-inline-end:2%;
+  border-radius:20% 80% 90% 10% / 15% 30% 20% 10%;
+  /*50% 20% / 10% 40%*/
+  text-align: center;
+  vertical-align: top;
+}
+.info{
+  visibility: hidden;
+  position:absolute;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  width: 100%;
+  margin: auto;
+  top: 50%;
+  transform: translate(0%, -50%);
+}
+.row td:hover{
+  background: rgba(15, 0, 144, 0.5);
+  color: rgba(222, 222, 222, 0.5);
+}
+.row td:hover div{
+  visibility: visible;
+  opacity: 1;
+  color: rgba(222, 222, 222, 1);
+}
+.row td:hover div:hover{
+  color: red;
+}
+.row h3{
+  text-transform: uppercase;
+}
