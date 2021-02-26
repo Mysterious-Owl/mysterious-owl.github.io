@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        <url>
+            <loc>https://mysterious-owl.github.io/</loc>
+        </url>
+        <url>
+            <loc>https://mysterious-owl.github.io/projects/</loc>
+        </url>
+        <url>
+            <loc>https://mysterious-owl.github.io/about/</loc>
+        </url>
+        <url>
+            <loc>https://mysterious-owl.github.io/moodle/</loc>
+        </url>
+        <url>
+            <loc>https://mysterious-owl.github.io/Snake-game-using-C/</loc>
+        </url>
+        <url>
+            <loc>https://mysterious-owl.github.io/node-mcu/</loc>
+        </url>
+        <url>
+            <loc>https://mysterious-owl.github.io/calculator/</loc>
+        </url>
+        <url>
+            <loc>https://mysterious-owl.github.io/twitter-bot/</loc>
+        </url>
+        <url>
+            <loc>https://mysterious-owl.github.io/Geocode-API/</loc>
+        </url>
+        <url>
+            <loc>https://mysterious-owl.github.io/wordcloud/</loc>
+        </url>
+    </urlset>
