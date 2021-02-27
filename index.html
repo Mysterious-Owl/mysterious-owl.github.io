@@ -14,7 +14,7 @@
     <link rel="FaviconIcon" href="favicon.ico" type="image/x-icon">
     <link rel="shortcut" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,300&family=Lato:wght@100;300&family=DotGothic16&family=Truculenta:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/stylesheet.css">
     <title>Mysterious Owl</title>
   </head>
@@ -29,7 +29,13 @@
         </div>
       </div>
     </div>
-    <div class="content">
+    <div id="arrow-1" class="arrow left" onclick="changepage(-1)" style="display: none;">
+        <div class="fa fa-caret-left"></div>
+    </div>
+    <div id="arrow1" class="arrow right" onclick="changepage(1)">
+        <div class="fa fa-caret-right"></div>
+    </div>
+    <div class="content" id="page1">
       <div class="avatar">
         <span id="avatar" class="avatertxt" onclick="fly()">𓅓</span>
       </div>
@@ -38,6 +44,25 @@
       <a class="icon" href="https://www.github.com/mysterious-owl"><div class="fa fa-github"></div></a>
       <a class="icon" href="https://www.youtube.com/channel/UCpkxxb7y9nIlUlft5GKTNsg/"><div class="fa fa-youtube-play"></div></a>
       <a class="icon remmar" href="mailto:mysteriousowl9@gmail.com"><div class="fa fa-envelope"></div></a>
+    </div>
+    <div class="content" style="display:none;" id="page2">
+      <article class="about">
+        <h1 class="about-head">About</h1>
+        <p>I&#39;m an Indian Undergraduate student, who is trying to learn many new things and is curious about how and why world works.
+        Just learning and experiencing new things every day.</p>
+        <ul class="about-list">
+          <li>I’m looking to collaborate on anything that catches my eye.</li>
+          <li>I’m currently learning GUI and Web browser extension.</li>
+          <li>I'm currently working on IoT and automizing things, like my online college quizzes.</li>
+        </ul>
+        <p>Currently I have worked on Python, C++, JavaScript, HTML and CSS and also have some experience with MATLAB.
+          Apart from software programming, I also have experience with Raspberry Pi, Arduino, Intel 8085 and electronics software like Proteus and LTspice.</p>
+        <p>Thanks for visiting!</p>
+      </article>
+    </div>
+    <div class="content projects" style="display: none;" id="page3">
+        <table class="row" id="table">
+        </table>
     </div>
     <footer class="footer">
       <a href="/sitemap">© 2020 OWL LAW</a>

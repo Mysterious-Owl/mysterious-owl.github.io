@@ -79,7 +79,7 @@ p{
 .content{
   position: absolute;
   top: 50%;
-  width: fit-content;
+  width: 90%;
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
@@ -99,11 +99,12 @@ p{
 .footer{
   position: absolute;
   line-height: 1.5;
-  bottom: -1%;
+  bottom: 2%;
   width: fit-content;
   left: 50%;
-  -ms-transform: translate(-50%, -100%);
-  transform: translate(-50%, -100%);
+  -ms-transform: translate(-50%, 50%);
+  transform: translate(-50%, 50%);
+  font-size: min(3vmin,1rem);
 }
 /*about page*/
 .about{
@@ -131,8 +132,6 @@ p{
 }
 /*projects*/
 .row{
-  margin-inline-start:5vw;
-  margin-inline-end:5vw;
   border-spacing: 2vw;
 }
 .row td{
@@ -171,6 +170,46 @@ p{
 .row td:hover div:hover{
   color: red;
 }
+@media screen and (max-width: 800px) {
+  .row td {
+    width: 98%;
+    display: block;
+    margin-bottom: 25px;
+  }
+  .projects{
+    position: relative;
+    top: 0;
+    left: 0;
+    -ms-transform: translate(5%, 2%);
+    transform: translate(5%, 2%);
+  }
+}
 .row h3{
-  text-transform: uppercase;
+    text-transform: uppercase;
+    margin-block-end:0.5em;
+    font-family: 'DotGothic16', sans-serif;
+    letter-spacing: 1.5px;
+    font-size: min(1.4rem,5vmin);
+}
+.row h4{
+    margin-block-start:0.5em;
+    margin-block-end:0.75em;
+    font-family: 'Truculenta', sans-serif;
+    font-size: min(1.2rem,4vmin);
+}
+.arrow{
+    position: fixed;
+    top: 50%;
+    font-size: 4vmin;
+    cursor: pointer;
+}
+.right{
+    right: 0%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.left{
+    left: 0%;
+    -ms-transform: translate(50%, -50%);
+    transform: translate(50%, -50%);
 }
