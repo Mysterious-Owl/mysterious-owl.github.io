@@ -88,9 +88,10 @@ xhttp.onreadystatechange = function() {
   load_content(this);
   }
 };
-xhttp.open("GET", "/projects/projects.xml", true);
-xhttp.send();
-
+if(window.location.pathname == "/projects/" || window.location.pathname == "/"){
+    xhttp.open("GET", "/projects/projects.xml", true);
+    xhttp.send();
+}
 function load_content(xml) {
   var xmlDoc = xml.responseXML;
   projects = xmlDoc.getElementsByTagName("project");
@@ -125,4 +126,19 @@ function load_content(xml) {
   document.getElementById("table").innerHTML = document.getElementById("table").innerHTML + content;
   if(window.innerWidth <= 800 && window.location.pathname == "/projects/")
     document.getElementsByClassName('footer')[0].style.position = "relative";
+}
+
+var xhttp2 = new XMLHttpRequest();
+var content2 = "";
+xhttp2.onreadystatechange = function() {
+  if (this.readyState == 4 && this.status == 200) {
+  load_contenta(this);
+  }
+};
+if(window.location.pathname == "/about/" || window.location.pathname == "/"){
+    xhttp2.open("GET", "/about/data.html", true);
+    xhttp2.send();
+}
+function load_contenta(content) {
+    document.getElementsByClassName("about")[0].innerHTML = content.response;
 }
