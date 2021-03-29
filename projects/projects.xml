@@ -6,6 +6,7 @@
     <desp>Marks attendance automatically according to time table or by selecting any subject.</desp>
     <links>
       <external-link>https://mysterious-owl.github.io/moodle</external-link>
+      <youtube-play>https://www.youtube.com/watch?v=vzU-uWL1MRs</youtube-play>
       <download>https://github.com/Mysterious-Owl/moodle/releases/latest</download>
     </links>
   </project>
@@ -63,7 +64,7 @@
     <tech>HTML, CSS, JavaScript</tech>
     <desp>The website you are viewing currently.</desp>
     <links>
-      <external-link>https://mysterious-owl.github.io/</external-link>
+      <external-link>https://tanishq-gupta.web.app/</external-link>
     </links>
   </project>
 
