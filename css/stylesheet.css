@@ -84,6 +84,11 @@ p{
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
+.proj{
+    top: 6%;
+    -ms-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+}
 .icon{
   font-size: min(2.7rem,7vmin);
   margin-inline-end: min(2rem,3vmin);

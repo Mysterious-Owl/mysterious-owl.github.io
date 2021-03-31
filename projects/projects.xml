@@ -6,7 +6,6 @@
     <desp>Marks attendance automatically according to time table or by selecting any subject.</desp>
     <links>
       <external-link>https://mysterious-owl.github.io/moodle</external-link>
-      <youtube-play>https://www.youtube.com/watch?v=vzU-uWL1MRs</youtube-play>
       <download>https://github.com/Mysterious-Owl/moodle/releases/latest</download>
     </links>
   </project>
@@ -75,6 +74,15 @@
     <links>
       <external-link>https://mysterious-owl.github.io/wordcloud</external-link>
       <youtube-play>https://www.youtube.com/watch?v=eTz7yqWI53c</youtube-play>
+    </links>
+  </project>
+
+  <project>
+    <name>Important stuff</name>
+    <tech>HTML, CSS, JavaScript</tech>
+    <desp>The website made to post information about internships and other important stuff chronologically, kind to be used among friends.</desp>
+    <links>
+      <external-link>https://aawaaraa-info.web.app/</external-link>
     </links>
   </project>
 </projects>
