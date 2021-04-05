@@ -78,8 +78,8 @@
   </project>
 
   <project>
-    <name>Important stuff</name>
-    <tech>HTML, CSS, JavaScript</tech>
+    <name>Internship portal</name>
+    <tech>Firebase, HTML, CSS, JavaScript</tech>
     <desp>The website made to post information about internships and other important stuff chronologically, kind to be used among friends.</desp>
     <links>
       <external-link>https://aawaaraa-info.web.app/</external-link>
