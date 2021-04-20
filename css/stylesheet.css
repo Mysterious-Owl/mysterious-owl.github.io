@@ -111,6 +111,11 @@ p{
   transform: translate(-50%, 50%);
   font-size: min(3vmin,1rem);
 }
+.footerproj{
+    text-align: center;
+    line-height: 1.5;
+    font-size: min(3vmin,1rem);
+}
 /*about page*/
 .about{
   font-family: Merriweather;

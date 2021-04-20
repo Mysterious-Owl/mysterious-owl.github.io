@@ -71,11 +71,16 @@ function changepage(difference) {
         document.getElementById('page2').style.display = "block";
         document.getElementById('arrow1').style.display = "block";
         document.getElementsByClassName('footer')[0].style.position = "absolute";
+        document.getElementsByClassName('footer')[0].style.display = "block";
     }
     else{
         document.getElementById('page' + String(number + difference)).style.display = "block";
         document.getElementById('page2').style.display = "none";
         document.getElementById('arrow' + String(difference)).style.display = "none";
+        if(difference == 1){
+            document.getElementsByClassName('footer')[0].style.display = "none";
+            document.getElementsByClassName('footerproj')[0].style.display = "block";
+        }
         if(difference == 1 && window.innerWidth <= 800)
             document.getElementsByClassName('footer')[0].style.position = "relative";
 
@@ -112,7 +117,7 @@ function load_content(xml) {
         var last_icon = "";
         if (j == link_count-1)
           last_icon += "remmar";
-        content += `<a class=\"icon\ ${last_icon}" href=\"${url}\"><div class=\"fa fa-${web}\"></div></a>`;
+        content += `<a class=\"icon\ ${last_icon}" href=\"${url}\" target="_blank"><div class=\"fa fa-${web}\"></div></a>`;
       }
       content += "</div>"
     }

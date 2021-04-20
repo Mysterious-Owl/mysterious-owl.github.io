@@ -7,6 +7,7 @@
     <links>
       <external-link>https://mysterious-owl.github.io/moodle</external-link>
       <download>https://github.com/Mysterious-Owl/moodle/releases/latest</download>
+      <youtube-play>https://www.youtube.com/watch?v=vzU-uWL1MRs</youtube-play>
     </links>
   </project>
 
@@ -63,7 +64,7 @@
     <tech>HTML, CSS, JavaScript</tech>
     <desp>The website you are viewing currently.</desp>
     <links>
-      <external-link>https://mysterious-owl.github.io/</external-link>
+      <external-link>https://tanishq-gupta.web.app/</external-link>
     </links>
   </project>
 
@@ -78,11 +79,22 @@
   </project>
 
   <project>
-    <name>Internship portal</name>
-    <tech>Firebase, HTML, CSS, JavaScript</tech>
-    <desp>The website made to post information about internships and other important stuff chronologically, kind to be used among friends.</desp>
-    <links>
-      <external-link>https://aawaaraa-info.web.app/</external-link>
-    </links>
-  </project>
+   <name>Important stuff</name>
+   <tech>HTML, CSS, JavaScript</tech>
+   <desp>The website made to post information about internships and other important stuff chronologically, kind to be used among friends.</desp>
+   <links>
+     <external-link>https://aawaaraa-info.web.app/</external-link>
+   </links>
+ </project>
+
+ <project>
+   <name>Self Aid</name>
+   <tech>Machine Learning, Flask, HTML, CSS, JavaScript</tech>
+   <desp>This was a group project for HackDartmouth VIrtual aimed at identifying stress level and calm your mind accordingly and also calming content.</desp>
+   <links>
+     <external-link>https://mysterious-owl.github.io/hackdartmouth</external-link>
+     <external-link>http://mysteriousowl.pythonanywhere.com/</external-link>
+     <youtube-play>https://www.youtube.com/watch?v=rqu7A0ZQR4A</youtube-play>
+   </links>
+ </project>
 </projects>
