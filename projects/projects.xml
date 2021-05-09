@@ -19,7 +19,7 @@
       <external-link>https://mysterious-owl.github.io/vehicle-tracking-system</external-link>
     </links>
   </project>
-  
+
   <project>
     <name>Calculator</name>
     <tech>ATmega328p, C++</tech>
@@ -28,16 +28,27 @@
       <external-link>https://mysterious-owl.github.io/calculator</external-link>
     </links>
   </project>
-  
+
   <project>
     <name>NodeMCU</name>
     <tech>NodeMCU, C++, HTML, CSS, JS</tech>
     <desp>Designed a responsive webpage to control the lights in different ways, send message to display, touch-less button to see message, webpage brightness can be controlled physically by potentiometer.</desp>
-      <links>
+    <links>
         <external-link>https://mysterious-owl.github.io/node-mcu</external-link>
         <youtube-play>https://www.youtube.com/watch?v=3kpdtdSheFk</youtube-play>
-      </links>
-    </project>
+    </links>
+  </project>
+
+  <project>
+    <name>Self Aid</name>
+    <tech>Machine Learning, Flask, HTML, JS</tech>
+    <desp>This was a group project for HackDartmouth VIrtual aimed at identifying stress level and calm your mind accordingly and also calming content.</desp>
+    <links>
+      <external-link>https://mysterious-owl.github.io/selfaid</external-link>
+      <external-link>http://mysteriousowl.pythonanywhere.com/</external-link>
+      <youtube-play>https://www.youtube.com/watch?v=rqu7A0ZQR4A</youtube-play>
+    </links>
+  </project>
 
   <project>
     <name>Snake Game</name>
@@ -60,11 +71,11 @@
   </project>
 
   <project>
-    <name>Geocode-API</name>
-    <tech>Python, Geocode API, HTML, JS</tech>
-    <desp>Pins the places specified in file on a map after using Geocode API to get coordinates.</desp>
+    <name>Important stuff</name>
+    <tech>HTML, CSS, JS</tech>
+    <desp>The website made to post information about internships and other important stuff chronologically, kind to be used among friends.</desp>
     <links>
-      <external-link>https://mysterious-owl.github.io/Geocode-API</external-link>
+      <external-link>https://aawaaraa-info.web.app/</external-link>
     </links>
   </project>
 
@@ -78,32 +89,22 @@
   </project>
 
   <project>
-   <name>Important stuff</name>
-   <tech>HTML, CSS, JS</tech>
-   <desp>The website made to post information about internships and other important stuff chronologically, kind to be used among friends.</desp>
-   <links>
-     <external-link>https://aawaaraa-info.web.app/</external-link>
-   </links>
- </project>
-
- <project>
-   <name>Self Aid</name>
-   <tech>Machine Learning, Flask, HTML, JS</tech>
-   <desp>This was a group project for HackDartmouth VIrtual aimed at identifying stress level and calm your mind accordingly and also calming content.</desp>
-   <links>
-     <external-link>https://mysterious-owl.github.io/selfaid</external-link>
-     <external-link>http://mysteriousowl.pythonanywhere.com/</external-link>
-     <youtube-play>https://www.youtube.com/watch?v=rqu7A0ZQR4A</youtube-play>
-   </links>
- </project>
+    <name>Geocode-API</name>
+    <tech>Python, HTML, Geocode API</tech>
+    <desp>Pins the places specified in file on a map after using Geocode API to get coordinates.</desp>
+    <links>
+      <external-link>https://mysterious-owl.github.io/Geocode-API</external-link>
+    </links>
+  </project>
 
   <project>
     <name>Worldcloud</name>
     <tech>Python</tech>
-    <desp>Generates a image by text, in which the size of word depends on frequency of word in that image. Simple but intresting.</desp>
+    <desp>Generates an image by text, in which greater prominence is given to words that appear more frequently. Simple but intresting.</desp>
     <links>
       <external-link>https://mysterious-owl.github.io/wordcloud</external-link>
       <youtube-play>https://www.youtube.com/watch?v=eTz7yqWI53c</youtube-play>
     </links>
   </project>
+
 </projects>
