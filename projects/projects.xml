@@ -12,15 +12,6 @@
   </project>
 
   <project>
-    <name>Calculator</name>
-    <tech>ATmega328p, C++</tech>
-    <desp>Total 24 buttons and implemented on self-printed PCB, works in proteus too.</desp>
-    <links>
-      <external-link>https://mysterious-owl.github.io/calculator</external-link>
-    </links>
-  </project>
-
-  <project>
     <name>Vehicle Tracking System</name>
     <tech>ATmega328p, C++, Flask, HTML, JS</tech>
     <desp>Designed hardware which need to be installed in vehicle along with server which will process all the request of hardware and of user who want to track</desp>
@@ -30,8 +21,17 @@
   </project>
   
   <project>
+    <name>Calculator</name>
+    <tech>ATmega328p, C++</tech>
+    <desp>Total 24 buttons and implemented on self-printed PCB, works in proteus too.</desp>
+    <links>
+      <external-link>https://mysterious-owl.github.io/calculator</external-link>
+    </links>
+  </project>
+  
+  <project>
     <name>NodeMCU</name>
-    <tech>NodeMCU, C++, HTML, CSS, JavaScript</tech>
+    <tech>NodeMCU, C++, HTML, CSS, JS</tech>
     <desp>Designed a responsive webpage to control the lights in different ways, send message to display, touch-less button to see message, webpage brightness can be controlled physically by potentiometer.</desp>
       <links>
         <external-link>https://mysterious-owl.github.io/node-mcu</external-link>
@@ -61,7 +61,7 @@
 
   <project>
     <name>Geocode-API</name>
-    <tech>Python, HTML, Geocode API</tech>
+    <tech>Python, Geocode API, HTML, JS</tech>
     <desp>Pins the places specified in file on a map after using Geocode API to get coordinates.</desp>
     <links>
       <external-link>https://mysterious-owl.github.io/Geocode-API</external-link>
@@ -70,12 +70,32 @@
 
   <project>
     <name>Portfolio Website</name>
-    <tech>HTML, CSS, JavaScript</tech>
+    <tech>HTML, CSS, JS</tech>
     <desp>The website you are viewing currently.</desp>
     <links>
       <external-link>https://mysterious-owl.github.io/</external-link>
     </links>
   </project>
+
+  <project>
+   <name>Important stuff</name>
+   <tech>HTML, CSS, JS</tech>
+   <desp>The website made to post information about internships and other important stuff chronologically, kind to be used among friends.</desp>
+   <links>
+     <external-link>https://aawaaraa-info.web.app/</external-link>
+   </links>
+ </project>
+
+ <project>
+   <name>Self Aid</name>
+   <tech>Machine Learning, Flask, HTML, JS</tech>
+   <desp>This was a group project for HackDartmouth VIrtual aimed at identifying stress level and calm your mind accordingly and also calming content.</desp>
+   <links>
+     <external-link>https://mysterious-owl.github.io/selfaid</external-link>
+     <external-link>http://mysteriousowl.pythonanywhere.com/</external-link>
+     <youtube-play>https://www.youtube.com/watch?v=rqu7A0ZQR4A</youtube-play>
+   </links>
+ </project>
 
   <project>
     <name>Worldcloud</name>
@@ -86,24 +106,4 @@
       <youtube-play>https://www.youtube.com/watch?v=eTz7yqWI53c</youtube-play>
     </links>
   </project>
-
-  <project>
-   <name>Important stuff</name>
-   <tech>HTML, CSS, JavaScript</tech>
-   <desp>The website made to post information about internships and other important stuff chronologically, kind to be used among friends.</desp>
-   <links>
-     <external-link>https://aawaaraa-info.web.app/</external-link>
-   </links>
- </project>
-
- <project>
-   <name>Self Aid</name>
-   <tech>Machine Learning, Flask, HTML, CSS, JavaScript</tech>
-   <desp>This was a group project for HackDartmouth VIrtual aimed at identifying stress level and calm your mind accordingly and also calming content.</desp>
-   <links>
-     <external-link>https://mysterious-owl.github.io/selfaid</external-link>
-     <external-link>http://mysteriousowl.pythonanywhere.com/</external-link>
-     <youtube-play>https://www.youtube.com/watch?v=rqu7A0ZQR4A</youtube-play>
-   </links>
- </project>
 </projects>
