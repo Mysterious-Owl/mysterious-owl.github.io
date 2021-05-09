@@ -21,6 +21,15 @@
   </project>
 
   <project>
+    <name>Vehicle Tracking System</name>
+    <tech>ATmega328p, C++, Flask, HTML, JS</tech>
+    <desp>Designed hardware which need to be installed in vehicle along with server which will process all the request of hardware and of user who want to track</desp>
+    <links>
+      <external-link>https://mysterious-owl.github.io/vehicle-tracking-system</external-link>
+    </links>
+  </project>
+  
+  <project>
     <name>NodeMCU</name>
     <tech>NodeMCU, C++, HTML, CSS, JavaScript</tech>
     <desp>Designed a responsive webpage to control the lights in different ways, send message to display, touch-less button to see message, webpage brightness can be controlled physically by potentiometer.</desp>
