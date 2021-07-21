@@ -40,13 +40,12 @@
   </project>
 
   <project>
-    <name>Self Aid</name>
-    <tech>Machine Learning, Flask, HTML, JS</tech>
-    <desp>This was a group project for HackDartmouth VIrtual aimed at identifying stress level and calm your mind accordingly and also calming content.</desp>
+    <name>Color Identifier</name>
+    <tech>Python</tech>
+    <desp>This GUI program identifies the color of the pixel where mouse cursor is present.</desp>
     <links>
-      <external-link>https://mysterious-owl.github.io/selfaid</external-link>
-      <external-link>http://mysteriousowl.pythonanywhere.com/</external-link>
-      <youtube-play>https://www.youtube.com/watch?v=rqu7A0ZQR4A</youtube-play>
+      <external-link>https://mysterious-owl.github.io/color-identification</external-link>
+      <youtube-play>https://www.youtube.com/watch?v=AzsgVuLHtf8</youtube-play>
     </links>
   </project>
 
@@ -71,20 +70,22 @@
   </project>
 
   <project>
+    <name>Self Aid</name>
+    <tech>Machine Learning, Flask, HTML, JS</tech>
+    <desp>This was a group project for HackDartmouth VIrtual aimed at identifying stress level and calm your mind accordingly and also calming content.</desp>
+    <links>
+      <external-link>https://mysterious-owl.github.io/selfaid</external-link>
+      <external-link>http://mysteriousowl.pythonanywhere.com/</external-link>
+      <youtube-play>https://www.youtube.com/watch?v=rqu7A0ZQR4A</youtube-play>
+    </links>
+  </project>
+  
+  <project>
     <name>Important stuff</name>
     <tech>HTML, CSS, JS</tech>
     <desp>The website made to post information about internships and other important stuff chronologically, kind to be used among friends.</desp>
     <links>
       <external-link>https://aawaaraa-info.web.app/</external-link>
-    </links>
-  </project>
-
-  <project>
-    <name>Portfolio Website</name>
-    <tech>HTML, CSS, JS</tech>
-    <desp>The website you are viewing currently.</desp>
-    <links>
-      <external-link>https://mysterious-owl.github.io/</external-link>
     </links>
   </project>
 
@@ -107,4 +108,13 @@
     </links>
   </project>
 
+  <project>
+    <name>Portfolio Website</name>
+    <tech>HTML, CSS, JS</tech>
+    <desp>The website you are viewing currently.</desp>
+    <links>
+      <external-link>https://mysterious-owl.github.io/</external-link>
+    </links>
+  </project>
+  
 </projects>
