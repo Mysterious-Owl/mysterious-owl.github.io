@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Mathematical Foundations of Machine Learning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Literata:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --white: #fff;
+      --f7: #f7f7f7;
+      --f5: #f5f5f7;
+      --f0: #f0f0f2;
+      --e8: #e8e8ed;
+      --d2: #d2d2d7;
+      --6e: #6e6e73;
+      --1d: #1d1d1f;
+      --blue: #0071e3;
+      --blue-bg: #f0f6ff;
+      --blue-bd: rgba(0, 113, 227, .2);
+      --green: #1c8a3e;
+      --green-bg: #f0faf3;
+      --green-bd: rgba(28, 138, 62, .22);
+      --orange: #b45309;
+      --orange-bg: #fffbeb;
+      --orange-bd: rgba(180, 83, 9, .22);
+      --purple: #6d28d9;
+      --purple-bg: #f5f3ff;
+      --purple-bd: rgba(109, 40, 217, .22);
+      --teal: #0d7377;
+      --teal-bg: #f0fafa;
+      --teal-bd: rgba(13, 115, 119, .22);
+      --c0: #c84b10;
+      --c0-bg: rgba(200, 75, 16, .08);
+      --c1: #0060b8;
+      --c1-bg: rgba(0, 96, 184, .08);
+      --c2: #6929d4;
+      --c2-bg: rgba(105, 41, 212, .08);
+      --c3: #057a4a;
+      --c3-bg: rgba(5, 122, 74, .08);
+      --c4: #9a4200;
+      --c4-bg: rgba(154, 66, 0, .08);
+      --c5: #0b6366;
+      --c5-bg: rgba(11, 99, 102, .08);
+      --r: 16px;
+      --r-sm: 10px;
+      --r-xs: 6px;
+      --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      --mono: 'JetBrains Mono', 'SF Mono', monospace;
+      --serif: 'Literata', Georgia, serif;
+      --sh-sm: 0 1px 4px rgba(0, 0, 0, .07), 0 2px 12px rgba(0, 0, 0, .05);
+      --sh: 0 2px 8px rgba(0, 0, 0, .08), 0 8px 32px rgba(0, 0, 0, .06);
+      --sh-lg: 0 4px 16px rgba(0, 0, 0, .09), 0 24px 64px rgba(0, 0, 0, .07);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--white);
+      color: var(--1d);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.7;
+      overflow-x: hidden
+    }
+
+    ::selection {
+      background: rgba(0, 113, 227, .15)
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--d2);
+      border-radius: 2px
+    }
+
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 52px;
+      background: rgba(255, 255, 255, .88);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: .5px solid var(--e8);
+      display: flex;
+      align-items: center;
+      padding: 0 44px;
+      justify-content: space-between
+    }
+
+    .nav-brand {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -.3px;
+      color: var(--1d)
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0;
+      align-items: center
+    }
+
+    .nav-link {
+      font-size: 13px;
+      color: var(--6e);
+      text-decoration: none;
+      padding: 6px 11px;
+      border-radius: 20px;
+      transition: color .15s, background .15s;
+      font-weight: 400;
+      white-space: nowrap
+    }
+
+    .nav-link:hover {
+      color: var(--1d);
+      background: var(--f5)
+    }
+
+    .nav-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 11px;
+      border-radius: 20px;
+      background: var(--blue-bg);
+      border: 1px solid var(--blue-bd);
+      color: var(--blue);
+      margin-left: 10px
+    }
+
+    .hero {
+      padding: 132px 44px 80px;
+      max-width: 840px;
+      margin: 0 auto
+    }
+
+    .hero-kicker {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeUp .6s .1s ease-out forwards
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 5.5vw, 62px);
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1.08;
+      color: var(--1d);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp .6s .2s ease-out forwards
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--blue)
+    }
+
+    .hero-lede {
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 300;
+      color: var(--6e);
+      line-height: 1.6;
+      max-width: 640px;
+      margin-bottom: 36px;
+      opacity: 0;
+      animation: fadeUp .6s .3s ease-out forwards
+    }
+
+    .hero-stat-row {
+      display: flex;
+      gap: 36px;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp .6s .35s ease-out forwards
+    }
+
+    .hero-stat .v {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: var(--1d);
+      line-height: 1
+    }
+
+    .hero-stat .l {
+      font-size: 11px;
+      color: var(--6e);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-top: 4px
+    }
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+      color: var(--6e);
+      padding-top: 32px;
+      border-top: .5px solid var(--e8);
+      opacity: 0;
+      animation: fadeUp .6s .4s ease-out forwards;
+      flex-wrap: wrap
+    }
+
+    .hero-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--d2);
+      flex-shrink: 0
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 44px
+    }
+
+    .section {
+      padding: 80px 0
+    }
+
+    .section+.section {
+      border-top: .5px solid var(--e8)
+    }
+
+    .hdivider {
+      border: none;
+      height: .5px;
+      background: var(--e8);
+      margin: 0
+    }
+
+    .sec-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 10px
+    }
+
+    .sec-title {
+      font-size: clamp(28px, 3.8vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      color: var(--1d)
+    }
+
+    .sec-intro {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--6e);
+      line-height: 1.65;
+      margin-bottom: 40px;
+      max-width: 680px
+    }
+
+    .sub-h {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -.5px;
+      margin: 52px 0 18px;
+      color: var(--1d);
+      border-top: .5px solid var(--e8);
+      padding-top: 44px
+    }
+
+    .sub-h.first {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 8px
+    }
+
+    .prose {
+      font-size: 15px;
+      color: var(--1d);
+      line-height: 1.8;
+      margin-bottom: 18px;
+      max-width: 700px
+    }
+
+    .prose strong {
+      font-weight: 600
+    }
+
+    .st-wrap {
+      margin-bottom: 48px
+    }
+
+    .st-row {
+      display: grid;
+      grid-template-columns: 190px 1fr 120px;
+      gap: 0;
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      background: var(--white);
+      margin-bottom: 4px;
+      overflow: hidden;
+      box-shadow: var(--sh-sm);
+      transition: box-shadow .2s, transform .2s
+    }
+
+    .st-row:hover {
+      box-shadow: var(--sh);
+      transform: translateY(-1px)
+    }
+
+    .st-name {
+      padding: 17px 18px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-right: .5px solid var(--e8)
+    }
+
+    .st-desc {
+      padding: 17px 22px;
+      font-size: 14px;
+      color: var(--6e);
+      line-height: 1.55;
+      display: flex;
+      align-items: center;
+      border-right: .5px solid var(--e8)
+    }
+
+    .st-role {
+      padding: 17px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--6e);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right
+    }
+
+    .st-row.r0 .st-name {
+      background: var(--c0-bg);
+      color: var(--c0)
+    }
+
+    .st-row.r1 .st-name {
+      background: var(--c1-bg);
+      color: var(--c1)
+    }
+
+    .st-row.r2 .st-name {
+      background: var(--c2-bg);
+      color: var(--c2)
+    }
+
+    .st-row.r3 .st-name {
+      background: var(--c3-bg);
+      color: var(--c3)
+    }
+
+    .st-row.r4 .st-name {
+      background: var(--c4-bg);
+      color: var(--c4)
+    }
+
+    .st-row.r5 .st-name {
+      background: var(--c5-bg);
+      color: var(--c5)
+    }
+
+    .viz {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      padding: 32px 28px;
+      margin: 32px 0;
+      box-shadow: var(--sh-sm)
+    }
+
+    .viz-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--6e);
+      margin-bottom: 24px;
+      text-align: center
+    }
+
+    .viz-cap {
+      font-size: 13px;
+      color: var(--6e);
+      text-align: center;
+      margin-top: 18px;
+      font-family: var(--serif);
+      font-style: italic;
+      line-height: 1.6
+    }
+
+    .viz svg {
+      display: block;
+      width: 100%
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 28px 0
+    }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin: 28px 0
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      padding: 22px 24px;
+      box-shadow: var(--sh-sm);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow .2s, transform .2s
+    }
+
+    .card:hover {
+      box-shadow: var(--sh);
+      transform: translateY(-1px)
+    }
+
+    .card-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px
+    }
+
+    .card-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      margin-top: 5px
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -.3px;
+      margin-bottom: 10px;
+      color: var(--1d)
+    }
+
+    .card-body {
+      font-size: 14px;
+      color: var(--6e);
+      line-height: 1.65
+    }
+
+    .ccard {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      box-shadow: var(--sh-sm);
+      overflow: hidden;
+      margin: 28px 0
+    }
+
+    .ccard-head {
+      padding: 26px 30px 22px;
+      border-bottom: .5px solid var(--e8);
+      position: relative
+    }
+
+    .ccard-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px
+    }
+
+    .ccard-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -.5px;
+      margin-bottom: 6px;
+      margin-top: 12px
+    }
+
+    .ccard-sub {
+      font-size: 15px;
+      color: var(--6e);
+      font-family: var(--serif);
+      font-weight: 300;
+      line-height: 1.5
+    }
+
+    .ccard-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0
+    }
+
+    .ccard-col {
+      padding: 24px 30px
+    }
+
+    .ccard-col+.ccard-col {
+      border-left: .5px solid var(--e8)
+    }
+
+    .ccard-full {
+      padding: 24px 30px;
+      border-top: .5px solid var(--e8)
+    }
+
+    .col-hd {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--6e);
+      margin-bottom: 14px
+    }
+
+    .fl {
+      list-style: none
+    }
+
+    .fl li {
+      font-size: 14px;
+      color: var(--6e);
+      padding: 8px 0;
+      border-bottom: .5px solid var(--f0);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.65
+    }
+
+    .fl li:last-child {
+      border-bottom: none
+    }
+
+    .fl li::before {
+      content: '›';
+      color: var(--d2);
+      flex-shrink: 0;
+      font-size: 16px;
+      margin-top: 0
+    }
+
+    .fl li strong {
+      color: var(--1d);
+      font-weight: 600
+    }
+
+    .note {
+      margin: 0 30px 24px;
+      padding: 16px 20px;
+      background: var(--f5);
+      border-radius: var(--r-sm);
+      border: .5px solid var(--e8);
+      font-size: 14px;
+      color: var(--6e);
+      line-height: 1.7
+    }
+
+    .note strong {
+      color: var(--1d)
+    }
+
+    .note-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--6e);
+      display: block;
+      margin-bottom: 8px
+    }
+
+    .callout {
+      display: flex;
+      gap: 14px;
+      padding: 16px 20px;
+      border-radius: var(--r-sm);
+      margin: 22px 0;
+      font-size: 14px;
+      line-height: 1.7;
+      border-left: 3px solid
+    }
+
+    .ci {
+      flex-shrink: 0;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-top: 2px
+    }
+
+    .info {
+      background: var(--blue-bg);
+      border-color: var(--blue);
+      color: #174080
+    }
+
+    .tip {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: #0f3320
+    }
+
+    .warn {
+      background: var(--orange-bg);
+      border-color: var(--orange);
+      color: #5c3200
+    }
+
+    .key {
+      background: var(--purple-bg);
+      border-color: var(--purple);
+      color: #321570
+    }
+
+    .eg {
+      background: var(--teal-bg);
+      border-color: var(--teal);
+      color: #063234
+    }
+
+    .pipe {
+      display: flex;
+      flex-direction: column;
+      margin: 32px 0
+    }
+
+    .pstep {
+      display: flex;
+      gap: 20px;
+      padding-bottom: 28px;
+      position: relative
+    }
+
+    .pstep:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 42px;
+      bottom: 0;
+      width: 1px;
+      background: var(--e8)
+    }
+
+    .pdot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+      border: 1.5px solid var(--e8);
+      background: var(--white);
+      position: relative;
+      z-index: 1;
+      box-shadow: var(--sh-sm)
+    }
+
+    .pdot.blue {
+      background: var(--blue-bg);
+      border-color: var(--blue-bd);
+      color: var(--blue)
+    }
+
+    .pdot.green {
+      background: var(--green-bg);
+      border-color: var(--green-bd);
+      color: var(--green)
+    }
+
+    .pdot.purple {
+      background: var(--purple-bg);
+      border-color: var(--purple-bd);
+      color: var(--purple)
+    }
+
+    .pdot.orange {
+      background: var(--orange-bg);
+      border-color: var(--orange-bd);
+      color: var(--orange)
+    }
+
+    .pdot.teal {
+      background: var(--teal-bg);
+      border-color: var(--teal-bd);
+      color: var(--teal)
+    }
+
+    .pcontent {
+      padding-top: 8px;
+      flex: 1
+    }
+
+    .pcontent h4 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.3px;
+      margin-bottom: 8px;
+      color: var(--1d)
+    }
+
+    .pcontent p {
+      font-size: 14px;
+      color: var(--6e);
+      line-height: 1.7;
+      margin-bottom: 8px
+    }
+
+    .pcontent ul {
+      margin-top: 10px;
+      padding-left: 20px
+    }
+
+    .pcontent li {
+      font-size: 14px;
+      color: var(--6e);
+      line-height: 1.65;
+      margin-bottom: 5px
+    }
+
+    .pcontent code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--f5);
+      border: .5px solid var(--e8);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--1d)
+    }
+
+    .twrap {
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      margin: 24px 0
+    }
+
+    .ptable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px
+    }
+
+    .ptable th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--6e);
+      background: var(--f5);
+      border-bottom: 1px solid var(--e8)
+    }
+
+    .ptable td {
+      padding: 14px 16px;
+      border-bottom: .5px solid var(--f0);
+      vertical-align: top;
+      color: var(--6e);
+      line-height: 1.6
+    }
+
+    .ptable tr:last-child td {
+      border-bottom: none
+    }
+
+    .ptable tr:hover td {
+      background: var(--f7)
+    }
+
+    .p-name {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--1d);
+      font-weight: 500
+    }
+
+    .dtbox {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      box-shadow: var(--sh-sm);
+      padding: 28px;
+      margin: 24px 0
+    }
+
+    .dtq {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--1d);
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .dtq::before {
+      content: '?';
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--blue-bg);
+      color: var(--blue);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0
+    }
+
+    .dtbranch {
+      margin-left: 36px;
+      padding-left: 18px;
+      border-left: 2px solid var(--e8);
+      margin-bottom: 22px
+    }
+
+    .dtrow {
+      padding: 10px 14px;
+      border-radius: var(--r-xs);
+      font-size: 14px;
+      color: var(--6e);
+      line-height: 1.65;
+      margin-bottom: 6px;
+      background: var(--f5);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start
+    }
+
+    .dtarr {
+      color: var(--d2);
+      flex-shrink: 0;
+      font-size: 14px;
+      margin-top: 2px
+    }
+
+    .dtrow strong {
+      color: var(--1d);
+      font-weight: 600
+    }
+
+    .codewin {
+      background: #1e1e2e;
+      border-radius: var(--r);
+      overflow: hidden;
+      margin: 24px 0;
+      box-shadow: var(--sh-lg)
+    }
+
+    .codebar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 12px 20px;
+      background: #2a2a3e;
+      border-bottom: 1px solid rgba(255, 255, 255, .07)
+    }
+
+    .cdot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%
+    }
+
+    .cr {
+      background: #ff5f57
+    }
+
+    .cy {
+      background: #febc2e
+    }
+
+    .cg {
+      background: #28c840
+    }
+
+    .codefn {
+      margin-left: 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255, 255, 255, .35)
+    }
+
+    .codepre {
+      padding: 24px 28px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 2.0;
+      overflow-x: auto;
+      color: #cdd6f4;
+      white-space: pre
+    }
+
+    .cm {
+      color: #6a6a7a;
+      font-style: italic
+    }
+
+    .hl {
+      color: #f9e2af
+    }
+
+    .gr {
+      color: #a6e3a1
+    }
+
+    .pk {
+      color: #f38ba8
+    }
+
+    .sec {
+      color: #585b70;
+      font-style: italic
+    }
+
+    .pquote {
+      font-family: var(--serif);
+      font-size: clamp(21px, 2.8vw, 30px);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.45;
+      color: var(--1d);
+      padding: 40px 0;
+      border-top: .5px solid var(--e8);
+      border-bottom: .5px solid var(--e8);
+      margin: 48px 0;
+      letter-spacing: -.3px
+    }
+
+    .rv {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .55s ease-out, transform .55s ease-out
+    }
+
+    .rv.vis {
+      opacity: 1;
+      transform: none
+    }
+
+    .series-footer {
+      background: var(--1d);
+      padding: 60px 44px;
+      margin-top: 100px
+    }
+
+    .sf-inner {
+      max-width: 860px;
+      margin: 0 auto
+    }
+
+    .sf-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .4);
+      margin-bottom: 16px
+    }
+
+    .sf-title {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, .9);
+      margin-bottom: 12px;
+      letter-spacing: -.4px
+    }
+
+    .sf-desc {
+      font-size: 15px;
+      color: rgba(255, 255, 255, .5);
+      line-height: 1.65;
+      max-width: 560px;
+      margin-bottom: 36px
+    }
+
+    .sf-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 40px
+    }
+
+    .sf-card {
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: var(--r-sm);
+      padding: 20px
+    }
+
+    .sf-card-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255, 255, 255, .3);
+      margin-bottom: 10px
+    }
+
+    .sf-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .85);
+      margin-bottom: 6px
+    }
+
+    .sf-card-desc {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .4);
+      line-height: 1.5
+    }
+
+    .sf-card.active {
+      border-color: var(--blue-bd);
+      background: rgba(0, 113, 227, .08)
+    }
+
+    .sf-card.active .sf-card-num {
+      color: var(--blue)
+    }
+
+    .sf-meta {
+      border-top: .5px solid rgba(255, 255, 255, .1);
+      padding-top: 24px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, .3)
+    }
+
+    @media(max-width:768px) {
+      .nav {
+        padding: 0 20px
+      }
+
+      .nav-links,
+      .nav-tag {
+        display: none
+      }
+
+      .wrap {
+        padding: 0 20px
+      }
+
+      .hero {
+        padding: 100px 20px 60px
+      }
+
+      .st-row,
+      .ccard-2col,
+      .grid2,
+      .grid3,
+      .sf-cards {
+        grid-template-columns: 1fr
+      }
+
+      .ccard-col+.ccard-col {
+        border-left: none;
+        border-top: .5px solid var(--e8)
+      }
+
+      .series-footer {
+        padding: 48px 20px
+      }
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 13px;
+      background: var(--f5);
+      border: .5px solid var(--e8);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--c4)
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="nav">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="index.html"
+        style="font-size:12px;color:var(--6e);text-decoration:none;display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1px solid var(--e8);transition:all 0.2s;"
+        onmouseover="this.style.color='var(--blue)';this.style.borderColor='rgba(0,113,227,0.3)'"
+        onmouseout="this.style.color='var(--6e)';this.style.borderColor='var(--e8)'">← Guides</a>
+      <div class="nav-brand">ML Foundations</div>
+    </div>
+    <div class="nav-links">
+      <a class="nav-link" href="#s-problem">The Problem</a>
+      <a class="nav-link" href="#s-prob">Probability</a>
+      <a class="nav-link" href="#s-rv">Random Variables</a>
+      <a class="nav-link" href="#s-dist">Distributions</a>
+      <a class="nav-link" href="#s-density">IID &amp; Density</a>
+      <a class="nav-link" href="#s-framework">Framework</a>
+      <a class="nav-link" href="#s-kl">KL &amp; MLE</a>
+    </div>
+    <div class="nav-tag">Part 1 of the ML Series</div>
+  </nav>
+  <div class="hero">
+    <div class="hero-kicker">The ML Series · Part 1</div>
+    <h1>The Mathematical<br>Foundations of<br><em>Machine Learning</em></h1>
+    <p class="hero-lede">Before understanding any ML algorithm - from linear regression to large language models - you
+      need to understand what ML is actually trying to compute. This guide builds that understanding from first
+      principles.</p>
+    <div class="hero-stat-row">
+      <div class="hero-stat">
+        <div class="v">6</div>
+        <div class="l">Core Concepts</div>
+      </div>
+      <div class="hero-stat">
+        <div class="v">14</div>
+        <div class="l">Visualisations</div>
+      </div>
+      <div class="hero-stat">
+        <div class="v">1</div>
+        <div class="l">Coherent Story</div>
+      </div>
+    </div>
+    <div class="hero-meta">
+      <span>Probability Theory</span><span class="hero-dot"></span>
+      <span>Distribution Estimation</span><span class="hero-dot"></span>
+      <span>Maximum Likelihood</span><span class="hero-dot"></span>
+      <span>~30 min read</span>
+    </div>
+  </div>
+  <div class="hdivider"></div>
+  <div class="wrap">
+    <section class="section">
+      <div class="rv">
+        <div class="sec-kicker">The big picture</div>
+        <h2 class="sec-title">Six ideas, one destination</h2>
+        <p class="sec-intro">Every ML algorithm ultimately optimises one equation: <strong>θ* = argmax (1/N) Σᵢ log
+            p_θ(xᵢ)</strong>. The six ideas below are the steps needed to understand where it comes from and why it is
+          correct.</p>
+      </div>
+      <div class="st-wrap rv">
+        <div class="st-row r0">
+          <div class="st-name">The Problem</div>
+          <div class="st-desc">We want f: X→Y mapping X-rays to diagnoses, but physics cannot give us f. We collect data
+            D and learn statistically. The function approximation problem becomes a distribution estimation problem.
+          </div>
+          <div class="st-role">Why ML Exists</div>
+        </div>
+        <div class="st-row r1">
+          <div class="st-name">Probability Theory</div>
+          <div class="st-desc">To handle uncertainty rigorously we build the triplet (Ω, F, P). Sample space, events,
+            and a probability measure satisfying Kolmogorov's three axioms. The formal language of uncertainty.</div>
+          <div class="st-role">The Language</div>
+        </div>
+        <div class="st-row r2">
+          <div class="st-name">Random Variables</div>
+          <div class="st-desc">Ω is abstract. The RV X: Ω → ℝᵈ bridges abstract to numeric via the push-forward, moving
+            (Ω,F,P) to (ℝ,B,P_X) where ML lives.</div>
+          <div class="st-role">The Bridge</div>
+        </div>
+        <div class="st-row r3">
+          <div class="st-name">Distributions</div>
+          <div class="st-desc">With X (image) and Y (label) on the same Ω, we study their joint P_{XY}, marginals, and
+            conditional P_{Y|X}. The IID assumption and the density function both enter here.</div>
+          <div class="st-role">The Structure</div>
+        </div>
+        <div class="st-row r4">
+          <div class="st-name">The ML Framework</div>
+          <div class="st-desc">P_x is unknown. We pick a parametric model p_θ and minimise a distance d(P_x, P_θ). This
+            generates four fundamental questions every algorithm must answer.</div>
+          <div class="st-role">The Framework</div>
+        </div>
+        <div class="st-row r5">
+          <div class="st-name">KL Divergence &amp; MLE</div>
+          <div class="st-desc">KL divergence as d. The Weak Law of Large Numbers makes P_x disappear. The result: θ* =
+            argmax (1/N) Σᵢ log p_θ(xᵢ) - Maximum Likelihood Estimation.</div>
+          <div class="st-role">The Solution</div>
+        </div>
+      </div>
+      <div class="callout key rv">
+        <div class="ci">🎯</div>
+        <div><strong>Everything points here:</strong> θ* = argmax<sub>θ</sub> (1/N) Σᵢ log p_θ(xᵢ). Every section
+          derives and justifies one part of this formula.</div>
+      </div>
+    </section>
+  </div>
+  <div class="hdivider"></div>
+  <div class="wrap">
+    <section class="section" id="s-problem">
+      <div class="rv">
+        <div class="sec-kicker">The core problem</div>
+        <h2 class="sec-title">What machine learning is actually trying to compute</h2>
+        <p class="sec-intro">Every ML algorithm exists to answer one underlying question. Understanding it precisely is
+          the prerequisite for everything that follows.</p>
+      </div>
+      <p class="prose rv">Consider diagnosing disease from a chest X-ray. A 1000×1000 pixel image is a vector of one
+        million numbers - a single point in ℝ¹⁰⁰⁰⁰⁰⁰. The diagnosis is a label: 0 for diseased, 1 for benign. We want a
+        function f mapping any pixel vector to the correct label. The trouble: f cannot be derived from first
+        principles. Two radiologists examining the same X-ray sometimes disagree. A deterministic function is the wrong
+        model - the right one is a <strong>probability distribution</strong> P(Y|X).</p>
+      <div class="ccard rv">
+        <div class="ccard-head">
+          <div class="ccard-bar" style="background:var(--c0)"></div>
+          <div class="ccard-title">The Four Objects of Every Learning Problem</div>
+          <div class="ccard-sub">Domain, range, unknown function, and dataset</div>
+        </div>
+        <div class="ccard-2col">
+          <div class="ccard-col">
+            <div class="col-hd">What We Have</div>
+            <ul class="fl">
+              <li><strong>X (domain)</strong> - all possible inputs. X-ray: X = ℝ¹⁰⁰⁰⁰⁰⁰ - every pixel flattened to a
+                vector</li>
+              <li><strong>Y (range)</strong> - all possible outputs. Diagnosis: Y = {0 diseased, 1 benign}</li>
+              <li><strong>D = {(x₁,y₁),...,(xₙ,yₙ)}</strong> - N observed pairs. The only evidence about f we will ever
+                have</li>
+            </ul>
+          </div>
+          <div class="ccard-col">
+            <div class="col-hd">The Shift</div>
+            <ul class="fl">
+              <li><strong>f: X → Y</strong> - the unknown true mapping. Exists in nature but not derivable from physics
+              </li>
+              <li>Labels are ambiguous - replace deterministic f(x)=y with <strong>P(Y|X)</strong></li>
+              <li>Function approximation becomes <strong>distribution estimation</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="viz rv">
+        <div class="viz-lbl">The fundamental shift in thinking</div>
+        <svg viewBox="0 0 720 170" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="m0" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#0071e3" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </marker>
+          </defs>
+          <rect x="16" y="24" width="256" height="122" rx="12" fill="#fff8f0" stroke="#e8c090" stroke-width="1" />
+          <text x="144" y="56" text-anchor="middle" font-size="12" font-weight="700" fill="#9a4200"
+            font-family="-apple-system,sans-serif" letter-spacing="0.06em">DETERMINISTIC</text>
+          <text x="144" y="88" text-anchor="middle" font-size="22" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">f(x) = y</text>
+          <text x="144" y="114" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">One fixed answer. Fails with uncertainty.</text>
+          <line x1="275" y1="85" x2="360" y2="85" stroke="#0071e3" stroke-width="1.8" marker-end="url(#m0)" />
+          <rect x="278" y="68" width="80" height="34" rx="8" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="318" y="83" text-anchor="middle" font-size="12" font-weight="600" fill="#0071e3"
+            font-family="-apple-system,sans-serif">shift to</text>
+          <text x="318" y="96" text-anchor="middle" font-size="11" fill="#0071e3"
+            font-family="-apple-system,sans-serif">probabilistic</text>
+          <rect x="364" y="24" width="340" height="122" rx="12" fill="#f0faf4" stroke="#90d0a8" stroke-width="1" />
+          <text x="534" y="56" text-anchor="middle" font-size="12" font-weight="700" fill="#057a4a"
+            font-family="-apple-system,sans-serif" letter-spacing="0.06em">PROBABILISTIC</text>
+          <text x="534" y="88" text-anchor="middle" font-size="22" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">P(Y | X)</text>
+          <text x="534" y="114" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Distribution over outputs. Captures uncertainty.</text>
+        </svg>
+        <div class="viz-cap">Finding a deterministic mapping becomes estimating a conditional distribution - the
+          foundation of all probabilistic machine learning.</div>
+      </div>
+      <div class="sub-h rv first">The Strategy: Start, Observe, Refine</div>
+      <div class="pipe rv">
+        <div class="pstep">
+          <div class="pdot blue">1</div>
+          <div class="pcontent">
+            <h4>Start with an initial guess</h4>
+            <p>Choose a parametric form - a neural network with random weights, a linear model. This is your starting
+              hypothesis, almost certainly wrong, but a point in parameter space that can be moved.</p>
+          </div>
+        </div>
+        <div class="pstep">
+          <div class="pdot orange">2</div>
+          <div class="pcontent">
+            <h4>Refine using observed data D</h4>
+            <p>Each pair (xᵢ, yᵢ) provides a constraint. Adjust model parameters so the distribution places high
+              probability on correct outputs. Every gradient descent step is one refinement. This is training.</p>
+          </div>
+        </div>
+        <div class="pstep">
+          <div class="pdot green">3</div>
+          <div class="pcontent">
+            <h4>Deploy on new inputs</h4>
+            <p>The model should generalise - give good predictions on inputs not seen during training. If it only
+              memorised D, it will fail on new data. This is the generalisation problem that statistical learning theory
+              studies.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="hdivider"></div>
+  <div class="wrap">
+    <section class="section" id="s-prob">
+      <div class="rv">
+        <div class="sec-kicker">Probability theory</div>
+        <h2 class="sec-title">The rigorous language of uncertainty</h2>
+        <p class="sec-intro">Every probability statement rests on a carefully constructed mathematical foundation.
+          Before reasoning about uncertain functions, we need that foundation built from scratch - three objects and
+          three axioms.</p>
+      </div>
+      <div class="grid3 rv">
+        <div class="card">
+          <div class="card-bar" style="background:var(--c1)"></div>
+          <div class="card-lbl" style="color:var(--c1)">Object 1</div>
+          <div class="card-title">Ω - Sample Space</div>
+          <div class="card-body">The set of all possible outcomes. Crucially abstract - it need not be numeric. "All
+            possible patients" is a valid sample space. You define what an outcome means for your experiment.</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background:var(--c2)"></div>
+          <div class="card-lbl" style="color:var(--c2)">Object 2</div>
+          <div class="card-title">F - σ-algebra</div>
+          <div class="card-body">A collection of subsets of Ω called events. Must be closed under complements and
+            countable unions - so "not A" and "A or B" are always valid events.</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background:var(--c3)"></div>
+          <div class="card-lbl" style="color:var(--c3)">Object 3</div>
+          <div class="card-title">P - Probability Measure</div>
+          <div class="card-body">P: F → [0,1] assigns a number to each event representing its likelihood. Not any
+            function qualifies - P must satisfy three specific axioms.</div>
+        </div>
+      </div>
+      <div class="viz rv">
+        <div class="viz-lbl">The Probability Triplet and Kolmogorov's Three Axioms</div>
+        <svg viewBox="0 0 720 306" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="14" width="200" height="82" rx="10" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="120" y="46" text-anchor="middle" font-size="28" font-weight="700" fill="#0060b8"
+            font-family="-apple-system,sans-serif">Ω</text>
+          <text x="120" y="70" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Sample space</text>
+          <text x="120" y="86" text-anchor="middle" font-size="11" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">All possible outcomes</text>
+          <rect x="260" y="14" width="200" height="82" rx="10" fill="#f5f2ff" stroke="#c090f0" stroke-width="1" />
+          <text x="360" y="46" text-anchor="middle" font-size="28" font-weight="700" fill="#6929d4"
+            font-family="-apple-system,sans-serif">F</text>
+          <text x="360" y="70" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">σ-algebra (events)</text>
+          <text x="360" y="86" text-anchor="middle" font-size="11" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">Measurable subsets of Ω</text>
+          <rect x="500" y="14" width="200" height="82" rx="10" fill="#f0faf4" stroke="#90d0a8" stroke-width="1" />
+          <text x="600" y="44" text-anchor="middle" font-size="19" font-weight="700" fill="#057a4a"
+            font-family="-apple-system,sans-serif">P: F → [0,1]</text>
+          <text x="600" y="66" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Probability measure</text>
+          <text x="600" y="84" text-anchor="middle" font-size="11" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">Assigns likelihood to events</text>
+          <rect x="20" y="116" width="680" height="34" rx="8" fill="#f5f5f7" />
+          <text x="360" y="138" text-anchor="middle" font-size="13" font-weight="600" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">Kolmogorov's Three Axioms - the complete foundation of probability
+            theory</text>
+          <rect x="20" y="164" width="210" height="124" rx="10" fill="#fff8f0" stroke="#e8c090" stroke-width="1" />
+          <text x="125" y="190" text-anchor="middle" font-size="11" font-weight="700" fill="#9a4200"
+            font-family="-apple-system,sans-serif" letter-spacing="0.08em">AXIOM i · NON-NEGATIVITY</text>
+          <text x="125" y="220" text-anchor="middle" font-size="16" font-weight="600" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif" font-style="italic">P(A) ≥ 0</text>
+          <text x="125" y="246" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">for all A ∈ F</text>
+          <text x="125" y="268" text-anchor="middle" font-size="12" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">No negative probabilities</text>
+          <rect x="255" y="164" width="210" height="124" rx="10" fill="#f5f2ff" stroke="#c090f0" stroke-width="1" />
+          <text x="360" y="190" text-anchor="middle" font-size="11" font-weight="700" fill="#6929d4"
+            font-family="-apple-system,sans-serif" letter-spacing="0.08em">AXIOM ii · NORMALIZATION</text>
+          <text x="360" y="222" text-anchor="middle" font-size="14" font-weight="600" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif" font-style="italic">P(Ω)=1 · P(∅)=0</text>
+          <text x="360" y="248" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Something must happen</text>
+          <text x="360" y="270" text-anchor="middle" font-size="12" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">Total probability = 1</text>
+          <rect x="490" y="164" width="210" height="124" rx="10" fill="#f0faf4" stroke="#90d0a8" stroke-width="1" />
+          <text x="595" y="190" text-anchor="middle" font-size="11" font-weight="700" fill="#057a4a"
+            font-family="-apple-system,sans-serif" letter-spacing="0.08em">AXIOM iii · ADDITIVITY</text>
+          <text x="595" y="218" text-anchor="middle" font-size="13" font-weight="600" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif" font-style="italic">A∩B=∅ ⟹ P(A∪B)=P(A)+P(B)</text>
+          <text x="595" y="246" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Disjoint events: probs add</text>
+          <text x="595" y="268" text-anchor="middle" font-size="12" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">Basis of all calculation</text>
+        </svg>
+        <div class="viz-cap">These three axioms are all of probability theory. Every theorem - from Bayes' rule to the
+          central limit theorem - is derived solely from them. (Ω, F, P) is the complete formal specification of any
+          probabilistic setup.</div>
+      </div>
+      <div class="callout tip rv">
+        <div class="ci">💡</div>
+        <div><strong>Probability is one particular kind of measure.</strong> A measure assigns non-negative numbers to
+          subsets consistently. Length, area, volume, and counting are all measures. Probability is the special measure
+          normalised to 1, representing likelihood. This is why probability can be studied with the same rigour as
+          geometry.</div>
+      </div>
+      <div class="pquote rv">(Ω, F, P) - the complete formal specification of any probabilistic setup. Every ML system,
+        no matter how complex, rests on this triplet.</div>
+    </section>
+  </div>
+  <div class="hdivider"></div>
+  <div class="wrap">
+    <section class="section" id="s-rv">
+      <div class="rv">
+        <div class="sec-kicker">Random variables</div>
+        <h2 class="sec-title">From abstract outcomes to numbers</h2>
+        <p class="sec-intro">The sample space Ω might be "all possible patients." You cannot integrate over patients or
+          compute derivatives with respect to weather states. To do mathematics, you need numbers - and the random
+          variable provides them.</p>
+      </div>
+      <p class="prose rv">Despite its name, a <strong>Random Variable</strong> is neither random nor a variable. It is a
+        completely <strong>deterministic function</strong> X: Ω → ℝ. X(Heads)=1, X(Tails)=0 - always, deterministically.
+        The randomness comes from which ω ∈ Ω occurs in the experiment, not from X itself.</p>
+      <p class="prose rv">When X maps Ω → ℝ, it transports the entire probability triplet - this is the
+        <strong>push-forward</strong>. Three things move simultaneously: Ω to ℝ, the σ-algebra F to the Borel σ-algebra
+        B (generated by intervals like (−∞, x]), and the probability measure P to a new measure P_X on ℝ called the
+        distribution of X.</p>
+      <div class="viz rv">
+        <div class="viz-lbl">The push-forward - (Ω, F, P) transported to (ℝ, B, P_X) via random variable X</div>
+        <svg viewBox="0 0 720 294" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="m2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#0071e3" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </marker>
+          </defs>
+          <rect x="10" y="12" width="215" height="270" rx="12" fill="#fff8f0" stroke="#e8c090" stroke-width="1" />
+          <text x="117" y="40" text-anchor="middle" font-size="14" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">Abstract World</text>
+          <text x="117" y="58" text-anchor="middle" font-size="12" fill="#9a9aaa"
+            font-family="-apple-system,sans-serif">(Ω, F, P)</text>
+          <rect x="26" y="74" width="182" height="54" rx="8" fill="white" stroke="#e8c090" stroke-width="1" />
+          <text x="117" y="100" text-anchor="middle" font-size="16" font-weight="700" fill="#c84b10"
+            font-family="-apple-system,sans-serif">Ω</text>
+          <text x="117" y="118" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">abstract outcomes</text>
+          <rect x="26" y="148" width="182" height="54" rx="8" fill="white" stroke="#e8c090" stroke-width="1" />
+          <text x="117" y="174" text-anchor="middle" font-size="14" font-weight="600" fill="#c84b10"
+            font-family="-apple-system,sans-serif">F (σ-algebra)</text>
+          <text x="117" y="192" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">events / subsets of Ω</text>
+          <rect x="26" y="222" width="182" height="54" rx="8" fill="white" stroke="#e8c090" stroke-width="1" />
+          <text x="117" y="246" text-anchor="middle" font-size="14" font-weight="600" fill="#c84b10"
+            font-family="-apple-system,sans-serif">P: F → [0,1]</text>
+          <text x="117" y="264" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">probability measure</text>
+          <line x1="228" y1="101" x2="374" y2="101" stroke="#0071e3" stroke-width="1.5" marker-end="url(#m2)" />
+          <text x="302" y="92" text-anchor="middle" font-size="11" fill="#0071e3"
+            font-family="-apple-system,sans-serif">Ω → ℝ via X(ω)</text>
+          <line x1="228" y1="175" x2="374" y2="175" stroke="#0071e3" stroke-width="1.5" marker-end="url(#m2)" />
+          <text x="302" y="166" text-anchor="middle" font-size="11" fill="#0071e3"
+            font-family="-apple-system,sans-serif">F → B (Borel sets)</text>
+          <line x1="228" y1="249" x2="374" y2="249" stroke="#0071e3" stroke-width="1.5" marker-end="url(#m2)" />
+          <text x="302" y="240" text-anchor="middle" font-size="11" fill="#0071e3"
+            font-family="-apple-system,sans-serif">P → P_X (distribution)</text>
+          <rect x="254" y="266" width="96" height="28" rx="13" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="302" y="284" text-anchor="middle" font-size="13" font-weight="700" fill="#0060b8"
+            font-family="-apple-system,sans-serif">R.V. X</text>
+          <rect x="494" y="12" width="215" height="270" rx="12" fill="#f0faf4" stroke="#90d0a8" stroke-width="1" />
+          <text x="601" y="40" text-anchor="middle" font-size="14" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">Real World</text>
+          <text x="601" y="58" text-anchor="middle" font-size="12" fill="#057a4a"
+            font-family="-apple-system,sans-serif">(ℝ, B, P_X) ← work here</text>
+          <rect x="510" y="74" width="182" height="54" rx="8" fill="white" stroke="#90d0a8" stroke-width="1" />
+          <text x="601" y="100" text-anchor="middle" font-size="16" font-weight="700" fill="#057a4a"
+            font-family="-apple-system,sans-serif">ℝ</text>
+          <text x="601" y="118" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">numeric values X(ω)</text>
+          <rect x="510" y="148" width="182" height="54" rx="8" fill="white" stroke="#90d0a8" stroke-width="1" />
+          <text x="601" y="174" text-anchor="middle" font-size="14" font-weight="600" fill="#057a4a"
+            font-family="-apple-system,sans-serif">B (Borel σ-algebra)</text>
+          <text x="601" y="192" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">intervals like (−∞, x]</text>
+          <rect x="510" y="222" width="182" height="54" rx="8" fill="white" stroke="#90d0a8" stroke-width="1" />
+          <text x="601" y="246" text-anchor="middle" font-size="14" font-weight="600" fill="#057a4a"
+            font-family="-apple-system,sans-serif">P_X: distribution</text>
+          <text x="601" y="264" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">P[X⁻¹(−∞, x]]</text>
+        </svg>
+        <div class="viz-cap">The RV X simultaneously carries Ω to ℝ, F to B, and P to P_X. All ML computation happens in
+          (ℝ, B, P_X) - never in the abstract Ω.</div>
+      </div>
+      <div class="callout eg rv">
+        <div class="ci">🎯</div>
+        <div><strong>The inverse image X⁻¹(S) decoded:</strong> It is not a function inverse - it is the set of all
+          outcomes ω that X maps into S: X⁻¹(S) = {ω ∈ Ω: X(ω) ∈ S}. The CDF formula P_X(x) = P[X⁻¹(−∞, x]] pulls (−∞,
+          x] back through X into Ω, then P measures that set. For a fair coin with X(H)=1, X(T)=0: P_X(0.5) = P({ω: X(ω)
+          ≤ 0.5}) = P({T}) = 0.5 ✓</div>
+      </div>
+      <div class="viz rv">
+        <div class="viz-lbl">Inverse image: collecting all ω that X maps into target set S</div>
+        <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="m3f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#057a4a" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </marker>
+            <marker id="m3r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#9a4200" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </marker>
+          </defs>
+          <rect x="18" y="16" width="250" height="190" rx="12" fill="#f5f2ff" stroke="#c090f0" stroke-width="1" />
+          <text x="143" y="44" text-anchor="middle" font-size="14" font-weight="700" fill="#6929d4"
+            font-family="-apple-system,sans-serif">Ω (sample space)</text>
+          <circle cx="76" cy="104" r="22" fill="#ede9fe" stroke="#c090f0" stroke-width="1" /><text x="76" y="109"
+            text-anchor="middle" font-size="13" font-weight="600" fill="#6929d4"
+            font-family="-apple-system,sans-serif">ω₁</text>
+          <circle cx="150" cy="86" r="22" fill="#ede9fe" stroke="#c090f0" stroke-width="1" /><text x="150" y="91"
+            text-anchor="middle" font-size="13" font-weight="600" fill="#6929d4"
+            font-family="-apple-system,sans-serif">ω₂</text>
+          <circle cx="220" cy="110" r="22" fill="#ede9fe" stroke="#c090f0" stroke-width="1" /><text x="220" y="115"
+            text-anchor="middle" font-size="13" font-weight="600" fill="#6929d4"
+            font-family="-apple-system,sans-serif">ω₃</text>
+          <circle cx="98" cy="160" r="22" fill="#ede9fe" stroke="#c090f0" stroke-width="1" /><text x="98" y="165"
+            text-anchor="middle" font-size="13" font-weight="600" fill="#6929d4"
+            font-family="-apple-system,sans-serif">ω₄</text>
+          <circle cx="192" cy="158" r="22" fill="#ede9fe" stroke="#c090f0" stroke-width="1" /><text x="192" y="163"
+            text-anchor="middle" font-size="13" font-weight="600" fill="#6929d4"
+            font-family="-apple-system,sans-serif">ω₅</text>
+          <line x1="98" y1="99" x2="356" y2="99" stroke="#057a4a" stroke-width="1.1" marker-end="url(#m3f)" />
+          <line x1="172" y1="83" x2="356" y2="120" stroke="#057a4a" stroke-width="1.1" marker-end="url(#m3f)" />
+          <line x1="242" y1="106" x2="356" y2="145" stroke="#057a4a" stroke-width="1.1" marker-end="url(#m3f)" />
+          <line x1="120" y1="155" x2="356" y2="168" stroke="#057a4a" stroke-width="1.1" marker-end="url(#m3f)" />
+          <line x1="214" y1="154" x2="356" y2="190" stroke="#057a4a" stroke-width="1.1" marker-end="url(#m3f)" />
+          <text x="274" y="66" text-anchor="middle" font-size="13" font-weight="600" fill="#057a4a"
+            font-family="-apple-system,sans-serif">X(ω) →</text>
+          <rect x="358" y="16" width="344" height="190" rx="12" fill="#f0faf4" stroke="#90d0a8" stroke-width="1" />
+          <text x="530" y="44" text-anchor="middle" font-size="14" font-weight="700" fill="#057a4a"
+            font-family="-apple-system,sans-serif">ℝ (real line)</text>
+          <line x1="376" y1="204" x2="688" y2="204" stroke="#d2d2d7" stroke-width="1" />
+          <circle cx="410" cy="99" r="9" fill="#f0faf4" stroke="#057a4a" stroke-width="1.5" /><text x="410" y="104"
+            text-anchor="middle" font-size="12" fill="#057a4a" font-family="-apple-system,sans-serif">0</text><text
+            x="410" y="212" text-anchor="middle" font-size="11" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">0</text>
+          <circle cx="480" cy="122" r="9" fill="#f0faf4" stroke="#057a4a" stroke-width="1.5" /><text x="480" y="127"
+            text-anchor="middle" font-size="12" fill="#057a4a" font-family="-apple-system,sans-serif">1</text><text
+            x="480" y="212" text-anchor="middle" font-size="11" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">1</text>
+          <circle cx="550" cy="147" r="9" fill="#f0faf4" stroke="#057a4a" stroke-width="1.5" /><text x="550" y="152"
+            text-anchor="middle" font-size="12" fill="#057a4a" font-family="-apple-system,sans-serif">2</text><text
+            x="550" y="212" text-anchor="middle" font-size="11" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">2</text>
+          <circle cx="620" cy="170" r="9" fill="#f0faf4" stroke="#057a4a" stroke-width="1.5" /><text x="620" y="175"
+            text-anchor="middle" font-size="12" fill="#057a4a" font-family="-apple-system,sans-serif">3</text><text
+            x="620" y="212" text-anchor="middle" font-size="11" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">3</text>
+          <rect x="466" y="102" width="100" height="62" rx="6" fill="rgba(154,66,0,.08)" stroke="#9a4200"
+            stroke-dasharray="5,3" stroke-width="1.3" />
+          <text x="516" y="88" text-anchor="middle" font-size="12" font-weight="700" fill="#9a4200"
+            font-family="-apple-system,sans-serif">S = [1, 2]</text>
+          <path d="M 468 176 L 306 176 L 306 190 L 272 190" fill="none" stroke="#9a4200" stroke-width="1.5"
+            stroke-dasharray="5,3" marker-end="url(#m3r)" />
+          <text x="378" y="192" text-anchor="middle" font-size="12" font-weight="600" fill="#9a4200"
+            font-family="-apple-system,sans-serif">X⁻¹(S) = {ω₂, ω₃, ω₅} - pulled back into Ω</text>
+        </svg>
+        <div class="viz-cap">X⁻¹(S) always exists, even when X has no inverse. It collects all outcomes mapping into S,
+          then P measures that event in Ω.</div>
+      </div>
+    </section>
+  </div>
+  <div class="hdivider"></div>
+  <div class="wrap">
+    <section class="section" id="s-dist">
+      <div class="rv">
+        <div class="sec-kicker">Distributions</div>
+        <h2 class="sec-title">Joint, marginal, and conditional</h2>
+        <p class="sec-intro">In supervised learning, two random variables - X (input) and Y (label) - are defined on the
+          same Ω. Every patient ω gives both an image X(ω) and a label Y(ω). The joint distribution P_{XY} captures
+          their complete probabilistic relationship.</p>
+      </div>
+      <div class="viz rv">
+        <div class="viz-lbl">Joint distribution table - three distribution types visible at once</div>
+        <table class="ptable" style="margin:0">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Y = 0 (Diseased)</th>
+              <th>Y = 1 (Benign)</th>
+              <th style="color:var(--c4)">P_X - marginal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="p-name">X = Low brightness</span></td>
+              <td><strong>0.30</strong></td>
+              <td>0.05</td>
+              <td style="color:var(--c4);font-weight:600">0.35 (sum row)</td>
+            </tr>
+            <tr>
+              <td><span class="p-name">X = Med brightness</span></td>
+              <td>0.10</td>
+              <td><strong>0.20</strong></td>
+              <td style="color:var(--c4);font-weight:600">0.30</td>
+            </tr>
+            <tr>
+              <td><span class="p-name">X = High brightness</span></td>
+              <td>0.05</td>
+              <td><strong>0.30</strong></td>
+              <td style="color:var(--c4);font-weight:600">0.35</td>
+            </tr>
+            <tr style="border-top:1.5px solid var(--e8)">
+              <td><span class="p-name" style="color:var(--blue)">P_Y - marginal</span></td>
+              <td style="color:var(--blue);font-weight:600">0.45 (sum col)</td>
+              <td style="color:var(--blue);font-weight:600">0.55</td>
+              <td style="color:var(--d2)">1.00</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="viz-cap">Reading it: P_{XY}(low,0)=0.30. P_X(low)=0.35. Conditional P(Y=0|X=low) = 0.30/0.35 =
+          <strong>0.86</strong> - a dark X-ray is 86% likely to be disease. This conditional is exactly what a trained
+          classifier outputs.</div>
+      </div>
+      <div class="grid2 rv">
+        <div class="card">
+          <div class="card-bar" style="background:var(--c4)"></div>
+          <div class="card-lbl" style="color:var(--c4)">Marginalisation</div>
+          <div class="card-title">P_X = ∫ P_{XY} dY</div>
+          <div class="card-body">Integrate out Y. What does a typical input look like, ignoring labels? Used for:
+            anomaly detection (flag low P_X inputs), image generation (Diffusion, VAE, GAN), compression.</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background:var(--blue)"></div>
+          <div class="card-lbl" style="color:var(--blue)">Conditional</div>
+          <div class="card-title">P_{Y|X}(y|x) = P_{XY}/P_X</div>
+          <div class="card-body">Given input x, what is the distribution over labels? This is what supervised learning
+            approximates. The softmax output of a neural network is literally this quantity.</div>
+        </div>
+      </div>
+      <div class="callout info rv">
+        <div class="ci">ℹ</div>
+        <div><strong>The chain rule connects all three:</strong> P_{XY} = P_{Y|X} · P_X = P_{X|Y} · P_Y. This identity
+          is always exact - no assumptions required. It is the foundation of Bayes' theorem.</div>
+      </div>
+    </section>
+  </div>
+  <div class="hdivider"></div>
+  <div class="wrap">
+    <section class="section" id="s-density">
+      <div class="rv">
+        <div class="sec-kicker">Two essential ideas</div>
+        <h2 class="sec-title">The IID assumption and the density function</h2>
+        <p class="sec-intro">Two ideas are so central to statistical learning they deserve focused treatment. The IID
+          assumption is what makes learning from data mathematically valid. The density function is the tool for
+          evaluating how well a model fits data.</p>
+      </div>
+      <div class="sub-h rv first">The IID Assumption - In Full Detail</div>
+      <p class="prose rv">A dataset D = {x₁,...,xₙ} ~ i.i.d. P_x. These four letters pack in two separate and equally
+        important assumptions.</p>
+      <div class="ccard rv">
+        <div class="ccard-head">
+          <div class="ccard-bar" style="background:var(--c3)"></div>
+          <div class="ccard-title">Independent and Identically Distributed</div>
+          <div class="ccard-sub">Two distinct conditions - each doing a different and essential job</div>
+        </div>
+        <div class="ccard-2col">
+          <div class="ccard-col">
+            <div class="col-hd">i.d. - Identically Distributed</div>
+            <ul class="fl">
+              <li>Every data point xᵢ is drawn from the <strong>same</strong> distribution P_x</li>
+              <li>Patient 1 and Patient 1000 come from the same population - same disease prevalence, same imaging
+                equipment</li>
+              <li>This is why training on past data generalises to future data: they come from the same P_x</li>
+              <li>When this breaks: <strong>distribution shift</strong>. Training on hospital A, deploying at hospital B
+                with different equipment. The i.d. assumption fails and performance degrades</li>
+            </ul>
+          </div>
+          <div class="ccard-col">
+            <div class="col-hd">i. - Independent</div>
+            <ul class="fl">
+              <li>Knowing xᵢ tells you <strong>absolutely nothing</strong> about xⱼ for j ≠ i</li>
+              <li>Formally: P(x₁,...,xₙ) = P(x₁) · P(x₂) · ··· · P(xₙ)</li>
+              <li>This factorisation means log-likelihood is a <strong>sum</strong>: log ∏ p(xᵢ) = Σ log p(xᵢ)</li>
+              <li>Without independence, P(x₁,...,xₙ) is one intractable joint object. Independence decomposes it into
+                individually manageable terms - this is what makes MLE tractable</li>
+            </ul>
+          </div>
+        </div>
+        <div class="note">
+          <span class="note-lbl">⚠ Critical: IID applies across datapoints, not across dimensions within one
+            datapoint</span>
+          Patient 3's X-ray is independent of Patient 7's X-ray - this is the IID assumption. But Pixel (100,100) and
+          Pixel (101,100) of the <em>same</em> X-ray are deeply correlated - nearby pixels have similar intensities,
+          edges create coherent spatial patterns. The IID assumption says nothing about this within-image structure.
+          That structure is captured by P_x itself, and it is precisely what convolutional networks learn to exploit.
+        </div>
+      </div>
+      <div class="callout warn rv">
+        <div class="ci">⚠</div>
+        <div><strong>When IID fails - time series.</strong> Sequential data violates independence: xₜ depends on xₜ₋₁.
+          The replacements are <strong>stationarity</strong> (distribution doesn't drift over time - replacing
+          "identically distributed"), <strong>Markov property</strong> P(xₜ|past) = P(xₜ|last k steps) (replacing
+          independence with bounded dependence), and the <strong>Ergodic theorem</strong> - the time-series analogue of
+          the WLLN. Models: RNNs, LSTMs, Transformers.</div>
+      </div>
+      <div class="sub-h rv">The Distribution Function vs The Density Function</div>
+      <p class="prose rv">There are two ways to describe the distribution of a continuous random variable. They carry
+        the same information - one determines the other - but represent fundamentally different things. This distinction
+        matters for everything that follows.</p>
+      <div class="viz rv">
+        <div class="viz-lbl">CDF vs PDF - two different mathematical objects describing the same distribution</div>
+        <svg viewBox="0 0 720 264" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="12" width="334" height="240" rx="12" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="179" y="40" text-anchor="middle" font-size="14" font-weight="700" fill="#0060b8"
+            font-family="-apple-system,sans-serif">CDF - Distribution Function F_X(x)</text>
+          <text x="179" y="58" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">F_X(x) = P(X ≤ x) · always in [0,1] · all RVs</text>
+          <line x1="50" y1="216" x2="50" y2="82" stroke="#c0d0e8" stroke-width="1" />
+          <line x1="50" y1="216" x2="320" y2="216" stroke="#c0d0e8" stroke-width="1" />
+          <path
+            d="M50,214 C68,213 98,210 126,200 C150,189 160,168 178,150 C196,133 216,119 244,109 C264,103 294,101 320,101"
+            fill="none" stroke="#0071e3" stroke-width="2.5" />
+          <text x="42" y="105" text-anchor="end" font-size="11" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">1</text>
+          <text x="42" y="218" text-anchor="end" font-size="11" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">0</text>
+          <text x="184" y="234" text-anchor="middle" font-size="11" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">x</text>
+          <text x="179" y="250" text-anchor="middle" font-size="12" fill="#0060b8"
+            font-family="-apple-system,sans-serif" font-weight="500">IS a probability. Always between 0 and 1.</text>
+          <rect x="374" y="12" width="334" height="240" rx="12" fill="#fffbeb" stroke="#e8c890" stroke-width="1" />
+          <text x="541" y="40" text-anchor="middle" font-size="14" font-weight="700" fill="#9a4200"
+            font-family="-apple-system,sans-serif">PDF - Density Function p_x(x)</text>
+          <text x="541" y="58" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">p_x(x) = dF_X/dx · can exceed 1 · continuous RVs only</text>
+          <line x1="410" y1="216" x2="410" y2="82" stroke="#d8c8a8" stroke-width="1" />
+          <line x1="410" y1="216" x2="692" y2="216" stroke="#d8c8a8" stroke-width="1" />
+          <path
+            d="M410,215 C428,215 448,213 468,206 C488,196 498,176 516,154 C528,138 540,128 554,128 C568,128 580,138 592,154 C610,176 620,196 640,206 C658,213 678,215 692,215"
+            fill="none" stroke="#b45309" stroke-width="2.5" />
+          <path
+            d="M498,176 C508,158 518,143 536,132 C544,129 552,128 554,128 C556,128 562,129 568,132 L568,216 L498,216 Z"
+            fill="rgba(180,83,9,.12)" stroke="none" />
+          <text x="498" y="230" text-anchor="middle" font-size="11" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">a</text>
+          <text x="568" y="230" text-anchor="middle" font-size="11" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">b</text>
+          <line x1="498" y1="216" x2="498" y2="176" stroke="#9a4200" stroke-width="1" stroke-dasharray="3,2" />
+          <line x1="568" y1="216" x2="568" y2="132" stroke="#9a4200" stroke-width="1" stroke-dasharray="3,2" />
+          <text x="530" y="204" text-anchor="middle" font-size="12" fill="#9a4200"
+            font-family="-apple-system,sans-serif">∫ₐᵇ p dx</text>
+          <text x="541" y="250" text-anchor="middle" font-size="12" fill="#9a4200"
+            font-family="-apple-system,sans-serif" font-weight="500">NOT a probability at a point. Integrate for
+            probability.</text>
+          <text x="356" y="148" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">d/dx ⇄ ∫dx</text>
+        </svg>
+        <div class="viz-cap">The shaded area ∫ₐᵇ p_x(t) dt = P(a ≤ X ≤ b) is the probability - integrating the density
+          over an interval gives a probability. The density itself at a point is not.</div>
+      </div>
+      <p class="prose rv">The critical point: <strong>for a continuous random variable, the probability of any single
+          exact value is zero</strong>. P(X = x) = 0 for any specific x. This is a mathematical consequence of having an
+        uncountable range. Probability only makes sense for intervals in the continuous case.</p>
+      <div class="ccard rv">
+        <div class="ccard-head">
+          <div class="ccard-bar" style="background:var(--c4)"></div>
+          <div class="ccard-title">What the Density Function Actually Means</div>
+          <div class="ccard-sub">Four precise ways to understand p_x(x)</div>
+        </div>
+        <div class="ccard-full">
+          <ul class="fl">
+            <li><strong>Infinitesimal probability:</strong> P(x ≤ X ≤ x+ε) ≈ p_x(x) · ε for small ε. The density times a
+              tiny interval width gives a tiny probability. Shrink the interval to zero and you shrink the probability
+              to zero - never a positive probability at a single point.</li>
+            <li><strong>Integration gives probability:</strong> P(a ≤ X ≤ b) = ∫ₐᵇ p_x(t) dt. The only valid way to
+              extract a probability from a density is to integrate over an interval. The total area under the entire
+              density curve always equals exactly 1.</li>
+            <li><strong>Can exceed 1:</strong> A distribution concentrated tightly in [0, 0.1] can have density p_x(x) =
+              10 within that interval (since 0.1 × 10 = 1, the total area is still 1). There is no contradiction -
+              density is probability per unit length, not probability itself.</li>
+            <li><strong>Likelihood:</strong> Evaluating p_θ(xᵢ) for an observed data point xᵢ gives the
+              <strong>likelihood</strong> of xᵢ under model p_θ. A higher value means the model places more probability
+              mass near xᵢ - the observation is more consistent with the model. Even though this number can exceed 1, it
+              is meaningful for comparing models and forms the basis of MLE.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout key rv">
+        <div class="ci">⚡</div>
+        <div><strong>Why ML works with densities, not CDFs.</strong> The MLE objective is Σᵢ log p_θ(xᵢ) - we evaluate
+          the density at each observed data point. KL divergence is ∫ p(x) log[p(x)/q(x)] dx - written entirely in
+          densities. The CDF F_X(x) is the theoretical object giving probabilities of half-lines. The density p_x(x) is
+          the computational tool we actually differentiate and optimise over.</div>
+      </div>
+      <div class="sub-h rv">When to Estimate Which Distribution</div>
+      <div class="dtbox rv">
+        <div class="dtq">Which distribution should I model?</div>
+        <div class="dtbranch">
+          <div class="dtrow"><span class="dtarr">→</span><span><strong>P_{Y|X}</strong> - Supervised learning (most
+              common). Labels available. Classification (Y discrete) or regression (Y continuous). Neural classifiers,
+              logistic regression.</span></div>
+          <div class="dtrow"><span class="dtarr">→</span><span><strong>P_X</strong> - Unsupervised / generative. Anomaly
+              detection (flag low P_X inputs), image generation (Diffusion, VAE, GAN), density estimation.</span></div>
+          <div class="dtrow"><span class="dtarr">→</span><span><strong>P_Y</strong> - Class prior. Imbalanced dataset
+              detection, Bayesian inference P_{Y|X} ∝ P_{X|Y}·P_Y, cost-sensitive learning.</span></div>
+          <div class="dtrow"><span class="dtarr">→</span><span><strong>P_{XY}</strong> - Full joint. Missing data
+              imputation, causal inference, multi-modal generation (image+text).</span></div>
+          <div class="dtrow"><span class="dtarr">→</span><span><strong>Functions of P_X</strong> - When full density is
+              intractable. Mean E[X], variance, covariance (PCA), log-likelihood E[log p_θ(x)] - the MLE
+              objective.</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="hdivider"></div>
+  <div class="wrap">
+    <section class="section" id="s-framework">
+      <div class="rv">
+        <div class="sec-kicker">The learning framework</div>
+        <h2 class="sec-title">Four questions every algorithm must answer</h2>
+        <p class="sec-intro">With the mathematical tools in place, we can state the core problem precisely: given
+          dataset D sampled i.i.d. from unknown P_x, estimate P_x. The word "unknown" is where everything gets hard -
+          and the three-step framework below is how it is resolved.</p>
+      </div>
+      <div class="callout warn rv">
+        <div class="ci">⚠</div>
+        <div><strong>The central challenge:</strong> P_x is completely unknown. You cannot compute any expectation
+          involving P_x directly. Yet you need parameters θ* such that p_θ* ≈ P_x. The framework below makes this
+          possible.</div>
+      </div>
+      <div class="pipe rv">
+        <div class="pstep">
+          <div class="pdot blue">i</div>
+          <div class="pcontent">
+            <h4>Model Choice - Assume a parametric family {p_θ : θ ∈ Θ}</h4>
+            <p>P_x is an infinite-dimensional object. Restrict to a parametric family indexed by a finite vector θ. Each
+              choice of θ gives one specific distribution.</p>
+            <ul>
+              <li><strong>Gaussian:</strong> <code>p_θ(x) = N(x;μ,Σ)</code>, θ={μ,Σ} - tractable, unimodal only</li>
+              <li><strong>GMM:</strong> <code>Σₖ πₖ N(x;μₖ,Σₖ)</code> - universal approximator for smooth densities</li>
+              <li><strong>Neural net:</strong> learned function - most expressive, can represent virtually any P_x</li>
+            </ul>
+          </div>
+        </div>
+        <div class="pstep">
+          <div class="pdot orange">ii</div>
+          <div class="pcontent">
+            <h4>Distance Metric - Define d(P_x, P_θ) : P_x × P_θ → ℝ⁺</h4>
+            <p>Measure how far p_θ is from the true P_x. Must satisfy d ≥ 0 and d=0 iff P_θ=P_x. The choice of d
+              determines what the model learns and which algorithm results.</p>
+            <ul>
+              <li><strong>KL divergence</strong> → Maximum Likelihood Estimation</li>
+              <li><strong>Jensen-Shannon divergence</strong> → GAN training</li>
+              <li><strong>Wasserstein distance</strong> → WGAN</li>
+            </ul>
+            <p>Problem: d requires computing something involving P_x - which is unknown. The WLLN resolves this in the
+              next section.</p>
+          </div>
+        </div>
+        <div class="pstep">
+          <div class="pdot green">iii</div>
+          <div class="pcontent">
+            <h4>Optimisation - Find θ* = argmin_θ d(P_x, P_θ)</h4>
+            <p>After making d computable, minimise it over θ. For neural networks with millions of parameters: gradient
+              descent, iteratively updating θ in the direction that reduces d. This process is model training.</p>
+          </div>
+        </div>
+      </div>
+      <div class="viz rv">
+        <div class="viz-lbl">The four fundamental questions - every ML algorithm answers all four simultaneously</div>
+        <svg viewBox="0 0 720 334" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="10" width="340" height="146" rx="12" fill="#fff8f0" stroke="#e8c090" stroke-width="1" />
+          <text x="180" y="36" text-anchor="middle" font-size="11" font-weight="700" fill="#c84b10"
+            font-family="-apple-system,sans-serif" letter-spacing="0.08em">QUESTION A · STATISTICAL</text>
+          <text x="180" y="60" text-anchor="middle" font-size="15" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">How to compute d(P_x, P_θ)</text>
+          <text x="180" y="80" text-anchor="middle" font-size="15" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">without knowing P_x?</text>
+          <text x="180" y="104" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">P_x unknown → WLLN replaces expectations</text>
+          <text x="180" y="122" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">KL → MLE · JS → GAN · Wasserstein → WGAN</text>
+          <text x="180" y="144" text-anchor="middle" font-size="11" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">Different d → different algorithm</text>
+          <rect x="370" y="10" width="340" height="146" rx="12" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="540" y="36" text-anchor="middle" font-size="11" font-weight="700" fill="#0060b8"
+            font-family="-apple-system,sans-serif" letter-spacing="0.08em">QUESTION B · OPTIMISATION</text>
+          <text x="540" y="60" text-anchor="middle" font-size="15" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">How to solve the</text>
+          <text x="540" y="80" text-anchor="middle" font-size="15" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">optimisation problem?</text>
+          <text x="540" y="104" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">θ ∈ ℝᴹ for millions of parameters</text>
+          <text x="540" y="122" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">SGD · Adam · RMSProp</text>
+          <text x="540" y="144" text-anchor="middle" font-size="11" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">Every training step = one gradient update</text>
+          <rect x="10" y="176" width="340" height="148" rx="12" fill="#f5f2ff" stroke="#c090f0" stroke-width="1" />
+          <text x="180" y="202" text-anchor="middle" font-size="11" font-weight="700" fill="#6929d4"
+            font-family="-apple-system,sans-serif" letter-spacing="0.08em">QUESTION C · MODEL SELECTION</text>
+          <text x="180" y="226" text-anchor="middle" font-size="15" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">What parametric family</text>
+          <text x="180" y="246" text-anchor="middle" font-size="15" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">to use for P_θ?</text>
+          <text x="180" y="270" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Gaussian · GMM · Normalizing Flows</text>
+          <text x="180" y="288" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">VAE · GAN · Diffusion Models</text>
+          <text x="180" y="318" text-anchor="middle" font-size="11" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">Expressiveness vs tractability tradeoff</text>
+          <rect x="370" y="176" width="340" height="148" rx="12" fill="#f0faf4" stroke="#90d0a8" stroke-width="1" />
+          <text x="540" y="202" text-anchor="middle" font-size="11" font-weight="700" fill="#057a4a"
+            font-family="-apple-system,sans-serif" letter-spacing="0.08em">QUESTION D · GENERATION</text>
+          <text x="540" y="226" text-anchor="middle" font-size="15" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">How to sample</text>
+          <text x="540" y="246" text-anchor="middle" font-size="15" font-weight="700" fill="#1d1d1f"
+            font-family="-apple-system,sans-serif">from P_θ*?</text>
+          <text x="540" y="270" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">MCMC · Ancestral sampling</text>
+          <text x="540" y="288" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">GAN: z~N(0,I) → G_θ(z) → x</text>
+          <text x="540" y="306" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Diffusion: iterative denoising</text>
+          <text x="540" y="322" text-anchor="middle" font-size="11" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">GANs sample without computing density</text>
+        </svg>
+        <div class="viz-cap">MLE = {any p_θ} + {KL divergence} + {gradient descent}. GAN = {implicit neural net} + {JS
+          divergence} + {alternating gradient descent}. Every ML algorithm is a consistent set of answers to all four.
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="hdivider"></div>
+  <div class="wrap">
+    <section class="section" id="s-kl">
+      <div class="rv">
+        <div class="sec-kicker">KL divergence and maximum likelihood</div>
+        <h2 class="sec-title">From information theory to the master equation</h2>
+        <p class="sec-intro">We start with a question from information theory - how much information does an event
+          carry? - and six connected steps later, we arrive at the training objective used by virtually every ML
+          algorithm ever built.</p>
+      </div>
+      <div class="sub-h rv first">Step 1 - Information Content</div>
+      <p class="prose rv">Define I(A) = −log P(A). This formula is uniquely determined by three requirements: certain
+        events carry zero information; rarer events carry more; information from two independent events adds. The
+        negative log is the only function satisfying all three.</p>
+      <div class="viz rv">
+        <div class="viz-lbl">Three requirements uniquely determining I(A) = −log P(A)</div>
+        <svg viewBox="0 0 720 190" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="12" width="220" height="90" rx="10" fill="#f0faf4" stroke="#90d0a8" stroke-width="1" />
+          <text x="122" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="#057a4a"
+            font-family="-apple-system,sans-serif">P(A) = 1 → I = 0</text>
+          <text x="122" y="58" text-anchor="middle" font-size="14" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">"Sun rose today"</text>
+          <text x="122" y="78" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Certain → zero information ✓</text>
+          <rect x="250" y="12" width="220" height="90" rx="10" fill="#fff8f0" stroke="#e8c090" stroke-width="1" />
+          <text x="360" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="#c84b10"
+            font-family="-apple-system,sans-serif">P(A) → 0 → I → ∞</text>
+          <text x="360" y="58" text-anchor="middle" font-size="14" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">"Earthquake today"</text>
+          <text x="360" y="78" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Rare → high information ✓</text>
+          <rect x="488" y="12" width="220" height="90" rx="10" fill="#f5f2ff" stroke="#c090f0" stroke-width="1" />
+          <text x="598" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="#6929d4"
+            font-family="-apple-system,sans-serif">I(A∩B) = I(A)+I(B)</text>
+          <text x="598" y="58" text-anchor="middle" font-size="14" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Independent events</text>
+          <text x="598" y="78" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Information is additive ✓</text>
+          <rect x="12" y="118" width="696" height="60" rx="10" fill="#1d1d1f" />
+          <text x="360" y="144" text-anchor="middle" font-size="15" font-weight="700" fill="#f9e2af"
+            font-family="'JetBrains Mono',monospace">I(A) = −log P(A)</text>
+          <text x="360" y="167" text-anchor="middle" font-size="12" fill="#6a6a7a"
+            font-family="-apple-system,sans-serif">The negative log is the only function satisfying all three - a
+            theorem, not a convention</text>
+        </svg>
+      </div>
+      <div class="sub-h rv">Steps 2–4 - Entropy, Cross-Entropy, KL Divergence</div>
+      <p class="prose rv"><strong>Entropy</strong> H(P_x) = E_{P_x}[−log P(x)] = Σᵢ P(xᵢ)·(−log P(xᵢ)) is the average
+        information content - the average surprise when drawing from P_x. A flat distribution has maximum entropy (all
+        outcomes equally surprising). A peaked one has minimum entropy (one outcome dominates).</p>
+      <div class="viz rv">
+        <div class="viz-lbl">Entropy - average surprise. Low means predictable. High means uncertain.</div>
+        <svg viewBox="0 0 720 188" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="12" width="330" height="164" rx="10" fill="#fff8f0" stroke="#e8c090" stroke-width="1" />
+          <text x="177" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#c84b10"
+            font-family="-apple-system,sans-serif">Low Entropy - Peaked</text>
+          <text x="177" y="56" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">One outcome dominates - low uncertainty</text>
+          <line x1="32" y1="154" x2="324" y2="154" stroke="#d2d2d7" stroke-width="1" />
+          <rect x="48" y="136" width="32" height="18" fill="#e8c090" rx="3" />
+          <rect x="94" y="84" width="32" height="70" fill="#c84b10" rx="3" />
+          <rect x="140" y="140" width="32" height="14" fill="#e8c090" rx="3" />
+          <rect x="186" y="144" width="32" height="10" fill="#e8c090" rx="3" />
+          <rect x="232" y="148" width="32" height="6" fill="#e8c090" rx="3" />
+          <text x="177" y="178" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">H is small - high confidence</text>
+          <rect x="378" y="12" width="330" height="164" rx="10" fill="#f0faf4" stroke="#90d0a8" stroke-width="1" />
+          <text x="543" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#057a4a"
+            font-family="-apple-system,sans-serif">High Entropy - Flat</text>
+          <text x="543" y="56" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">All outcomes roughly equal - maximum uncertainty</text>
+          <line x1="398" y="154" x2="690" y2="154" stroke="#d2d2d7" stroke-width="1" />
+          <rect x="408" y="104" width="32" height="50" fill="#057a4a" rx="3" opacity="0.8" />
+          <rect x="454" y="100" width="32" height="54" fill="#057a4a" rx="3" opacity="0.8" />
+          <rect x="500" y="106" width="32" height="48" fill="#057a4a" rx="3" opacity="0.8" />
+          <rect x="546" y="102" width="32" height="52" fill="#057a4a" rx="3" opacity="0.8" />
+          <rect x="592" y="104" width="32" height="50" fill="#057a4a" rx="3" opacity="0.8" />
+          <text x="543" y="178" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">H is large - maximum uncertainty</text>
+        </svg>
+      </div>
+      <p class="prose rv"><strong>Cross-entropy</strong> H(P, Q) = E_P[−log Q(x)] measures average information when data
+        comes from P but surprise is measured using a different model Q. It always satisfies H(P,Q) ≥ H(P), with
+        equality only when Q = P. Using the wrong model always increases average surprise.</p>
+      <p class="prose rv"><strong>KL divergence</strong> is the difference: D_KL(P ‖ Q) = H(P,Q) − H(P) = E_P[log P/Q] =
+        ∫ P(x) log[P(x)/Q(x)] dx. It measures the excess surprise from using model Q when the truth is P. Three key
+        properties: D_KL ≥ 0; D_KL = 0 iff P = Q; and D_KL(P‖Q) ≠ D_KL(Q‖P) - it is asymmetric, not a true metric
+        distance.</p>
+
+      <div class="sub-h rv">Step 5 - The Weak Law of Large Numbers</div>
+      <p class="prose rv">We want to minimise D_KL(P_x ‖ P_θ) over θ. Expanding the KL gives D_KL = −H(P_x) −
+        E_{P_x}[log p_θ(x)]. The first term is constant in θ and drops out. What remains is −E_{P_x}[log p_θ(x)] - an
+        expectation under the <em>unknown</em> P_x. We cannot compute this integral directly.</p>
+      <p class="prose rv">The <strong>Weak Law of Large Numbers (WLLN)</strong> resolves this. Its role is precise: it
+        does not solve the integral - it provides a substitution that makes the intractable tractable. If x₁,...,xₙ are
+        drawn i.i.d. from P_x, then for any measurable function g with finite expectation:</p>
+      <div class="viz rv">
+        <div class="viz-lbl">WLLN: replacing an intractable expectation with a computable sample average</div>
+        <svg viewBox="0 0 720 178" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="12" width="340" height="154" rx="12" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="182" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#0060b8"
+            font-family="-apple-system,sans-serif">Intractable (P_x unknown)</text>
+          <text x="182" y="70" text-anchor="middle" font-size="18" fill="#1d1d1f"
+            font-family="'JetBrains Mono',monospace">E_{P_x}[ g(x) ]</text>
+          <text x="182" y="100" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">= ∫ g(x) P_x(x) dx</text>
+          <text x="182" y="122" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Requires knowing P_x - impossible</text>
+          <text x="182" y="144" text-anchor="middle" font-size="11" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">One integral over an unknown distribution</text>
+          <text x="360" y="86" text-anchor="middle" font-size="24" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">≈</text>
+          <text x="360" y="108" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">WLLN, N→∞</text>
+          <rect x="376" y="12" width="332" height="154" rx="12" fill="#f0faf4" stroke="#90d0a8" stroke-width="1" />
+          <text x="542" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#057a4a"
+            font-family="-apple-system,sans-serif">Computable (data only)</text>
+          <text x="542" y="70" text-anchor="middle" font-size="18" fill="#1d1d1f"
+            font-family="'JetBrains Mono',monospace">(1/N) Σᵢ g(xᵢ)</text>
+          <text x="542" y="100" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">xᵢ ~ i.i.d. P_x, N large</text>
+          <text x="542" y="122" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Requires only samples - the dataset D</text>
+          <text x="542" y="144" text-anchor="middle" font-size="11" fill="#b0b8c8"
+            font-family="-apple-system,sans-serif">N simple additions - completely tractable</text>
+        </svg>
+        <div class="viz-cap">WLLN: (1/N) Σᵢ g(xᵢ) →ᵖ E_{P_x}[g(x)] as N→∞, when xᵢ ~ i.i.d. P_x. The IID assumption is
+          exactly what makes this valid - it is the prerequisite, not a side condition.</div>
+      </div>
+      <p class="prose rv">Notice the essential role of IID: the WLLN requires samples drawn independently and
+        identically from P_x. If samples are not independent, the average does not converge reliably. If not identically
+        distributed, it converges to the wrong target. IID is not a convenience assumption - it is the prerequisite that
+        enables this substitution.</p>
+
+      <div class="sub-h rv">Step 6 - The Derivation: From KL to MLE</div>
+      <div class="viz rv">
+        <div class="viz-lbl">The complete chain: KL divergence minimisation → Maximum Likelihood Estimation</div>
+        <svg viewBox="0 0 720 406" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="chain" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#d2d2d7" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </marker>
+          </defs>
+          <rect x="12" y="12" width="696" height="72" rx="10" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="196" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="#0060b8"
+            font-family="-apple-system,sans-serif" letter-spacing="0.1em">STEP 1 · EXPAND KL DIVERGENCE</text>
+          <text x="360" y="62" text-anchor="middle" font-size="14" fill="#1d1d1f"
+            font-family="'JetBrains Mono',monospace">D_KL(P_x ‖ P_θ) = ∫P_x log P_x dv − ∫P_x log P_θ dv</text>
+          <text x="560" y="78" text-anchor="middle" font-size="11" fill="#9a9aaa"
+            font-family="-apple-system,sans-serif">−H(P_x) constant in θ −H(P_x, P_θ) depends on θ</text>
+          <line x1="360" y1="86" x2="360" y2="106" stroke="#d2d2d7" stroke-width="1.5" marker-end="url(#chain)" />
+          <rect x="12" y="108" width="696" height="64" rx="10" fill="#f5f2ff" stroke="#c090f0" stroke-width="1" />
+          <text x="200" y="132" text-anchor="middle" font-size="11" font-weight="700" fill="#6929d4"
+            font-family="-apple-system,sans-serif" letter-spacing="0.1em">STEP 2 · DROP CONSTANT (−H(P_x) has no
+            θ)</text>
+          <text x="360" y="156" text-anchor="middle" font-size="14" fill="#1d1d1f"
+            font-family="'JetBrains Mono',monospace">θ* = argmin_θ −E_{Px}[log p_θ(x)]</text>
+          <text x="554" y="168" text-anchor="middle" font-size="11" fill="#c0c0d0"
+            font-family="-apple-system,sans-serif">↑ still contains P_x - unknown!</text>
+          <line x1="360" y1="174" x2="360" y2="194" stroke="#d2d2d7" stroke-width="1.5" marker-end="url(#chain)" />
+          <rect x="12" y="196" width="696" height="92" rx="10" fill="#fff8f0" stroke="#e8c090" stroke-width="1.5" />
+          <rect x="12" y="196" width="4" height="92" rx="2" fill="#c84b10" />
+          <text x="214" y="222" text-anchor="middle" font-size="11" font-weight="700" fill="#c84b10"
+            font-family="-apple-system,sans-serif" letter-spacing="0.1em">STEP 3 · APPLY WEAK LAW OF LARGE
+            NUMBERS</text>
+          <text x="360" y="248" text-anchor="middle" font-size="13" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">WLLN: (1/N) Σᵢ g(xᵢ) → E_{Px}[g(x)] as N→∞, xᵢ ~ i.i.d. P_x</text>
+          <text x="360" y="270" text-anchor="middle" font-size="14" fill="#1d1d1f"
+            font-family="'JetBrains Mono',monospace">E_{Px}[log p_θ(x)] ≈ (1/N) Σᵢ log p_θ(xᵢ)</text>
+          <text x="504" y="282" text-anchor="middle" font-size="12" font-weight="600" fill="#c84b10"
+            font-family="-apple-system,sans-serif">↑ P_x gone - only data D and model remain</text>
+          <line x1="360" y1="290" x2="360" y2="310" stroke="#d2d2d7" stroke-width="1.5" marker-end="url(#chain)" />
+          <rect x="12" y="312" width="696" height="82" rx="10" fill="#1d1d1f" />
+          <text x="220" y="338" text-anchor="middle" font-size="11" font-weight="700" fill="#f9e2af"
+            font-family="-apple-system,sans-serif" letter-spacing="0.1em">RESULT · MAXIMUM LIKELIHOOD ESTIMATION</text>
+          <text x="360" y="366" text-anchor="middle" font-size="16" font-weight="700" fill="#a6e3a1"
+            font-family="'JetBrains Mono',monospace">θ* = argmax_θ (1/N) Σᵢ log p_θ(xᵢ)</text>
+          <text x="360" y="388" text-anchor="middle" font-size="12" fill="#6a6a7a"
+            font-family="-apple-system,sans-serif">MLE is not an arbitrary heuristic - it IS minimising KL divergence,
+            made tractable by WLLN</text>
+        </svg>
+      </div>
+      <div class="sub-h rv">Joint Likelihood - Why IID Makes It a Sum</div>
+      <div class="codewin rv">
+        <div class="codebar"><span class="cdot cr"></span><span class="cdot cy"></span><span
+            class="cdot cg"></span><span class="codefn">joint_likelihood_to_mle.math</span></div>
+        <div class="codepre"><span class="sec">// IID → independence → joint probability factorises into a
+            product</span>
+          <span class="hl">ℓ_θ(D)</span> = P_θ(x₁, x₂, ..., xₙ)
+          = P_θ(x₁) · P_θ(x₂) · ... · P_θ(xₙ) <span class="cm">// because i.i.d.</span>
+          = ∏ᵢ₌₁ᴺ p_θ(xᵢ)
+
+          <span class="cm">// Problem: product of N numbers each &lt; 1 causes numerical underflow</span>
+          <span class="cm">// 0.9^1000 ≈ 10⁻⁴⁶ - computers round this to zero</span>
+          <span class="cm">// Solution: take the log. Log is monotone → same argmax. Product → sum.</span>
+
+          <span class="hl">l̃_θ(D)</span> = Σᵢ₌₁ᴺ log p_θ(xᵢ) <span class="cm">// log-likelihood - numerically
+            stable</span>
+
+          <span class="hl">θ*</span> = argmax_θ (1/N) l̃_θ(D) <span class="cm">// (1/N) makes scale
+            dataset-size-independent</span>
+          = argmax_θ (1/N) Σᵢ log p_θ(xᵢ) <span class="cm">← THE MASTER EQUATION</span>
+
+          <span class="sec">// ── Coin example: 7 heads, 3 tails, model: p_θ(heads) = θ ────────────</span>
+          ℓ_θ(D) = θ⁷ · (1−θ)³ <span class="cm">// joint likelihood (product)</span>
+          l̃_θ(D) = 7·log(θ) + 3·log(1−θ) <span class="cm">// log-likelihood (sum)</span>
+          dl̃/dθ = 7/θ − 3/(1−θ) = 0 → <span class="gr">θ* = 7/10 = 0.7</span> <span class="cm">// fraction of heads
+            ✓</span>
+        </div>
+      </div>
+
+      <div class="sub-h rv">The Complete Picture - Every Concept Connected</div>
+      <div class="viz rv">
+        <div class="viz-lbl">From abstract sample space to the master equation - every concept in one chain</div>
+        <svg viewBox="0 0 720 288" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="c1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#d2d2d7" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </marker>
+            <marker id="c2g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#e8c890" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </marker>
+            <marker id="c2b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#90c0f8" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </marker>
+          </defs>
+          <!-- Main chain -->
+          <rect x="8" y="110" width="96" height="58" rx="8" fill="#f5f2ff" stroke="#c090f0" stroke-width="1" />
+          <text x="56" y="134" text-anchor="middle" font-size="12" font-weight="600" fill="#6929d4"
+            font-family="-apple-system,sans-serif">Sample</text>
+          <text x="56" y="150" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Space Ω</text>
+          <line x1="105" y1="139" x2="141" y2="139" stroke="#d2d2d7" stroke-width="1.5" marker-end="url(#c1)" />
+          <text x="123" y="130" text-anchor="middle" font-size="10" fill="#b0b0b8"
+            font-family="-apple-system,sans-serif">RV X</text>
+          <rect x="143" y="110" width="96" height="58" rx="8" fill="#f0faf4" stroke="#90d0a8" stroke-width="1" />
+          <text x="191" y="134" text-anchor="middle" font-size="12" font-weight="600" fill="#057a4a"
+            font-family="-apple-system,sans-serif">Real line</text>
+          <text x="191" y="150" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">ℝ, B, P_X</text>
+          <line x1="240" y1="139" x2="276" y2="139" stroke="#d2d2d7" stroke-width="1.5" marker-end="url(#c1)" />
+          <text x="258" y="130" text-anchor="middle" font-size="10" fill="#b0b0b8"
+            font-family="-apple-system,sans-serif">sample</text>
+          <rect x="278" y="110" width="96" height="58" rx="8" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="326" y="134" text-anchor="middle" font-size="12" font-weight="600" fill="#0060b8"
+            font-family="-apple-system,sans-serif">Dataset D</text>
+          <text x="326" y="150" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">i.i.d. P_x</text>
+          <line x1="375" y1="139" x2="411" y2="139" stroke="#d2d2d7" stroke-width="1.5" marker-end="url(#c1)" />
+          <text x="393" y="130" text-anchor="middle" font-size="10" fill="#b0b0b8"
+            font-family="-apple-system,sans-serif">KL+WLLN</text>
+          <rect x="413" y="110" width="116" height="58" rx="8" fill="#fffbeb" stroke="#e8c890" stroke-width="1" />
+          <text x="471" y="132" text-anchor="middle" font-size="12" font-weight="600" fill="#9a4200"
+            font-family="-apple-system,sans-serif">MLE Objective</text>
+          <text x="471" y="150" text-anchor="middle" font-size="12" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">Σ log p_θ(xᵢ)</text>
+          <line x1="530" y1="139" x2="566" y2="139" stroke="#d2d2d7" stroke-width="1.5" marker-end="url(#c1)" />
+          <text x="548" y="130" text-anchor="middle" font-size="10" fill="#b0b0b8"
+            font-family="-apple-system,sans-serif">argmax</text>
+          <rect x="568" y="110" width="144" height="58" rx="8" fill="#1d1d1f" />
+          <text x="640" y="132" text-anchor="middle" font-size="12" font-weight="600" fill="#f9e2af"
+            font-family="-apple-system,sans-serif">θ* - Trained</text>
+          <text x="640" y="150" text-anchor="middle" font-size="12" fill="#6a6a7a"
+            font-family="-apple-system,sans-serif">p_θ* ≈ P_x</text>
+          <!-- Top labels -->
+          <rect x="143" y="32" width="96" height="46" rx="8" fill="#fffbeb" stroke="#e8c890" stroke-width="1" />
+          <text x="191" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#9a4200"
+            font-family="-apple-system,sans-serif">Prob. triplet</text>
+          <text x="191" y="66" text-anchor="middle" font-size="10" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">(Ω, F, P)</text>
+          <line x1="191" y1="79" x2="191" y2="108" stroke="#e8c890" stroke-width="1.2" stroke-dasharray="4,3"
+            marker-end="url(#c2g)" />
+          <rect x="278" y="32" width="96" height="46" rx="8" fill="#fffbeb" stroke="#e8c890" stroke-width="1" />
+          <text x="326" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#9a4200"
+            font-family="-apple-system,sans-serif">IID</text>
+          <text x="326" y="66" text-anchor="middle" font-size="10" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">assumption</text>
+          <line x1="326" y1="79" x2="326" y2="108" stroke="#e8c890" stroke-width="1.2" stroke-dasharray="4,3"
+            marker-end="url(#c2g)" />
+          <!-- Bottom labels -->
+          <rect x="143" y="192" width="96" height="46" rx="8" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="191" y="210" text-anchor="middle" font-size="11" font-weight="600" fill="#0060b8"
+            font-family="-apple-system,sans-serif">Entropy</text>
+          <text x="191" y="226" text-anchor="middle" font-size="10" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">H(P_x)</text>
+          <line x1="191" y1="192" x2="191" y2="170" stroke="#90c0f8" stroke-width="1.2" stroke-dasharray="4,3"
+            marker-end="url(#c2b)" />
+          <rect x="262" y="192" width="116" height="46" rx="8" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="320" y="210" text-anchor="middle" font-size="11" font-weight="600" fill="#0060b8"
+            font-family="-apple-system,sans-serif">Cross-Entropy</text>
+          <text x="320" y="226" text-anchor="middle" font-size="10" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">H(P_x, P_θ)</text>
+          <line x1="320" y1="192" x2="380" y2="170" stroke="#90c0f8" stroke-width="1.2" stroke-dasharray="4,3"
+            marker-end="url(#c2b)" />
+          <rect x="396" y="192" width="108" height="46" rx="8" fill="#f0f6ff" stroke="#90c0f8" stroke-width="1" />
+          <text x="450" y="210" text-anchor="middle" font-size="11" font-weight="600" fill="#0060b8"
+            font-family="-apple-system,sans-serif">KL Divergence</text>
+          <text x="450" y="226" text-anchor="middle" font-size="10" fill="#6e6e73"
+            font-family="-apple-system,sans-serif">H(P,Q)−H(P)</text>
+          <line x1="450" y1="192" x2="450" y2="170" stroke="#90c0f8" stroke-width="1.2" stroke-dasharray="4,3"
+            marker-end="url(#c2b)" />
+          <!-- WLLN -->
+          <rect x="262" y="252" width="158" height="30" rx="8" fill="#fffbeb" stroke="#e8c890" stroke-width="1" />
+          <text x="341" y="271" text-anchor="middle" font-size="11" font-weight="600" fill="#9a4200"
+            font-family="-apple-system,sans-serif">WLLN - makes P_x disappear</text>
+          <line x1="341" y1="252" x2="418" y2="170" stroke="#e8c890" stroke-width="1.2" stroke-dasharray="4,3"
+            marker-end="url(#c2g)" />
+        </svg>
+        <div class="viz-cap">Every concept connects into one chain ending at the MLE objective. The Probability Triplet,
+          IID, information theory, and WLLN each contribute one essential piece.</div>
+      </div>
+      <div class="pquote rv">"MLE is not an arbitrary recipe. It is what you get when you choose KL divergence as your
+        distance metric and apply the Weak Law of Large Numbers to replace the intractable expectation with a sample
+        average over your data."</div>
+    </section>
+  </div>
+  <div class="hdivider"></div>
+  <div class="wrap">
+    <section class="section">
+      <div class="rv">
+        <div class="sec-kicker">Quick reference</div>
+        <h2 class="sec-title">All formulas in one place</h2>
+      </div>
+      <div class="codewin rv">
+        <div class="codebar"><span class="cdot cr"></span><span class="cdot cy"></span><span
+            class="cdot cg"></span><span class="codefn">ml_foundations_reference.math</span></div>
+        <div class="codepre"><span class="sec">// ── PROBABILITY TRIPLET
+            ──────────────────────────────────────────────</span>
+          (Ω, F, P) P: F → [0,1]
+          Axiom i: P(A) ≥ 0 for all A ∈ F
+          Axiom ii: P(Ω) = 1 · P(∅) = 0
+          Axiom iii: A∩B=∅ → P(A∪B) = P(A) + P(B)
+
+          <span class="sec">// ── RANDOM VARIABLE ─────────────────────────────────────────────────</span>
+          X: Ω → ℝ (scalar) X: Ω → ℝᵈ (vector, X-ray: d=1,000,000)
+          <span class="hl">P_X(x)</span> ≜ P[ X⁻¹(−∞, x] ] ← CDF via inverse image
+          (Ω, F, P) →[RV X]→ (ℝ, B, P_X) ← work here in ML
+
+          <span class="sec">// ── DISTRIBUTIONS ───────────────────────────────────────────────────</span>
+          Joint: P_{XY}(x,y)
+          Marginals: P_X = ∫ P_{XY} dY · P_Y = ∫ P_{XY} dX
+          Conditional: P_{Y|X}(y|x) = P_{XY}(x,y) / P_X(x)
+          Chain rule: P_{XY} = P_{Y|X}·P_X = P_{X|Y}·P_Y (always exact)
+
+          <span class="sec">// ── CDF vs PDF ──────────────────────────────────────────────────────</span>
+          CDF: F_X(x) = P(X ≤ x) ∈ [0,1] IS a probability
+          PDF: p_x(x) = dF_X/dx ≥ 0 NOT a probability at a point
+          P(a ≤ X ≤ b) = ∫ₐᵇ p_x(t) dt integrate to get probability
+          P(X = exact point) = 0 (continuous RV)
+          <span class="hl">Likelihood</span> = p_θ(x) evaluated at observed x (can exceed 1)
+
+          <span class="sec">// ── INFORMATION THEORY ──────────────────────────────────────────────</span>
+          Information: I(x) = −log P(x)
+          Entropy: <span class="hl">H(P)</span> = E_P[−log P(x)] = Σ P(xᵢ)·(−log P(xᵢ))
+          Cross-entropy: <span class="hl">H(P,Q)</span> = E_P[−log Q(x)] ≥ H(P) always
+          KL divergence: <span class="hl">D_KL(P‖Q)</span> = H(P,Q) − H(P) = ∫ P(x) log[P(x)/Q(x)] dx
+          D_KL ≥ 0 · D_KL = 0 iff P=Q · D_KL(P‖Q) ≠ D_KL(Q‖P)
+
+          <span class="sec">// ── WEAK LAW OF LARGE NUMBERS ────────────────────────────────────────</span>
+          If x₁,...,xₙ ~ i.i.d. P_x: (1/N) Σᵢ g(xᵢ) →ᵖ E_{P_x}[g(x)] as N→∞
+          Replaces intractable E_{P_x}[·] with computable sample average over D
+
+          <span class="sec">// ── KL → MLE DERIVATION ─────────────────────────────────────────────</span>
+          D_KL(P_x ‖ P_θ) = −H(P_x) [constant in θ] − E_{Px}[log p_θ(x)]
+          → argmin_θ −E_{Px}[log p_θ(x)] (drop constant)
+          → argmin_θ −(1/N) Σᵢ log p_θ(xᵢ) (WLLN applied)
+          → <span class="gr">argmax_θ (1/N) Σᵢ log p_θ(xᵢ)</span> ← MLE THE MASTER EQUATION
+
+          <span class="sec">// ── JOINT LIKELIHOOD (IID) ───────────────────────────────────────────</span>
+          ℓ_θ(D) = ∏ᵢ p_θ(xᵢ) ← IID → independence → joint = product
+          l̃_θ(D) = Σᵢ log p_θ(xᵢ) ← log-likelihood (numerically stable sum)
+          θ* = argmax_θ (1/N) l̃_θ(D)
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="series-footer">
+    <div class="sf-inner">
+      <div class="sf-label">The ML Series</div>
+      <div class="sf-title">Built as a connected curriculum</div>
+      <div class="sf-desc">Each guide builds on the ones before it. Every algorithm covered in later parts rests on the
+        probabilistic foundations established here.</div>
+      <div class="sf-cards">
+        <div class="sf-card active">
+          <div class="sf-card-num">Part 1 · Current</div>
+          <div class="sf-card-title">Mathematical Foundations</div>
+          <div class="sf-card-desc">Probability, random variables, distributions, IID, density functions, KL divergence,
+            WLLN, MLE</div>
+        </div>
+        <div class="sf-card">
+          <div class="sf-card-num">Part 2 · Coming</div>
+          <div class="sf-card-title">Linear Models</div>
+          <div class="sf-card-desc">Linear regression, logistic regression, and why MLE gives the least squares solution
+          </div>
+        </div>
+        <div class="sf-card">
+          <div class="sf-card-num">Part 3 · Coming</div>
+          <div class="sf-card-title">Deep Neural Networks</div>
+          <div class="sf-card-desc">Universal approximation, backpropagation, and training dynamics through the MLE lens
+          </div>
+        </div>
+      </div>
+      <div class="sf-meta">The ML Series · Mathematical Foundations of Machine Learning</div>
+    </div>
+  </div>
+  <script>
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+    }, { threshold: 0.04, rootMargin: '0px 0px -24px 0px' });
+    document.querySelectorAll('.rv').forEach(el => io.observe(el));
+    document.querySelectorAll('.st-row, .card').forEach((el, i) => {
+      el.style.transitionDelay = (i * 0.05) + 's';
+    });
+  </script>
+</body>
+
+</html>

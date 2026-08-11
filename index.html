@@ -1,64 +1,658 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="Mysterious Owl">
-    <meta name="description" content="Mysterious Owl&#39;s Personal Website">
-    <meta name="keywords" content="blog,developer,personal">
-    <meta property="og:title" content="Mysterious Owl" />
-    <meta property="og:description" content="Mysterious Owl&#39;s Personal Website" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://mysterious-owl.github.io/about" />
 
-    <link rel="FaviconIcon" href="favicon.ico" type="image/x-icon">
-    <link rel="shortcut" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,300&family=Lato:wght@100;300&family=DotGothic16&family=Truculenta:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/stylesheet.css">
-    <title>Mysterious Owl</title>
-  </head>
-  <body>
-    <div class="header">
-      <span class="header-text">
-        <a href="https://mysterious-owl.github.io">Mysterious Owl</a>
-      </span>
-      <div id="btn-out" class="header-btn" onclick="changecolor()">
-        <div class="header-btn-out">
-          <div id="btn-in" class="header-btn-in"></div>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tanishq Gupta - Senior Data Scientist – AI</title>
+  <meta name="description"
+    content="Tanishq Gupta - Senior Data Scientist – AI with 5 years of experience across production GenAI services, multi-agent platforms, self-hosted LLMs, GRPO post-training, OCR document understanding, and scalable fraud engines.">
+  <meta name="keywords"
+    content="Data Scientist, AI Engineer, LLM, GenAI, LangChain, RAG, LoRA, GRPO, vLLM, Qwen, Machine Learning, Python, Fraud Analytics, FinTech">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Tanishq Gupta - Senior Data Scientist – AI">
+  <meta property="og:description"
+    content="5 years building production GenAI in regulated FinTech. Production LLM platforms, open-weight fine-tuning (LoRA / GRPO), OCR pipelines, and fraud analytics engines.">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon & Styles -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/stylesheet.css">
+</head>
+
+<body>
+
+  <!-- Ambient background effect & top accent stripe -->
+  <div class="ambient"></div>
+  <div class="stripe"></div>
+
+  <!-- Navigation Bar -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">
+        Tanishq Gupta
+        <span class="badge-role">Sr Data Scientist – AI</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#about-philosophy">About</a></li>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#visual-guides">Visual Guides</a></li>
+        <li><a href="#certifications">Credentials</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">🌙 Dark Mode</button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="container">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+        <span class="eyebrow" style="margin-bottom:0;">5 Years in Regulated FinTech &amp; AI Engineering</span>
+        <!-- Commented out Notice Period badge as requested -->
+        <!-- <span style="font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--green);background:rgba(48,209,88,0.12);padding:3px 10px;border-radius:999px;border:1px solid rgba(48,209,88,0.3);">⚡ Serving Notice Period</span> -->
+      </div>
+
+      <h1>
+        Senior Data Scientist – AI<br>
+        <span class="grad">Production GenAI &amp; LLMs</span>
+      </h1>
+      <p class="hero-subtitle">
+        5 years of experience across TransUnion and Bajaj Finserv Health. <em>"I've written the ETL and I've written the
+          LLM prompts. I've built the API, the database, the dashboard, and the model that consumed all three. That
+          range is deliberate."</em>
+      </p>
+
+      <div class="hero-actions">
+        <a href="#work" class="btn-primary"><i class="fa fa-code"></i> View Work</a>
+        <a href="https://drive.google.com/file/d/14sI7eSIQq5CeY8xHNlvS7CfzIJs3HSgz/view?usp=sharing" target="_blank" rel="noopener" class="btn-secondary">
+          <i class="fa fa-file-text-o"></i> Resume
+        </a>
+        <a href="https://github.com/Mysterious-Owl" target="_blank" rel="noopener" class="btn-secondary">
+          <i class="fa fa-github"></i> GitHub <i class="fa fa-external-link"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/tanishq25gupta/" target="_blank" rel="noopener" class="btn-secondary">
+          <i class="fa fa-linkedin"></i> LinkedIn <i class="fa fa-external-link"></i>
+        </a>
+        <a href="/visual_guide/index.html" class="btn-secondary"><i class="fa fa-book"></i> Visual Guides</a>
+      </div>
+
+      <!-- Key Impact Metrics -->
+      <div class="metrics-grid reveal">
+        <div class="metric-card">
+          <div class="metric-num">35%</div>
+          <div class="metric-label">Consumer Dispute Volume Reduction</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">~90%</div>
+          <div class="metric-label">Manual Handling Saved on Non-Actionable Cases</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">₹10M+</div>
+          <div class="metric-label">Fraudulent Transactions Prevented</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">79%</div>
+          <div class="metric-label">Anomaly Model Accuracy (2.7% Geo Fraud Flagged)</div>
         </div>
       </div>
     </div>
-    <div id="arrow-1" class="arrow left" onclick="changepage(-1)" style="display: none;">
-        <div class="fa fa-caret-left"></div>
-    </div>
-    <div id="arrow1" class="arrow right" onclick="changepage(1)">
-        <div class="fa fa-caret-right"></div>
-    </div>
-    <div class="content" id="page1">
-      <div class="avatar">
-        <span id="avatar" class="avatertxt" onclick="fly()">𓅓</span>
+  </header>
+
+  <!-- Philosophy Quote Box -->
+  <section id="about-philosophy" class="sec">
+    <div class="container">
+      <div class="card reveal" style="background:var(--surf2);border:1px solid var(--acc-bd);padding:32px;">
+        <span class="eyebrow">Engineering Approach</span>
+        <h3 style="font-size:1.3rem;font-weight:700;color:var(--t1);margin-bottom:12px;">Layer-Agnostic Problem Solving
+        </h3>
+        <p style="font-size:1.02rem;color:var(--t2);line-height:1.75;font-style:italic;">
+          "The pattern I care about most: knowing when a problem actually needs a model, and when a well-placed rule, a
+          better pipeline, or a conversation with the business team solves it faster and cheaper. Plenty of my best work
+          involved talking someone out of the complicated version. When you've owned a problem end-to-end, you stop
+          being precious about which layer the answer lives in."
+        </p>
       </div>
-      <h1><a href="/about">Mysterious Owl</a></h1>
-      <h2><a href="/projects">Python Developer and IoT Enthusiast</a></h2>
-      <a class="icon" href="https://www.github.com/mysterious-owl" target="_blank"><div class="fa fa-github"></div></a>
-      <a class="icon" href="https://www.youtube.com/channel/UCpkxxb7y9nIlUlft5GKTNsg/" target="_blank"><div class="fa fa-youtube-play"></div></a>
-      <a class="icon remmar" href="mailto:mysteriousowl9@gmail.com" target="_blank"><div class="fa fa-envelope"></div></a>
     </div>
-    <div class="content" style="display:none;" id="page2">
-      <article class="about">
-      </article>
+  </section>
+
+  <!-- Featured Work & Case Studies -->
+  <section id="work" class="sec">
+    <div class="container">
+      <span class="section-label">Selected Work</span>
+      <h2 class="section-title">Production Systems &amp; Case Studies</h2>
+
+      <div class="cards-grid">
+        <!-- Project 1 -->
+        <article class="card reveal">
+          <span class="card-tag">GenAI &amp; RAG Platform</span>
+          <h3 class="card-title">Consumer Dispute Resolution GenAI Platform</h3>
+          <p class="card-desc">
+            Architected a modular LLM platform for dispute resolution in a regulated credit bureau: hybrid RAG over
+            policy and regulatory corpora, tool-calling agents for multi-step workflows, and PII/compliance guardrails.
+            Built email triage combining intent classifiers with LLM response generation under guardrails (cutting ~10
+            min/case). Cut dispute volume by 35% and manual handling by ~90%.
+          </p>
+          <div class="tech-pills">
+            <span class="pill">Llama 3</span>
+            <span class="pill">Gemini</span>
+            <span class="pill">Hybrid RAG</span>
+            <span class="pill">Tool Agents</span>
+            <span class="pill">LoRA</span>
+            <span class="pill">vLLM</span>
+          </div>
+        </article>
+
+        <!-- Project 2 -->
+        <article class="card reveal">
+          <span class="card-tag">OCR &amp; Document Understanding</span>
+          <h3 class="card-title">Handwritten Prescription Document Pipeline</h3>
+          <p class="card-desc">
+            Built an end-to-end document understanding pipeline converting photographed, handwritten prescription images
+            into decision-ready structured data. Applied Vision OCR followed by LLM-based entity extraction &amp; slot
+            filling (OpenAI APIs) to parse medications, dosages, and diagnoses from noisy text, enriched against master
+            data for claims fraud ML models.
+          </p>
+          <div class="tech-pills">
+            <span class="pill">Vision OCR</span>
+            <span class="pill">LLM Slot-Filling</span>
+            <span class="pill">OpenAI API</span>
+            <span class="pill">Entity Normalization</span>
+            <span class="pill">Python</span>
+          </div>
+        </article>
+
+        <!-- Project 3 -->
+        <article class="card reveal">
+          <span class="card-tag">Open Models &amp; RL</span>
+          <h3 class="card-title">Self-Hosted Llama 3 &amp; Qwen GRPO Post-Training</h3>
+          <p class="card-desc">
+            Self-hosted Llama 3 fine-tuned with LoRA on vLLM alongside Gemini on GCP Vertex AI for data privacy, cost
+            control, and low latency. Independently post-trained Qwen models using GRPO (Group Relative Policy
+            Optimization) to evaluate where reinforcement learning genuinely beats SFT versus where it burns compute.
+          </p>
+          <div class="tech-pills">
+            <span class="pill">Llama 3</span>
+            <span class="pill">vLLM</span>
+            <span class="pill">Qwen</span>
+            <span class="pill">GRPO (RL)</span>
+            <span class="pill">LoRA / PEFT</span>
+            <span class="pill">PyTorch</span>
+          </div>
+        </article>
+
+        <!-- Project 4 -->
+        <article class="card reveal">
+          <span class="card-tag">ML &amp; Risk Analytics</span>
+          <h3 class="card-title">Syndicate Fraud &amp; Geolocation Risk Engine</h3>
+          <p class="card-desc">
+            Led fraud analytics charter (2 analysts, 6 interns); built risk scoring combining supervised classifiers,
+            DBSCAN clustering, and LLM entity analysis preventing ₹10M+ fraud. Geolocation aggregation flagged 2.7%
+            extra fraud; mined clickstream data with 79% accuracy anomaly detection models for real-time fraud
+            identification.
+          </p>
+          <div class="tech-pills">
+            <span class="pill">DBSCAN</span>
+            <span class="pill">XGBoost</span>
+            <span class="pill">Anomaly Models (79%)</span>
+            <span class="pill">Geolocation</span>
+            <span class="pill">Clickstream</span>
+          </div>
+        </article>
+
+        <!-- Project 5 -->
+        <article class="card reveal">
+          <span class="card-tag">Data Engineering &amp; APIs</span>
+          <h3 class="card-title">Near Real-Time Data Warehouse &amp; Blocklist API</h3>
+          <p class="card-desc">
+            Set up near-real-time data warehouse in MySQL (Python + Azure ADF + Power BI). Automated Data Mart creation
+            (<1 hr go-live vs 1+ wk) and implemented automated data lineage &amp; metadata scanning for DataLake &amp;
+              Power BI datasets. Engineered Mobile &amp; Email Blocklist API preventing 200+ escalations/month. </p>
+              <div class="tech-pills">
+                <span class="pill">MySQL</span>
+                <span class="pill">Azure ADF</span>
+                <span class="pill">Data Lineage</span>
+                <span class="pill">Flask</span>
+                <span class="pill">Power BI</span>
+              </div>
+        </article>
+
+        <!-- Project 6 -->
+        <article class="card reveal">
+          <span class="card-tag">Enterprise Automation</span>
+          <h3 class="card-title">Central Financial Reconciliation &amp; MIS Automation</h3>
+          <p class="card-desc">
+            Deployed Central Reconciliation System saving 50+ manual hours weekly across teams, paired with configurable
+            MIS Email Automation reducing deployment time by 98%. Designed and deployed a Node.js application automating
+            Loyalty Card creation and management.
+          </p>
+          <div class="tech-pills">
+            <span class="pill">Python</span>
+            <span class="pill">Node.js</span>
+            <span class="pill">Flask</span>
+            <span class="pill">Automation</span>
+            <span class="pill">Docker</span>
+          </div>
+        </article>
+      </div>
     </div>
-    <div class="content projects proj" style="display: none;" id="page3">
-        <table class="row" id="table">
-        </table>
-        <footer class="footerproj" style="display:none;">
-          <a href="/sitemap">© 2020</a>
-        </footer>
+  </section>
+
+  
+  <!-- Personal Projects -->
+  <section id="personal-projects" class="sec">
+    <div class="container">
+      <span class="section-label">Personal Projects</span>
+      <h2 class="section-title">Open Source & Tools</h2>
+      <div class="cards-grid">
+        
+        <article class="card reveal">
+          <span class="card-tag">RAG & AI</span>
+          <h3 class="card-title">sql-agent</h3>
+          <p class="card-desc">Premium Multi-Agent Vendor RAG System. A high-performance, observable RAG system designed for complex vendor data analysis, built in Python.</p>
+          <div class="tech-pills">
+            <span class="pill">Python</span>
+            <span class="pill">Multi-Agent</span>
+            <span class="pill">RAG</span>
+          </div>
+          <a href="https://github.com/Mysterious-Owl/sql-agent" target="_blank" class="guide-link" style="margin-top:16px;">View on GitHub</a>
+        </article>
+
+        <article class="card reveal">
+          <span class="card-tag">Finance & Web</span>
+          <h3 class="card-title">FundMatrix</h3>
+          <p class="card-desc">A local-first personal portfolio dashboard for Indian investments. It parses CAMS Consolidated Account Statement (CAS) PDFs and rebuilds mutual-fund lot history with FIFO matching.</p>
+          <div class="tech-pills">
+            <span class="pill">JavaScript</span>
+            <span class="pill">PDF Parsing</span>
+            <span class="pill">Finance</span>
+          </div>
+          <a href="https://github.com/Mysterious-Owl/FundMatrix" target="_blank" class="guide-link" style="margin-top:16px;">View on GitHub</a>
+        </article>
+        
+        <article class="card reveal">
+          <span class="card-tag">Data Visualization</span>
+          <h3 class="card-title">college-data</h3>
+          <p class="card-desc">Interactive data visualization and processing tool for analyzing and structuring college metrics and datasets.</p>
+          <div class="tech-pills">
+            <span class="pill">HTML</span>
+            <span class="pill">JavaScript</span>
+          </div>
+          <a href="https://github.com/Mysterious-Owl/college-data" target="_blank" class="guide-link" style="margin-top:16px;">View on GitHub</a>
+        </article>
+        
+        <article class="card reveal">
+          <span class="card-tag">Web Apps</span>
+          <h3 class="card-title">my-life-helpers</h3>
+          <p class="card-desc">A suite of lightweight, frontend-only web applications powered by Firebase, including a Debt Tracker for managing personal debts and credit card bills.</p>
+          <div class="tech-pills">
+            <span class="pill">JavaScript</span>
+            <span class="pill">Firebase</span>
+          </div>
+          <a href="https://github.com/Mysterious-Owl/my-life-helpers" target="_blank" class="guide-link" style="margin-top:16px;">View on GitHub</a>
+        </article>
+        
+        <article class="card reveal">
+          <span class="card-tag">Python Scripting</span>
+          <h3 class="card-title">CAMS_mf_parser</h3>
+          <p class="card-desc">CAS - CAMS+KFintech Parser. A utility designed to reliably parse and extract investment data from complex mutual fund CAS statements.</p>
+          <div class="tech-pills">
+            <span class="pill">Python</span>
+            <span class="pill">Data Extraction</span>
+          </div>
+          <a href="https://github.com/Mysterious-Owl/CAMS_mf_parser" target="_blank" class="guide-link" style="margin-top:16px;">View on GitHub</a>
+        </article>
+        
+        <article class="card reveal" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border: 1px dashed var(--border); background: transparent;">
+          <h3 class="card-title" style="margin-bottom: 12px;">Archived Projects</h3>
+          <p class="card-desc" style="margin-bottom: 24px;">View 13+ older hardware, python, and web projects from my archives.</p>
+          <a href="archived_projects.html" class="guide-link" style="width: 100%; display: block;">View Archives</a>
+        </article>
+
+      </div>
     </div>
-    <footer class="footer">
-      <a href="/sitemap">© 2020</a>
-    </footer>
-  </body>
+  </section>
+
+  <!-- Work Experience Timeline -->
+<section id="experience" class="sec">
+    <div class="container">
+      <span class="section-label">Experience</span>
+      <h2 class="section-title">Work Experience (5 Years)</h2>
+
+      <div class="timeline">
+
+        <!-- Company 1: TransUnion -->
+        <div class="timeline-item reveal">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-header">
+              <div>
+                <h3 class="company-name">TransUnion</h3>
+                <div class="job-role">Sr Data Scientist - AI, Global Data and Analytics</div>
+              </div>
+              <span class="job-date">Aug 2024 – Present (2 yrs 1 mo)</span>
+            </div>
+            <ul class="timeline-bullets">
+              <li>Architected and shipped the <strong>consumer dispute resolution LLM platform</strong>: <strong>hybrid RAG</strong> over policy and regulatory corpora, <strong>tool-calling agents</strong> for multi-step workflows, <strong>PII and compliance guardrails</strong>. Cut dispute volume 35%, manual handling ~90%.</li>
+              <li><strong>Self-hosted Llama 3 on vLLM</strong> alongside <strong>Gemini (Vertex AI)</strong> for data residency, cost and latency control; <strong>fine-tuned with LoRA</strong> on curated dispute data for <strong>output consistency</strong>.</li>
+              <li>Built the <strong>eval harness</strong> the platform ships against: golden set stratified across dispute types, retrieval and generation graded separately, LLM-as-judge with human review, regression gates blocking deploys.</li>
+              <li>Built <strong>LLM email triage and auto-response</strong> - intent classification, queue routing and templated draft generation, saving ~10 minutes per case across 5,000+ cases/month.</li>
+              <li>Added <strong>LLM-generated explanations for production ML decisions</strong>, turning feature attributions into reviewer-facing rationale; <strong>post-trained with GRPO</strong> so explanations generalise to unseen decisions instead of reproducing training-set phrasing.</li>
+              <li>Working on <strong>goal-seeking agents</strong> with <strong>persistent memory</strong>, <strong>goal decomposition and sub-goal recovery</strong> for <strong>deterministic, auditable multi-step resolution</strong>, utilising SOAR cognitive architecture.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Company 2: Bajaj Finserv Health - Data Scientist -->
+        <div class="timeline-item reveal">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-header">
+              <div>
+                <h3 class="company-name">Bajaj Finserv Health Limited</h3>
+                <div class="job-role">Data Scientist</div>
+              </div>
+              <span class="job-date">Jun 2022 – Jul 2024 (2 yrs 2 mos)</span>
+            </div>
+            <ul class="timeline-bullets">
+              <li><strong>Led a 2-person fraud analytics team</strong>. Built the transaction and claims <strong>risk-scoring engine</strong> - supervised classifiers, DBSCAN clustering and LLM entity analysis, surfacing coordinated syndicate activity and preventing 10M+ in fraudulent transactions.</li>
+              <li>Engineered a document understanding pipeline turning handwritten prescription images into structured claim data: <strong>OCR plus LLM entity extraction</strong> for medications, dosages, diagnoses and prescriber, consumed as features by downstream fraud models.</li>
+              <li>Added <strong>geolocation-based fraud detection</strong> aggregating user and provider location signals, flagging 2.7% of transactions that rule-based checks missed; real-time anomaly models at 79% accuracy.</li>
+              <li>Built a <strong>full-stack Mobile &amp; Email Blocklist framework</strong> - API, schema and near-real-time ETL, preventing 50+ escalations weekly.</li>
+              <li>Shifted 20% of users from reimbursement to cashless claims through <strong>behavioural analysis</strong>, saving 5M+, with 1M+ more from claim-level process improvements.</li>
+              <li>Provided technical guidance and <strong>mentorship for 6+ data interns</strong>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Company 3: Bajaj Finserv Health - Data Engineer Intern -->
+        <div class="timeline-item reveal">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-header">
+              <div>
+                <h3 class="company-name">Bajaj Finserv Health Limited</h3>
+                <div class="job-role">Data Engineer Intern</div>
+              </div>
+              <span class="job-date">Sep 2021 – May 2022 (9 mos)</span>
+            </div>
+            <ul class="timeline-bullets">
+              <li><strong>Automated Data Mart creation</strong>, cutting go-live from a week to under an hour; built a <strong>near-real-time MySQL warehouse</strong> and a <strong>central financial reconciliation system</strong> saving 50+ manual hours.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Skills -->
+  <section id="skills" class="sec">
+    <div class="container">
+      <span class="section-label">Technical Competencies</span>
+      <h2 class="section-title">Skills &amp; Technology Stack</h2>
+
+      <div class="skills-grid reveal">
+        <div class="skill-category">
+          <h3><i class="fa fa-code" style="color:var(--acc);"></i> Languages &amp; Core Tools</h3>
+          <div class="skill-tags">
+            <span class="skill-pill">Python</span>
+            <span class="skill-pill">SQL</span>
+            <span class="skill-pill">PySpark</span>
+            <span class="skill-pill">Pandas</span>
+            <span class="skill-pill">NumPy</span>
+            <span class="skill-pill">JavaScript (Node.js)</span>
+            <span class="skill-pill">C++</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <h3><i class="fa fa-cogs" style="color:var(--acc);"></i> Generative AI &amp; LLMs</h3>
+          <div class="skill-tags">
+            <span class="skill-pill">RAG</span>
+            <span class="skill-pill">LangChain</span>
+            <span class="skill-pill">Huggingface</span>
+            <span class="skill-pill">Transformers</span>
+            <span class="skill-pill">LangGraph</span>
+            <span class="skill-pill">Agentic AI</span>
+            <span class="skill-pill">Llama 3</span>
+            <span class="skill-pill">Gemini</span>
+            <span class="skill-pill">Qwen</span>
+            <span class="skill-pill">vLLM</span>
+            <span class="skill-pill">Ollama</span>
+            <span class="skill-pill">Fine-Tuning (LoRA / PEFT)</span>
+            <span class="skill-pill">GRPO (RL)</span>
+            <span class="skill-pill">Guardrails</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <h3><i class="fa fa-bar-chart" style="color:var(--acc);"></i> ML, Vision &amp; Data Science</h3>
+          <div class="skill-tags">
+            <span class="skill-pill">Vision OCR</span>
+            <span class="skill-pill">LLM Slot-Filling</span>
+            <span class="skill-pill">Scikit-Learn</span>
+            <span class="skill-pill">PyTorch</span>
+            <span class="skill-pill">TensorFlow</span>
+            <span class="skill-pill">DBSCAN</span>
+            <span class="skill-pill">XGBoost</span>
+            <span class="skill-pill">FAISS</span>
+            <span class="skill-pill">Chroma</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <h3><i class="fa fa-database" style="color:var(--acc);"></i> Data Engineering &amp; Cloud</h3>
+          <div class="skill-tags">
+            <span class="skill-pill">GCP (Vertex AI, BigQuery)</span>
+            <span class="skill-pill">Azure</span>
+            <span class="skill-pill">Databricks</span>
+            <span class="skill-pill">MySQL</span>
+            <span class="skill-pill">Flask</span>
+            <span class="skill-pill">FastAPI</span>
+            <span class="skill-pill">Docker</span>
+            <span class="skill-pill">Kubernetes</span>
+            <span class="skill-pill">Power BI</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visual Learning Guides Showcase -->
+  <section id="visual-guides" class="sec">
+    <div class="container">
+      <div class="vg-banner reveal">
+        <div class="vg-info">
+          <span class="eyebrow">Interactive Learning</span>
+          <h3>Visual Learning Guides</h3>
+          <p>
+            Explore interactive, visual deep-dives into machine learning concepts - covering the HuggingFace training
+            ecosystem, GPU memory &amp; OOM errors, LLM fine-tuning strategies (LoRA/QLoRA), agentic workflow patterns,
+            and ML mathematical foundations.
+          </p>
+        </div>
+        <a href="/visual_guide/index.html" class="btn-primary">Explore All Visual Guides &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Certifications & Credentials -->
+  <section id="certifications" class="sec">
+    <div class="container">
+      <span class="section-label">Credentials</span>
+      <h2 class="section-title">Education &amp; Certifications</h2>
+
+      <div class="cards-grid">
+        <!-- Education Card -->
+        <article class="card reveal">
+          <span class="card-tag">Education</span>
+          <h3 class="card-title">B.Tech, Electronics &amp; Telecommunication Engineering</h3>
+          <p class="card-desc">
+            <strong>Madhav Institute of Technology and Science</strong>, Gwalior, India<br>
+            2018 – 2022
+          </p>
+          <div class="skill-pill" style="display:inline-block;margin-top:8px;">CGPA: 8.88 / 10</div>
+        </article>
+
+        <!-- Cert 1 -->
+        <article class="card reveal">
+          <span class="card-tag">IBM Specialization</span>
+          <h3 class="card-title">Generative AI for Data Scientists Specialization</h3>
+          <p class="card-desc">Issued by <strong>IBM</strong> (Nov 2025) - Advanced specialization in building,
+            fine-tuning, and deploying generative AI pipelines for enterprise data science.</p>
+          <a href="https://www.coursera.org/account/accomplishments/specialization/9F13GOPHYPR1" target="_blank"
+            rel="noopener" class="guide-link" style="margin-top:12px;display:inline-block;">Verify Credential <i
+              class="fa fa-external-link"></i></a>
+        </article>
+
+        <!-- Cert 2 -->
+        <article class="card reveal">
+          <span class="card-tag">IBM Professional</span>
+          <h3 class="card-title">IBM AI Developer Professional Certificate</h3>
+          <p class="card-desc">Issued by <strong>IBM</strong> (Nov 2025) - Comprehensive certification covering deep
+            learning architectures, Python AI frameworks, and production model deployment.</p>
+          <a href="https://www.coursera.org/account/accomplishments/professional-cert/certificate/00M8C7AIIZU3"
+            target="_blank" rel="noopener" class="guide-link" style="margin-top:12px;display:inline-block;">Verify
+            Credential <i class="fa fa-external-link"></i></a>
+        </article>
+
+        <!-- Cert 3 -->
+        <article class="card reveal">
+          <span class="card-tag">Microsoft Certification</span>
+          <h3 class="card-title">Azure Data Fundamentals (DP-900)</h3>
+          <p class="card-desc">Issued by <strong>Microsoft</strong> (Feb 2022) - Core cloud data architectures,
+            relational &amp; non-relational database systems, and Azure analytics services.</p>
+          <a href="https://learn.microsoft.com/api/credentials/share/en-in/TanishqGupta-3464/CE15B44E98C4B129?sharingId"
+            target="_blank" rel="noopener" class="guide-link" style="margin-top:12px;display:inline-block;">Verify
+            Credential <i class="fa fa-external-link"></i></a>
+        </article>
+
+        <!-- Cert 4 -->
+        <article class="card reveal">
+          <span class="card-tag">IIT Distinction</span>
+          <h3 class="card-title">Data Science for Engineers (Topper 2%)</h3>
+          <p class="card-desc">Issued by <strong>NPTEL / IIT Madras</strong> (Apr 2022) - Awarded <strong>Topper 2%
+              distinction</strong> for exceptional mastery of core data science fundamentals.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Accomplishments & Honors (Fixed Order) -->
+  <section id="accomplishments" class="sec">
+    <div class="container">
+      <span class="section-label">Recognition</span>
+      <h2 class="section-title">Honors &amp; Awards</h2>
+
+      <div class="acc-grid reveal">
+        <!-- 1. Champ Award -->
+        <div class="acc-card">
+          <div class="acc-icon"><i class="fa fa-trophy" style="color:var(--acc);"></i></div>
+          <div class="acc-text">
+            <h4>Champ Award</h4>
+            <p>Received Champ Award for outstanding performance in TransUnion.</p>
+          </div>
+        </div>
+
+        <!-- 2. 30 Under 30 & PropelX Finalist -->
+        <div class="acc-card">
+          <div class="acc-icon"><i class="fa fa-star" style="color:var(--acc);"></i></div>
+          <div class="acc-text">
+            <h4>Finalist - 30 Under 30 &amp; PropelX</h4>
+            <p>Finalist of 30 Under 30 and PropelX, career fast track programs of BFL and BFHL, among more than 1000 participants.</p>
+          </div>
+        </div>
+
+        <!-- 3. Corporate Excellence Awards -->
+        <div class="acc-card">
+          <div class="acc-icon"><i class="fa fa-award" style="color:var(--acc);"></i></div>
+          <div class="acc-text">
+            <h4>Corporate Excellence Awards</h4>
+            <p>Received various corporate awards such as the Hero, Limelight, and appreciation award for outstanding performance at BFHL.</p>
+          </div>
+        </div>
+
+        <!-- 4. RGPV Hackathon Winner -->
+        <div class="acc-card">
+          <div class="acc-icon"><i class="fa fa-laptop" style="color:var(--acc);"></i></div>
+          <div class="acc-text">
+            <h4>Winner - RGPV Hackathon 1.0</h4>
+            <p>First place in Statewide &amp; Gwalior Zone hackathon rounds (Oct 2021).</p>
+          </div>
+        </div>
+
+        <!-- 5. IETE Zonal 1st Rank -->
+        <div class="acc-card">
+          <div class="acc-icon"><i class="fa fa-check-circle" style="color:var(--acc);"></i></div>
+          <div class="acc-text">
+            <h4>1st Rank - IETE Zonal Proficiency Test</h4>
+            <p>Secured 1st rank in IETE Madhya Pradesh Chapter Zonal Proficiency Test (May 2021).</p>
+          </div>
+        </div>
+
+        <!-- 6. BITS Pilani Blind Coding Winner -->
+        <div class="acc-card">
+          <div class="acc-icon"><i class="fa fa-terminal" style="color:var(--acc);"></i></div>
+          <div class="acc-text">
+            <h4>Blind Coding Winner</h4>
+            <p>2nd position at BITS Pilani APOGEE 2021 Blind Coding competition (Mar 2021).</p>
+          </div>
+        </div>
+
+        <!-- 7. Merit Scholarship -->
+        <div class="acc-card">
+          <div class="acc-icon"><i class="fa fa-graduation-cap" style="color:var(--acc);"></i></div>
+          <div class="acc-text">
+            <h4>Merit Scholarship Awardee</h4>
+            <p>Recipient of MukhyaMantri Medhavi Chatra Yojna Scholarship worth my full B.Tech course fees.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Form -->
+  <section id="contact" class="sec">
+    <div class="container">
+      <div class="contact-box reveal">
+        <span class="section-label">Get in Touch</span>
+        <h2 class="section-title" style="font-size:1.8rem;">Contact</h2>
+        <p class="hero-subtitle" style="font-size:0.95rem;margin-bottom:20px;">
+          Always happy to talk about production LLMs, open-weight fine-tuning, fraud analytics, or what breaks when any
+          of it meets real users.
+        </p>
+
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:24px;">
+          <a href="mailto:tanishq25gupta@gmail.com" class="btn-primary" style="text-decoration:none;"><i class="fa fa-envelope"></i> Email Me</a>
+          <a href="https://www.linkedin.com/in/tanishq25gupta/" target="_blank" rel="noopener" class="btn-secondary" style="text-decoration:none;"><i class="fa fa-linkedin"></i> LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> Tanishq Gupta. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="https://github.com/Mysterious-Owl" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/tanishq25gupta/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="#work">Work</a>
+        <a href="#experience">Experience</a>
+        <a href="/visual_guide/index.html">Visual Guides</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactivity Script -->
   <script src="/js/script.js"></script>
+</body>
+
 </html>

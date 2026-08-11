@@ -1,0 +1,3524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How slm-125m Was Built - A Beginner's Guide to Pretraining</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --w: #ffffff;
+      --w2: #f5f5f7;
+      --w3: #e8e8ed;
+      --bd: #d2d2d7;
+      --bd2: #adadb3;
+      --ink: #1d1d1f;
+      --ink2: #6e6e73;
+      --ink3: #86868b;
+      --blue: #0071e3;
+      --blue-l: rgba(0, 113, 227, .08);
+      --blue-m: rgba(0, 113, 227, .16);
+      --green: #1d7a3e;
+      --green-l: rgba(52, 199, 89, .1);
+      --red: #d70015;
+      --red-l: rgba(215, 0, 21, .07);
+      --orange: #bf4800;
+      --orange-l: rgba(191, 72, 0, .08);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04);
+      --shadow: 0 4px 16px rgba(0, 0, 0, .08), 0 1px 4px rgba(0, 0, 0, .04);
+      --shadow-lg: 0 12px 40px rgba(0, 0, 0, .1), 0 2px 8px rgba(0, 0, 0, .05);
+      --r: 12px;
+      --r-lg: 18px;
+      --r-xl: 24px;
+      --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      --mono: "DM Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: var(--body);
+      background: var(--w);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    #prog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--blue), #34aadc);
+      z-index: 200;
+      width: 0%;
+      transition: width .1s linear;
+    }
+
+    nav {
+      position: fixed;
+      top: 2px;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 52px;
+      background: rgba(255, 255, 255, .82);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, .1);
+    }
+
+    .nav-brand {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--ink);
+    }
+
+    .nav-brand span {
+      color: var(--blue);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2px;
+    }
+
+    .nav-links a {
+      padding: 5px 12px;
+      border-radius: 980px;
+      font-size: .77rem;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--ink2);
+      transition: all .18s;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover {
+      background: var(--w2);
+      color: var(--ink);
+    }
+
+    .nav-links a.on {
+      background: var(--blue);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .hero {
+      min-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 100px 80px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -240px;
+      right: -240px;
+      width: 780px;
+      height: 780px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 113, 227, .05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 24px;
+      font-family: var(--mono);
+    }
+
+    .hero-tag::before {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 1px;
+      background: var(--blue);
+    }
+
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(2.4rem, 5.6vw, 4.6rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -.04em;
+      margin-bottom: 22px;
+      max-width: 720px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--blue);
+    }
+
+    .hero-desc {
+      font-size: 1.08rem;
+      color: var(--ink2);
+      max-width: 540px;
+      line-height: 1.65;
+      margin-bottom: 40px;
+      font-weight: 300;
+    }
+
+    .hero-stat-row {
+      display: flex;
+      gap: 48px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+
+    .hero-stat .hn {
+      font-family: var(--display);
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1;
+      color: var(--ink);
+    }
+
+    .hero-stat .hn .unit {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink3);
+    }
+
+    .hero-stat .hd {
+      font-size: .76rem;
+      color: var(--ink3);
+      margin-top: 5px;
+      font-family: var(--mono);
+    }
+
+    .hero-scroll {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .8rem;
+      color: var(--ink3);
+    }
+
+    .scroll-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--blue);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .35;
+        transform: scale(.55)
+      }
+    }
+
+    .ft-section {
+      padding: 76px 48px;
+      border-top: 1px solid var(--bd);
+      background: var(--w);
+    }
+
+    .ft-section.ft-alt {
+      background: var(--w2);
+    }
+
+    .ft-section-inner {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .ft-section-num {
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+
+    .ft-section-inner.visible .ft-section-num {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .ft-section h2 {
+      font-family: var(--display);
+      font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -.03em;
+      line-height: 1.15;
+      margin-bottom: 10px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .6s ease .1s, transform .6s ease .1s;
+    }
+
+    .ft-section-inner.visible h2 {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .ft-section h2 em {
+      font-style: italic;
+      color: var(--blue);
+    }
+
+    .ft-section .subtitle {
+      font-size: 1rem;
+      color: var(--ink2);
+      line-height: 1.6;
+      margin-bottom: 30px;
+      max-width: 600px;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity .6s ease .2s, transform .6s ease .2s;
+    }
+
+    .ft-section-inner.visible .subtitle {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .ft-section h3 {
+      font-family: var(--display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -.015em;
+      margin: 30px 0 10px;
+    }
+
+    .ft-section p {
+      font-size: .93rem;
+      line-height: 1.75;
+      margin-bottom: 12px;
+      color: var(--ink2);
+    }
+
+    .ft-section p strong,
+    li strong {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .ft-section ul {
+      margin: 10px 0 16px 20px;
+      color: var(--ink2);
+      font-size: .93rem;
+    }
+
+    .ft-section li {
+      margin-bottom: 6px;
+      line-height: 1.6;
+    }
+
+    p code,
+    li code,
+    td code {
+      font-family: var(--mono);
+      font-size: .82em;
+      background: var(--w2);
+      color: var(--blue);
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid var(--bd);
+    }
+
+    .fade-child {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+
+    .ft-section-inner.visible .fade-child {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .ft-section-inner.visible .fade-child:nth-child(1) {
+      transition-delay: .1s;
+    }
+
+    .ft-section-inner.visible .fade-child:nth-child(2) {
+      transition-delay: .18s;
+    }
+
+    .ft-section-inner.visible .fade-child:nth-child(3) {
+      transition-delay: .26s;
+    }
+
+    .ft-section-inner.visible .fade-child:nth-child(4) {
+      transition-delay: .34s;
+    }
+
+    .ft-section-inner.visible .fade-child:nth-child(5) {
+      transition-delay: .42s;
+    }
+
+    .ft-section-inner.visible .fade-child:nth-child(6) {
+      transition-delay: .5s;
+    }
+
+    .ft-section-inner.visible .fade-child:nth-child(7) {
+      transition-delay: .58s;
+    }
+
+    .chapter {
+      padding: 88px 80px;
+      border-top: 1px solid var(--bd);
+      background: var(--w);
+    }
+
+    .chapter.alt {
+      background: var(--w2);
+    }
+
+    .chapter.dark {
+      background: #1d1d1f;
+      color: #f5f5f7;
+    }
+
+    .chapter.dark p {
+      color: rgba(245, 245, 247, .65);
+    }
+
+    .chapter.dark p strong {
+      color: #f5f5f7;
+    }
+
+    .ch-num {
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--ink3);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .chapter.dark .ch-num {
+      color: rgba(245, 245, 247, .3);
+    }
+
+    .chapter h2 {
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1.08;
+      margin-bottom: 14px;
+    }
+
+    .chapter.dark h2 {
+      color: #f5f5f7;
+    }
+
+    .chapter h2 em {
+      font-style: italic;
+      color: var(--blue);
+    }
+
+    .chapter.dark h2 em {
+      color: #34aadc;
+    }
+
+    .chapter .lead {
+      font-size: 1rem;
+      color: var(--ink2);
+      max-width: 580px;
+      line-height: 1.65;
+      margin-bottom: 44px;
+      font-weight: 300;
+    }
+
+    .chapter.dark .lead {
+      color: rgba(245, 245, 247, .65);
+    }
+
+    .chapter h3 {
+      font-family: var(--display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin: 40px 0 10px;
+    }
+
+    .chapter.dark h3 {
+      color: #f5f5f7;
+    }
+
+    .chapter p {
+      font-size: .93rem;
+      color: var(--ink2);
+      line-height: 1.75;
+      margin-bottom: 12px;
+      max-width: 680px;
+    }
+
+    .chapter p strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: start;
+    }
+
+    .two-col-60 {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 56px;
+      align-items: start;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .callout {
+      display: flex;
+      gap: 14px;
+      padding: 16px 20px;
+      border-radius: var(--r);
+      margin: 20px 0;
+      align-items: flex-start;
+      max-width: 680px;
+    }
+
+    .callout-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: .7rem;
+      font-weight: 800;
+      margin-top: 1px;
+      color: #fff;
+    }
+
+    .callout-info {
+      background: var(--blue-l);
+      border: 1px solid rgba(0, 113, 227, .15);
+    }
+
+    .callout-info .callout-icon {
+      background: var(--blue);
+    }
+
+    .callout-warn {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+    }
+
+    .callout-warn .callout-icon {
+      background: #f59e0b;
+    }
+
+    .callout-success {
+      background: var(--green-l);
+      border: 1px solid rgba(52, 199, 89, .25);
+    }
+
+    .callout-success .callout-icon {
+      background: #34c759;
+    }
+
+    .callout p {
+      font-size: .87rem;
+      line-height: 1.6;
+      margin: 0;
+      color: var(--ink2);
+      max-width: none;
+    }
+
+    .pillar {
+      background: var(--w);
+      border: 1px solid var(--bd);
+      border-radius: var(--r-xl);
+      padding: 26px 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform .22s, box-shadow .22s;
+    }
+
+    .pillar:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .pillar-num {
+      font-family: var(--display);
+      font-size: 4.4rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -.05em;
+      opacity: .05;
+      position: absolute;
+      top: 8px;
+      right: 12px;
+    }
+
+    .pillar-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 14px;
+      background: var(--blue-l);
+    }
+
+    .pillar h3 {
+      font-family: var(--display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin: 0 0 8px;
+    }
+
+    .pillar .pil-desc {
+      font-size: .85rem;
+      color: var(--ink2);
+      line-height: 1.6;
+    }
+
+    .pillar .pil-stat {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--bd);
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--ink3);
+    }
+
+    .pillar .pil-stat strong {
+      color: var(--blue);
+      font-size: .85rem;
+    }
+
+    .mem-cmp {
+      max-width: 680px;
+    }
+
+    .mem-row {
+      display: grid;
+      grid-template-columns: 130px 1fr 90px;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .mem-lbl {
+      font-size: .78rem;
+      font-family: var(--mono);
+      color: var(--ink2);
+      text-align: right;
+    }
+
+    .mem-track {
+      height: 32px;
+      background: var(--w2);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--bd);
+    }
+
+    .mem-fill {
+      height: 100%;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      width: 0%;
+      transition: width 1.4s cubic-bezier(.16, 1, .3, 1);
+      white-space: nowrap;
+    }
+
+    .mem-fill span {
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .9);
+    }
+
+    .mf-a {
+      background: linear-gradient(90deg, #0071e3, #34aadc);
+    }
+
+    .mf-b {
+      background: linear-gradient(90deg, #30d158, #34c759);
+    }
+
+    .mf-b span {
+      color: rgba(0, 0, 0, .6);
+    }
+
+    .mf-c {
+      background: linear-gradient(90deg, #ff9f0a, #ffcc00);
+    }
+
+    .mf-c span {
+      color: rgba(0, 0, 0, .6);
+    }
+
+    .mem-val {
+      font-family: var(--mono);
+      font-size: .76rem;
+      color: var(--ink3);
+    }
+
+    .tw {
+      overflow-x: auto;
+      border: 1px solid var(--bd);
+      border-radius: var(--r);
+    }
+
+    .tw table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .82rem;
+    }
+
+    .tw th {
+      background: var(--w2);
+      color: var(--ink2);
+      font-weight: 600;
+      padding: 10px 16px;
+      text-align: left;
+      font-size: .69rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--bd);
+      font-family: var(--mono);
+    }
+
+    .tw td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--bd);
+      color: var(--ink2);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+
+    .tw td:first-child {
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--blue);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .tw td strong {
+      color: var(--ink);
+    }
+
+    .tw tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tw tr:hover td {
+      background: var(--w2);
+    }
+
+    .tw .tg td {
+      background: var(--w2);
+      font-size: .68rem;
+      font-family: var(--mono);
+      color: var(--ink3);
+      padding: 7px 16px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-weight: 600;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 20px 0;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--bd);
+      font-size: .87rem;
+    }
+
+    .compare-table th {
+      background: #1d1d1f;
+      color: white;
+      font-weight: 600;
+      padding: 11px 16px;
+      text-align: left;
+      font-size: .76rem;
+      font-family: var(--mono);
+    }
+
+    .compare-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--bd);
+      background: white;
+      vertical-align: top;
+      line-height: 1.5;
+      color: var(--ink2);
+    }
+
+    .compare-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .compare-table td:first-child {
+      font-weight: 600;
+      color: var(--ink2);
+      white-space: nowrap;
+    }
+
+    .compare-table tr:hover td {
+      background: var(--w2);
+    }
+
+    .code-block {
+      background: #161b22;
+      border-radius: var(--r);
+      margin: 20px 0;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .code-block .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, .04);
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .code-block .code-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .code-block .code-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .code-block .code-dots span:nth-child(1) {
+      background: #ff5f57;
+    }
+
+    .code-block .code-dots span:nth-child(2) {
+      background: #febc2e;
+    }
+
+    .code-block .code-dots span:nth-child(3) {
+      background: #28c840;
+    }
+
+    .code-block .code-lang {
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: rgba(255, 255, 255, .35);
+      letter-spacing: .04em;
+    }
+
+    .code-block .c-cpy {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, .15);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: .66rem;
+      font-family: var(--mono);
+      color: rgba(255, 255, 255, .4);
+      cursor: pointer;
+    }
+
+    .code-block .c-cpy:hover {
+      border-color: var(--blue);
+      color: #34aadc;
+    }
+
+    .code-block pre {
+      padding: 20px 24px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: .8rem;
+      line-height: 1.68;
+      color: #e0e0e8;
+      white-space: pre;
+    }
+
+    .hl-keyword {
+      color: #c792ea;
+    }
+
+    .hl-string {
+      color: #c3e88d;
+    }
+
+    .hl-comment {
+      color: #546e7a;
+      font-style: italic;
+    }
+
+    .hl-func {
+      color: #82aaff;
+    }
+
+    .hl-number {
+      color: #f78c6c;
+    }
+
+    .hl-special {
+      color: #ff9cac;
+    }
+
+    .hl-param {
+      color: #ffcb6b;
+    }
+
+    .diagram-card {
+      background: white;
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin: 26px 0;
+      border: 1px solid var(--bd);
+    }
+
+    .diagram-card-dark {
+      background: #1a1a2e;
+    }
+
+    .diagram-header {
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--bd);
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--ink2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--w2);
+    }
+
+    .diagram-card-dark .diagram-header {
+      border-color: rgba(255, 255, 255, .06);
+      color: rgba(255, 255, 255, .5);
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .diagram-header .icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      background: var(--blue-l);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .diagram-body {
+      padding: 22px 20px;
+    }
+
+    .token-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin: 12px 0;
+      font-family: var(--mono);
+      font-size: .75rem;
+    }
+
+    .token {
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(8px) scale(.92);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+
+    .token.animated {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .token-a {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    .token-b {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .token-special {
+      background: #f3e8ff;
+      color: #6b21a8;
+      border: 1px solid #e9d5ff;
+    }
+
+    .token-pos {
+      background: #f8fafc;
+      color: #94a3b8;
+      border: 1px solid #e2e8f0;
+      font-size: .65rem;
+    }
+
+    .shift-anim-wrap {
+      position: relative;
+      margin: 20px 0;
+      padding: 16px 0;
+    }
+
+    .shift-row {
+      display: flex;
+      gap: 3px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 6px 0;
+    }
+
+    .shift-cell {
+      min-width: 46px;
+      padding: 8px 4px;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: .63rem;
+      text-align: center;
+      font-weight: 500;
+      transition: transform .6s cubic-bezier(.4, 0, .2, 1), opacity .4s ease, background .4s ease, box-shadow .4s ease;
+    }
+
+    .shift-cell.input-cell {
+      background: #eef2ff;
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+    }
+
+    .shift-cell.target-cell {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+      opacity: .4;
+    }
+
+    .shift-cell.target-cell.shifted {
+      opacity: 1;
+    }
+
+    .shift-cell.active-train {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+      box-shadow: 0 0 12px rgba(52, 199, 89, .3);
+    }
+
+    .shift-arrow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 30px;
+      font-size: 1.05rem;
+      color: var(--ink3);
+      opacity: 0;
+      transition: opacity .5s ease .3s;
+    }
+
+    .shift-anim-wrap.animated .shift-arrow {
+      opacity: 1;
+    }
+
+    .shift-label {
+      font-family: var(--mono);
+      font-size: .6rem;
+      font-weight: 600;
+      color: var(--ink3);
+      letter-spacing: .04em;
+      width: 50px;
+      text-align: right;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+    }
+
+    .mask-row {
+      display: flex;
+      gap: 3px;
+      margin: 8px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .mask-cell {
+      min-width: 46px;
+      padding: 6px 4px;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: .6rem;
+      text-align: center;
+      font-weight: 500;
+      line-height: 1.3;
+      transition: transform .4s ease, opacity .4s ease, box-shadow .4s ease;
+      opacity: 0;
+      transform: scale(.8);
+    }
+
+    .mask-cell.pop {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .mask-cell.trained {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .mask-cell.trained.glow {
+      animation: trainGlow 1.6s ease infinite;
+    }
+
+    @keyframes trainGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 6px rgba(52, 199, 89, .2);
+      }
+
+      50% {
+        box-shadow: 0 0 16px rgba(52, 199, 89, .5);
+      }
+    }
+
+    .mask-label {
+      font-size: .63rem;
+      font-weight: 600;
+      color: var(--ink3);
+      margin-bottom: 4px;
+      letter-spacing: .04em;
+      text-align: center;
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+      justify-content: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .74rem;
+      color: var(--ink2);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+    }
+
+    .loss-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin: 20px 0;
+    }
+
+    .loss-card {
+      background: white;
+      border-radius: var(--r);
+      border: 1px solid var(--bd);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .5s ease, transform .5s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .loss-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .loss-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .8s cubic-bezier(.4, 0, .2, 1) .3s;
+      background: var(--blue);
+    }
+
+    .loss-card.visible::before {
+      transform: scaleX(1);
+    }
+
+    .loss-position {
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 600;
+      color: var(--ink3);
+      margin-bottom: 6px;
+      letter-spacing: .05em;
+    }
+
+    .loss-context {
+      font-size: .85rem;
+      color: var(--ink2);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .prob-bar-wrap {
+      margin: 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .prob-label {
+      font-family: var(--mono);
+      font-size: .7rem;
+      width: 80px;
+      text-align: right;
+      flex-shrink: 0;
+      color: var(--ink2);
+    }
+
+    .prob-bar-bg {
+      flex: 1;
+      height: 18px;
+      background: var(--w2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .prob-bar {
+      height: 100%;
+      border-radius: 4px;
+      width: 0;
+      transition: width 1.2s cubic-bezier(.25, .46, .45, .94);
+    }
+
+    .prob-bar.correct {
+      background: #34c759;
+    }
+
+    .prob-bar.wrong {
+      background: #e2e8f0;
+    }
+
+    .prob-value {
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--ink3);
+      width: 40px;
+    }
+
+    .loss-result {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--bd);
+      font-family: var(--mono);
+      font-size: .85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .loss-result .formula {
+      color: var(--ink3);
+    }
+
+    .loss-result .value {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 26px 0;
+    }
+
+    .pipeline-step {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .pipeline-line {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 36px;
+    }
+
+    .pipeline-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--blue);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      z-index: 1;
+      transform: scale(0);
+      transition: transform .5s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .pipeline-step.visible .pipeline-dot {
+      transform: scale(1);
+    }
+
+    .pipeline-connector {
+      width: 2px;
+      flex: 1;
+      min-height: 20px;
+      background: linear-gradient(to bottom, var(--blue), rgba(0, 113, 227, .12));
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform .6s ease .2s;
+    }
+
+    .pipeline-step.visible .pipeline-connector {
+      transform: scaleY(1);
+    }
+
+    .pipeline-content {
+      padding-bottom: 22px;
+      flex: 1;
+      opacity: 0;
+      transform: translateX(15px);
+      transition: opacity .5s ease .15s, transform .5s ease .15s;
+    }
+
+    .pipeline-step.visible .pipeline-content {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .pipeline-content h4 {
+      font-family: var(--display);
+      font-size: .96rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      line-height: 1.3;
+      padding-top: 6px;
+    }
+
+    .pipeline-content p {
+      font-size: .86rem;
+      color: var(--ink2);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .accord {
+      margin: 8px 0;
+      border: 1px solid var(--bd);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .a-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      background: var(--w2);
+      cursor: pointer;
+      user-select: none;
+      transition: background .15s;
+    }
+
+    .a-head:hover {
+      background: var(--w3);
+    }
+
+    .a-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .a-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .7rem;
+      font-weight: 700;
+      font-family: var(--mono);
+      flex-shrink: 0;
+      background: var(--blue-l);
+      color: var(--blue);
+    }
+
+    .a-title {
+      font-size: .93rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .a-sub {
+      font-size: .72rem;
+      color: var(--ink3);
+      font-family: var(--mono);
+      margin-top: 1px;
+    }
+
+    .a-chev {
+      color: var(--ink3);
+      transition: transform .25s;
+      font-size: .76rem;
+    }
+
+    .accord.open .a-chev {
+      transform: rotate(90deg);
+    }
+
+    .a-body {
+      display: none;
+      border-top: 1px solid var(--bd);
+    }
+
+    .accord.open .a-body {
+      display: block;
+    }
+
+    .pf-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin: 20px 0;
+    }
+
+    .pf {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      background: var(--w);
+      border: 1px solid var(--bd);
+      border-radius: var(--r);
+      padding: 12px 16px;
+      align-items: start;
+    }
+
+    .pf:hover {
+      background: var(--w2);
+    }
+
+    .pf-prob {
+      font-size: .83rem;
+      color: var(--ink2);
+    }
+
+    .pf-prob strong {
+      color: var(--red);
+      font-family: var(--mono);
+      font-weight: 600;
+    }
+
+    .pf-fix {
+      font-family: var(--mono);
+      font-size: .7rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      background: var(--green-l);
+      color: var(--green);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .stat-card {
+      background: var(--w);
+      border: 1px solid var(--bd);
+      border-radius: var(--r-lg);
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--blue);
+    }
+
+    .stat-card .sl {
+      font-size: .6rem;
+      font-family: var(--mono);
+      color: var(--ink3);
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .sn {
+      font-family: var(--display);
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -.03em;
+      line-height: 1;
+    }
+
+    .stat-card .sd {
+      font-size: .7rem;
+      color: var(--ink3);
+      margin-top: 6px;
+    }
+
+    .calc-box {
+      background: var(--w2);
+      border: 1px solid var(--bd);
+      border-radius: var(--r-lg);
+      padding: 26px;
+      margin: 22px 0;
+    }
+
+    .calc-title {
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--ink3);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .calc-row {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .calc-row label {
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--ink2);
+      width: 130px;
+      flex-shrink: 0;
+    }
+
+    .calc-row label strong {
+      color: var(--blue);
+    }
+
+    .calc-row input[type=range] {
+      flex: 1;
+      accent-color: var(--blue);
+      cursor: pointer;
+    }
+
+    .calc-result {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .cr {
+      background: var(--w);
+      border: 1px solid var(--bd);
+      border-radius: var(--r);
+      padding: 13px 15px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cr .crl {
+      font-size: .6rem;
+      font-family: var(--mono);
+      color: var(--ink3);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .cr .crv {
+      font-family: var(--display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+      margin-top: 4px;
+    }
+
+    .cr.hit {
+      border-color: var(--blue);
+      background: var(--blue-l);
+    }
+
+    .cr.hit .crv {
+      color: var(--blue);
+    }
+
+    .blocks-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin: 24px 0;
+    }
+
+    .blk {
+      width: 100%;
+      max-width: 420px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: .8rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .blk-emb {
+      background: var(--blue-l);
+      border-color: rgba(0, 113, 227, .3);
+      color: var(--blue);
+    }
+
+    .blk-layer {
+      background: var(--w2);
+      border-color: var(--bd);
+      color: var(--ink);
+      position: relative;
+    }
+
+    .blk-norm {
+      background: var(--green-l);
+      border-color: rgba(52, 199, 89, .3);
+      color: var(--green);
+      font-size: .68rem;
+      padding: 6px 20px;
+    }
+
+    .blk-attn {
+      background: #fef3c7;
+      border-color: #fde68a;
+      color: #92400e;
+    }
+
+    .blk-mlp {
+      background: #dbeafe;
+      border-color: #bfdbfe;
+      color: #1e40af;
+    }
+
+    .blk-out {
+      background: var(--blue-l);
+      border-color: rgba(0, 113, 227, .3);
+      color: var(--blue);
+    }
+
+    .blk-arrow {
+      font-family: var(--mono);
+      color: var(--ink3);
+      font-size: .8rem;
+    }
+
+    .blk-repeat {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--ink3);
+      background: var(--w);
+      border: 1px dashed var(--bd);
+      border-radius: 8px;
+      padding: 4px 12px;
+      margin: 2px 0;
+    }
+
+    .blk-group {
+      border: 1.5px dashed var(--bd2);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 980px;
+      font-family: var(--mono);
+      font-size: .73rem;
+      font-weight: 500;
+      margin: 3px;
+      border: 1px solid;
+    }
+
+    .chip-on {
+      background: var(--blue-l);
+      color: var(--blue);
+      border-color: rgba(0, 113, 227, .3);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--bd);
+      margin: 32px 0;
+    }
+
+    .part-bridge {
+      padding: 60px 48px;
+      background: linear-gradient(135deg, #1d1d1f 0%, #2d2d2f 100%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .part-bridge::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 113, 227, .12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .pb-label {
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(0, 113, 227, .8);
+      margin-bottom: 14px;
+    }
+
+    .pb-title {
+      font-family: var(--display);
+      font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1.15;
+      color: white;
+      margin-bottom: 14px;
+    }
+
+    .pb-title em {
+      color: #34aadc;
+      font-style: italic;
+    }
+
+    .pb-sub {
+      font-size: .96rem;
+      color: rgba(255, 255, 255, .55);
+      max-width: 520px;
+      margin: 0 auto 26px;
+      line-height: 1.65;
+    }
+
+    .pb-pills {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .pb-pill {
+      padding: 6px 14px;
+      border-radius: 980px;
+      font-size: .76rem;
+      font-family: var(--mono);
+      font-weight: 500;
+      border: 1px solid rgba(255, 255, 255, .15);
+      color: rgba(255, 255, 255, .6);
+      background: rgba(255, 255, 255, .06);
+    }
+
+    .pb-pill.active {
+      border-color: rgba(0, 113, 227, .5);
+      color: #34aadc;
+      background: rgba(0, 113, 227, .1);
+    }
+
+    .cta-banner {
+      max-width: 900px;
+      margin: 32px auto 0;
+      padding: 24px 32px;
+      background: linear-gradient(135deg, var(--blue-l), var(--w2));
+      border: 1px solid rgba(0, 113, 227, .18);
+      border-radius: var(--r-xl);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .cta-text {
+      font-size: .93rem;
+      color: var(--ink2);
+      max-width: 400px;
+    }
+
+    .cta-text strong {
+      color: var(--ink);
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 22px;
+      font-size: .78rem;
+      font-weight: 600;
+      text-decoration: none;
+      font-family: var(--mono);
+      transition: transform .15s, box-shadow .15s;
+      white-space: nowrap;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cta-btn.primary {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .cta-btn.secondary {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .55s cubic-bezier(.22, 1, .36, 1), transform .55s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .fade-up.in {
+      opacity: 1;
+      transform: none;
+    }
+
+    .stagger>* {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .4s cubic-bezier(.22, 1, .36, 1), transform .4s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .stagger.in>*:nth-child(1) {
+      opacity: 1;
+      transform: none;
+      transition-delay: .04s;
+    }
+
+    .stagger.in>*:nth-child(2) {
+      opacity: 1;
+      transform: none;
+      transition-delay: .09s;
+    }
+
+    .stagger.in>*:nth-child(3) {
+      opacity: 1;
+      transform: none;
+      transition-delay: .14s;
+    }
+
+    .stagger.in>*:nth-child(4) {
+      opacity: 1;
+      transform: none;
+      transition-delay: .19s;
+    }
+
+    .chart-card {
+      border: 1px solid var(--bd);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 26px 28px;
+      margin: 22px 0;
+      background: var(--w);
+    }
+
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .chart-head h4 {
+      font-family: var(--display);
+      font-size: .96rem;
+      font-weight: 700;
+    }
+
+    .chart-head .mono {
+      font-family: var(--mono);
+      font-size: .74rem;
+      color: var(--ink2);
+    }
+
+    #loss-chart {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    footer {
+      text-align: center;
+      padding: 48px 44px;
+      border-top: 1px solid var(--bd);
+      color: var(--ink3);
+      font-size: .8rem;
+    }
+
+    footer a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media(max-width:900px) {
+      .hero {
+        padding: 90px 24px 50px;
+      }
+
+      .chapter,
+      .ft-section {
+        padding: 56px 24px;
+      }
+
+      .two-col,
+      .three-col,
+      .two-col-60,
+      .calc-result {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        padding: 0 20px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .part-bridge,
+      .cta-banner {
+        padding: 40px 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="prog"></div>
+
+  <nav>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="index.html"
+        style="font-size:12px;color:var(--ink2);text-decoration:none;display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1px solid var(--bd);transition:all 0.2s;"
+        onmouseover="this.style.color='var(--blue)';this.style.borderColor='rgba(0,113,227,0.3)'"
+        onmouseout="this.style.color='var(--ink2)';this.style.borderColor='var(--bd)'">← Guides</a>
+      <div class="nav-brand">slm-125m <span>· Learn</span></div>
+    </div>
+    <div class="nav-links">
+      <a href="#p1s1" class="nav-link">Big Picture</a>
+      <a href="#p1s2" class="nav-link">Tokens</a>
+      <a href="#p1s3" class="nav-link">Shift</a>
+      <a href="#p1s5" class="nav-link">Loss</a>
+      <a href="#data" class="nav-link">Data</a>
+      <a href="#bpe" class="nav-link">BPE</a>
+      <a href="#arch" class="nav-link">Architecture</a>
+      <a href="#memory" class="nav-link">Memory</a>
+      <a href="#config" class="nav-link">Config</a>
+      <a href="#curve" class="nav-link">Curve</a>
+      <a href="#infra" class="nav-link">Modal/Vercel</a>
+    </div>
+  </nav>
+
+  <div class="hero" id="top">
+    <div class="hero-tag">A Beginner's Guide, From First Principles</div>
+    <h1>What does it actually <em>mean</em><br>to pretrain a language model?</h1>
+    <p class="hero-desc">Not a summary - a from-scratch explanation. We'll build up the concepts one at a time, then
+      show exactly how each one played out when training <strong>slm-125m</strong>, a 125.8M-parameter model built from
+      nothing.</p>
+    <div class="hero-stat-row stagger">
+      <div class="hero-stat">
+        <div class="hn"><span class="cnt" data-to="125.8" data-suffix="M">0</span></div>
+        <div class="hd">parameters, from random init</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hn"><span class="cnt" data-to="2" data-suffix=".04B">0</span></div>
+        <div class="hd">tokens trained on</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hn" style="color:var(--blue)">$15.54</div>
+        <div class="hd">total cost, every phase</div>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-dot"></div>Start with the big picture
+    </div>
+  </div>
+
+  <!-- ═══════════════ PART 1 - FUNDAMENTALS ═══════════════ -->
+
+  <div class="ft-section" id="p1s1">
+    <div class="ft-section-inner">
+      <div class="ft-section-num">Part 1 · Step 01</div>
+      <h2>The Big Picture</h2>
+      <p class="subtitle">A language model is a function that predicts the next token. That's the entire mechanical
+        premise - everything else is detail.</p>
+      <p class="fade-child">Before training, <strong>slm-125m</strong> has 125,847,552 parameters, and every one of them
+        is a small random number. It has never seen a sentence. It doesn't know English exists, let alone what a legal
+        opinion or an SEC filing looks like.</p>
+      <p class="fade-child"><strong>Pretraining</strong> is the process of fixing that - by showing the model an
+        enormous amount of real text and, at every single position in that text, asking it to guess what comes next.
+        It's wrong, almost every time, at first. The gap between its guess and the truth becomes a signal that nudges
+        its parameters. Repeat that billions of times and something that started as noise becomes a model that writes
+        fluent, stylistically-correct (if occasionally fabricated) legal and financial prose.</p>
+      <div class="callout callout-info fade-child">
+        <div class="callout-icon">i</div>
+        <p>This is different from <strong>fine-tuning</strong>, which you may have seen elsewhere - fine-tuning starts
+          from an already-pretrained model and adjusts it with a smaller, more targeted dataset (often using LoRA
+          adapters to update only a fraction of the weights). <strong>slm-125m has no starting point.</strong> Every one
+          of its 125.8M parameters is trained, from scratch, on this project's own corpus. There's no LoRA here -
+          there's nothing to adapt yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ft-section ft-alt" id="p1s2">
+    <div class="ft-section-inner">
+      <div class="ft-section-num">Part 1 · Step 02</div>
+      <h2>Tokenization - Text Becomes Numbers</h2>
+      <p class="subtitle">Neural networks don't read letters. Before any of this works, text has to become a sequence of
+        integers.</p>
+      <p class="fade-child">A <strong>tokenizer</strong> splits text into chunks - not always whole words, sometimes
+        word-pieces or even single characters - and maps each chunk to an integer ID. <strong>slm-125m</strong> uses a
+        vocabulary of exactly 16,384 possible chunks, trained specifically on this project's own legal/financial/web
+        corpus (more on how that training works in Part 2).</p>
+      <div class="diagram-card fade-child">
+        <div class="diagram-header">
+          <div class="icon">T</div>Tokenizing "The plaintiff shall bear the burden."
+        </div>
+        <div class="diagram-body">
+          <div class="mask-label">TOKENS - watch them appear</div>
+          <div class="token-flow" id="tokenFlow">
+            <span class="token token-special" data-delay="0">&lt;bos&gt;</span>
+            <span class="token token-a" data-delay="70">The</span>
+            <span class="token token-a" data-delay="140">Ġplain</span>
+            <span class="token token-a" data-delay="210">tiff</span>
+            <span class="token token-a" data-delay="280">Ġshall</span>
+            <span class="token token-a" data-delay="350">Ġbear</span>
+            <span class="token token-a" data-delay="420">Ġthe</span>
+            <span class="token token-a" data-delay="490">Ġburden</span>
+            <span class="token token-a" data-delay="560">.</span>
+            <span class="token token-special" data-delay="630">&lt;eos&gt;</span>
+          </div>
+          <div class="mask-label" style="margin-top:14px">TOKEN IDS (out of 16,384 possible)</div>
+          <div class="token-flow" id="idFlow">
+            <span class="token token-pos" data-delay="0">1</span>
+            <span class="token token-pos" data-delay="70">412</span>
+            <span class="token token-pos" data-delay="140">2891</span>
+            <span class="token token-pos" data-delay="210">7734</span>
+            <span class="token token-pos" data-delay="280">1205</span>
+            <span class="token token-pos" data-delay="350">3390</span>
+            <span class="token token-pos" data-delay="420">201</span>
+            <span class="token token-pos" data-delay="490">9012</span>
+            <span class="token token-pos" data-delay="560">18</span>
+            <span class="token token-pos" data-delay="630">2</span>
+          </div>
+          <div class="legend" style="margin-top:14px">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#dbeafe;border:1px solid #bfdbfe"></div>Text tokens
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#f3e8ff;border:1px solid #e9d5ff"></div>Special (begin/end)
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="fade-child">Note the "Ġ" - that's how byte-level tokenizers commonly represent "a space precedes this
+        chunk." Ten tokens for a nine-word sentence is typical; the real tokenizer in this project averages close to one
+        token per word for its trained domains, which we'll measure precisely in Part 2.</p>
+    </div>
+  </div>
+
+  <div class="ft-section" id="p1s3">
+    <div class="ft-section-inner">
+      <div class="ft-section-num">Part 1 · Step 03</div>
+      <h2>The Shift-by-One</h2>
+      <p class="subtitle">Here's the entire trick behind next-token prediction: the same sequence is used as both the
+        input and the answer key, offset by one position.</p>
+      <p class="fade-child">At every position, the model sees all tokens <strong>up to and including</strong> that
+        position, and must predict the <strong>next</strong> one. There's no separate "question" and "answer" dataset -
+        one sentence, read once, generates a training signal at <em>every single token</em>.</p>
+      <div class="diagram-card diagram-card-dark fade-child">
+        <div class="diagram-header">
+          <div class="icon" style="background:rgba(0,113,227,0.2)">→</div>The Shift-by-One Mechanism
+        </div>
+        <div class="diagram-body">
+          <div class="shift-anim-wrap" id="shiftAnim">
+            <div style="display:flex;align-items:center;gap:0;margin-bottom:4px">
+              <div class="shift-label" style="color:rgba(255,255,255,0.4)">POS</div>
+              <div class="shift-row" id="shiftPosRow"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0">
+              <div class="shift-label" style="color:#82aaff">INPUT</div>
+              <div class="shift-row" id="shiftInputRow"></div>
+            </div>
+            <div class="shift-arrow">↓ &nbsp; predicts &nbsp; ↓</div>
+            <div style="display:flex;align-items:center;gap:0">
+              <div class="shift-label" style="color:#ffcb6b">TARGET</div>
+              <div class="shift-row" id="shiftTargetRow"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="fade-child">At position 6 ("...shall bear the"), the model has seen "&lt;bos&gt; The plaintiff shall
+        bear the" and must predict "burden". At position 7, it's seen one token more and must predict ".". This is
+        exactly what happens 1,024 times per training window, for every one of the 1,991,282 windows in the training
+        set.</p>
+    </div>
+  </div>
+
+  <div class="ft-section ft-alt" id="p1s4">
+    <div class="ft-section-inner">
+      <div class="ft-section-num">Part 1 · Step 04</div>
+      <h2>Every Token Trains - No Masking Needed</h2>
+      <p class="subtitle">If you've read about fine-tuning a chat model, you've likely seen "loss masking" - hiding the
+        user's turn so the model only learns to predict the assistant's reply. Pretraining doesn't need that.</p>
+      <p class="fade-child">In instruction fine-tuning, a training example has structure: a system prompt, a user turn,
+        an assistant turn. You only want the model to learn to <em>generate</em> the assistant part, so every other
+        token's loss gets set to <code>-100</code> - PyTorch's "ignore this" signal.</p>
+      <p class="fade-child"><strong>slm-125m's training data has no such structure.</strong> It's raw continuous text -
+        court opinions, SEC filings, web pages - with no roles, no turns, nothing to mask. Every single token
+        contributes to the loss:</p>
+      <div class="diagram-card fade-child">
+        <div class="diagram-header">
+          <div class="icon">✓</div>All positions trained - nothing masked
+        </div>
+        <div class="diagram-body">
+          <div class="mask-label">TOKENS</div>
+          <div class="mask-row" id="maskTokenRow">
+            <div class="mask-cell trained">&lt;bos&gt;</div>
+            <div class="mask-cell trained">The</div>
+            <div class="mask-cell trained">plain-<br>tiff</div>
+            <div class="mask-cell trained">shall</div>
+            <div class="mask-cell trained">bear</div>
+            <div class="mask-cell trained">the</div>
+            <div class="mask-cell trained">burden</div>
+            <div class="mask-cell trained">.</div>
+            <div class="mask-cell trained">&lt;eos&gt;</div>
+          </div>
+          <div class="legend" style="margin-top:14px">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#d1fae5;border:1px solid #6ee7b7"></div>Trained - loss computed
+              at every position
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="callout callout-info fade-child">
+        <div class="callout-icon">i</div>
+        <p>This is one reason <strong>continued pretraining</strong> (what this project does) needs far more tokens than
+          instruction fine-tuning typically does - but also why it's conceptually simpler. There's no dataset-formatting
+          decision to make about "what counts as the target." Everything is the target.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ft-section" id="p1s5">
+    <div class="ft-section-inner">
+      <div class="ft-section-num">Part 1 · Step 05</div>
+      <h2>Cross-Entropy Loss</h2>
+      <p class="subtitle">At every trained position, the model outputs a probability across all 16,384 possible next
+        tokens. Loss measures how much probability it put on the token that was actually correct.</p>
+      <p class="fade-child">The formula is simple: <code>loss = −log(P(correct token))</code>. High confidence in the
+        right answer → loss near zero. Confidently wrong → loss shoots up. Here's what the pattern looks like,
+        illustratively, at three positions in our example sentence, before any training has happened:</p>
+      <div class="loss-grid">
+        <div class="loss-card" id="lossCard1">
+          <div class="loss-position">POSITION 4 - Predict "shall"</div>
+          <div class="loss-context">Model sees: <code>&lt;bos&gt; The plaintiff</code> → should output
+            <code>shall</code></div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">"is"</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar wrong" data-width="9%"></div>
+            </div>
+            <div class="prob-value">0.09</div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">"shall" ✓</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar correct" data-width="5%"></div>
+            </div>
+            <div class="prob-value">0.05</div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">"was"</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar wrong" data-width="7%"></div>
+            </div>
+            <div class="prob-value">0.07</div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">everything else</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar wrong" data-width="79%"></div>
+            </div>
+            <div class="prob-value">0.79</div>
+          </div>
+          <div class="loss-result"><span class="formula">Loss = −log(0.05) =</span><span class="value"
+              style="color:var(--blue)">3.00</span></div>
+        </div>
+        <div class="loss-card" id="lossCard2">
+          <div class="loss-position">POSITION 6 - Predict "burden"</div>
+          <div class="loss-context">Model sees: <code>...shall bear the</code> → should output <code>burden</code></div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">"same"</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar wrong" data-width="6%"></div>
+            </div>
+            <div class="prob-value">0.06</div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">"burden" ✓</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar correct" data-width="3%"></div>
+            </div>
+            <div class="prob-value">0.03</div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">"case"</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar wrong" data-width="4%"></div>
+            </div>
+            <div class="prob-value">0.04</div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">everything else</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar wrong" data-width="87%"></div>
+            </div>
+            <div class="prob-value">0.87</div>
+          </div>
+          <div class="loss-result"><span class="formula">Loss = −log(0.03) =</span><span class="value"
+              style="color:#ff9500">3.51</span></div>
+        </div>
+        <div class="loss-card" id="lossCard3">
+          <div class="loss-position">POSITION 8 - Predict "."</div>
+          <div class="loss-context">Model sees: <code>...bear the burden</code> → should output <code>.</code></div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">"of"</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar wrong" data-width="22%"></div>
+            </div>
+            <div class="prob-value">0.22</div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">"for"</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar wrong" data-width="8%"></div>
+            </div>
+            <div class="prob-value">0.08</div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">"." ✓</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar correct" data-width="4%"></div>
+            </div>
+            <div class="prob-value">0.04</div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-label">everything else</div>
+            <div class="prob-bar-bg">
+              <div class="prob-bar wrong" data-width="66%"></div>
+            </div>
+            <div class="prob-value">0.66</div>
+          </div>
+          <div class="loss-result"><span class="formula">Loss = −log(0.04) =</span><span class="value"
+              style="color:var(--red)">3.22</span></div>
+        </div>
+      </div>
+      <div class="callout callout-warn fade-child">
+        <div class="callout-icon">!</div>
+        <p>The specific probabilities above are <strong>illustrative</strong> - reconstructing the exact softmax output
+          at a single position from a live run isn't practical for a static page. But the overall pattern is exactly
+          what happened, measured for real, averaged across the entire training and validation sets:</p>
+      </div>
+      <table class="compare-table fade-child">
+        <thead>
+          <tr>
+            <th>Checkpoint</th>
+            <th>Avg. loss (nats)</th>
+            <th>Perplexity</th>
+            <th>What it means</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Step 0 (random init)</td>
+            <td>9.8706</td>
+            <td>≈19,412</td>
+            <td>= ln(16,384) almost exactly - confirms correct initialization, measured before training began</td>
+          </tr>
+          <tr>
+            <td>Step 3,889 (final)</td>
+            <td>2.326 (val)</td>
+            <td>≈10.2</td>
+            <td>real, measured on held-out data the model never trained on</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout callout-success fade-child">
+        <div class="callout-icon">✓</div>
+        <p><strong>That drop - 9.87 to 2.33 - is the entire story of training,</strong> compressed into two numbers.
+          Everything from here on is about <em>how</em> that happened.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ft-section ft-alt" id="p1s6">
+    <div class="ft-section-inner">
+      <div class="ft-section-num">Part 1 · Step 06</div>
+      <h2>The Complete Loop</h2>
+      <p class="subtitle">Every one of the 3,889 training steps in this project did exactly this, on a fresh
+        524,288-token batch each time.</p>
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="pipeline-line">
+            <div class="pipeline-dot">01</div>
+            <div class="pipeline-connector"></div>
+          </div>
+          <div class="pipeline-content">
+            <h4>Take a batch of real text</h4>
+            <p>524,288 tokens, sampled from the 2.04B-token training corpus, already packed into 1,024-token windows.
+            </p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-line">
+            <div class="pipeline-dot">02</div>
+            <div class="pipeline-connector"></div>
+          </div>
+          <div class="pipeline-content">
+            <h4>Shift by one position</h4>
+            <p>Input = tokens[0..N-1], target = tokens[1..N] - the same data, offset.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-line">
+            <div class="pipeline-dot">03</div>
+            <div class="pipeline-connector"></div>
+          </div>
+          <div class="pipeline-content">
+            <h4>Forward pass → logits</h4>
+            <p>At every position, the model outputs a probability distribution over all 16,384 vocabulary tokens.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-line">
+            <div class="pipeline-dot">04</div>
+            <div class="pipeline-connector"></div>
+          </div>
+          <div class="pipeline-content">
+            <h4>Cross-entropy loss</h4>
+            <p>Average of <code>−log(P(correct))</code> across every position - no masking, everything counts.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-line">
+            <div class="pipeline-dot">05</div>
+            <div class="pipeline-connector"></div>
+          </div>
+          <div class="pipeline-content">
+            <h4>Backpropagation</h4>
+            <p>Gradients flow to <strong>every one of the 125.8M parameters</strong> - full pretraining, not
+              adapter-based.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-line">
+            <div class="pipeline-dot">06</div>
+            <div class="pipeline-connector"></div>
+          </div>
+          <div class="pipeline-content">
+            <h4>AdamW optimizer step</h4>
+            <p>Every parameter nudges slightly in the direction that reduces loss, scaled by the current learning rate.
+            </p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-line">
+            <div class="pipeline-dot" style="background:#34c759">↻</div>
+          </div>
+          <div class="pipeline-content">
+            <h4>Repeat - 3,889 times</h4>
+            <p>Each cycle ≈2.6 seconds on the GPU used here. The whole run: 2.85 hours.</p>
+          </div>
+        </div>
+      </div>
+      <div class="callout callout-info fade-child">
+        <div class="callout-icon">i</div>
+        <p><strong>Part 1 complete.</strong> You now know what pretraining mechanically does. Part 2 gets specific:
+          exactly what data slm-125m trained on, exactly how its tokenizer was built, exactly how big it is and why, and
+          exactly what happened when this ran for real.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="part-bridge">
+    <div class="pb-label">End of Part 1 · Beginning of Part 2</div>
+    <h2 class="pb-title">Now the specifics.<br>How <em>slm-125m</em> was actually built.</h2>
+    <p class="pb-sub">Part 1 covered what pretraining does, in general. Part 2 is this project, specifically - the real
+      dataset, the real tokenizer, the real architecture, and the real numbers from the real training run.</p>
+    <div class="pb-pills">
+      <span class="pb-pill">2.04B real tokens</span>
+      <span class="pb-pill">16,384-vocab custom BPE</span>
+      <span class="pb-pill">125.8M params, full pretrain</span>
+      <span class="pb-pill active">→ Part 2 starts here</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════ PART 2 - THE SPECIFICS ═══════════════ -->
+
+  <div class="chapter" id="data">
+    <div class="ch-num">Part 2 · Chapter 01 - The Data Problem</div>
+    <h2>Three sources.<br>Only one has <em>enough</em> text.</h2>
+    <p class="lead">The plan was 70% US case law, 20% SEC filings, 10% web text. Measuring the real token yield first
+      ruled that out before a dollar was spent.</p>
+
+    <div class="two-col fade-up">
+      <div>
+        <div class="mem-cmp">
+          <div class="mem-row">
+            <div class="mem-lbl">case law avail.</div>
+            <div class="mem-track">
+              <div class="mem-fill mf-a" data-t="7"><span>0.81B</span></div>
+            </div>
+            <div class="mem-val">0.81B tok</div>
+          </div>
+          <div class="mem-row">
+            <div class="mem-lbl">SEC avail.</div>
+            <div class="mem-track">
+              <div class="mem-fill mf-a" data-t="10"><span>1.16B</span></div>
+            </div>
+            <div class="mem-val">1.16B tok</div>
+          </div>
+          <div class="mem-row">
+            <div class="mem-lbl">web avail.</div>
+            <div class="mem-track">
+              <div class="mem-fill mf-c" data-t="100"><span>11.67B available</span></div>
+            </div>
+            <div class="mem-val">11.67B tok</div>
+          </div>
+          <div class="mem-row">
+            <div class="mem-lbl">case law used</div>
+            <div class="mem-track">
+              <div class="mem-fill mf-b" data-t="7"><span>1.0B budget</span></div>
+            </div>
+            <div class="mem-val">1.0B cap</div>
+          </div>
+          <div class="mem-row">
+            <div class="mem-lbl">SEC used</div>
+            <div class="mem-track">
+              <div class="mem-fill mf-b" data-t="9"><span>1.3B budget</span></div>
+            </div>
+            <div class="mem-val">1.3B cap</div>
+          </div>
+          <div class="mem-row">
+            <div class="mem-lbl">web used</div>
+            <div class="mem-track">
+              <div class="mem-fill mf-b" data-t="4"><span>0.5B budget</span></div>
+            </div>
+            <div class="mem-val">0.5B cap</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p>Case law and SEC filings together only contain about <strong>2 billion clean tokens, total</strong>. There is
+          no version of this project where legal text is 70% of a 10-billion-token corpus - the source material doesn't
+          physically contain that much.</p>
+        <p><strong>fineweb-edu</strong>, by contrast, is nearly bottomless - 11.67B tokens in the sampled slice alone.
+          So the actual strategy: take <em>all</em> of both legal sources, cap web text at just enough to round out the
+          mix.</p>
+        <div class="callout callout-success" style="margin:16px 0 0">
+          <div class="callout-icon">✓</div>
+          <p>Realized mix after cleaning: <strong>case law ~35%, SEC ~42%, web ~23%</strong> - about 78% legal text,
+            nowhere near 70/20/10, but the closest legal-first mix this data actually supports.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="three-col stagger" style="margin-top:44px">
+      <div class="pillar">
+        <div class="pillar-num">1</div>
+        <div class="pillar-icon">🧹</div>
+        <h3>Clean</h3>
+        <p class="pil-desc">Line-level noise filters, boilerplate stripping, repetition and language gates, plus an
+          OCR-garbage gate for scanned case law.</p>
+        <div class="pil-stat">2.68B <strong>proxy tokens kept</strong> · ~97%</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">2</div>
+        <div class="pillar-icon">🔁</div>
+        <h3>Dedup</h3>
+        <p class="pil-desc">Exact-hash duplicates removed, MinHash near-duplicates caught on case law, and a 13-word
+          overlap check strips anything resembling the eval benchmarks.</p>
+        <div class="pil-stat">2.40B <strong>tokens</strong> · 24k contaminated docs removed</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">3</div>
+        <div class="pillar-icon">🔤</div>
+        <h3>Tokenize</h3>
+        <p class="pil-desc">Encoded with the custom 16,384-vocab BPE tokenizer (next chapter), packed into 1,024-token
+          windows, 99/1 train/val split.</p>
+        <div class="pil-stat">2.04B <strong>train tokens</strong> · 20.6M val</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter alt" id="bpe">
+    <div class="ch-num">Part 2 · Chapter 02 - Byte-Pair Encoding</div>
+    <h2>A vocabulary,<br>grown from <em>this</em> corpus.</h2>
+    <p class="lead">The tokenizer wasn't downloaded from a larger model - it's trained from scratch, on this project's
+      own cleaned text, so its 16,384 chunks reflect legal and financial language specifically.</p>
+
+    <div class="two-col-60 fade-up">
+      <div>
+        <h3>The algorithm, one merge at a time</h3>
+        <p>BPE starts with every input broken into raw bytes - the smallest possible unit, guaranteeing anything can be
+          represented. Then, repeatedly:</p>
+        <ol style="margin:12px 0 16px 20px; color:var(--ink2); font-size:.93rem; line-height:1.8;">
+          <li>Scan the whole training corpus for the <strong>most frequent adjacent pair</strong> of units</li>
+          <li>Merge that pair into one new unit</li>
+          <li>Repeat - 16,384 minus the starting alphabet size, times</li>
+        </ol>
+        <p>Common English/legal/financial sequences - "tion", "the", whole short words - collapse into single tokens
+          early. Rare sequences stay as smaller pieces or individual bytes. Nothing is ever unrepresentable; worst case,
+          a token falls all the way back to raw bytes.</p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <div class="code-lang">real output - Phase 3 tokenizer test</div>
+          </div>
+          <pre>&gt;&gt;&gt; tok.encode(<span class="hl-string">"The plaintiff shall bear the burden
+    of proof by a preponderance
+    of the evidence."</span>)
+<span class="hl-func">15 tokens</span>
+
+&gt;&gt;&gt; tok.encode(<span class="hl-string">"The Company's net revenues
+    increased 12% year over year
+    pursuant to the agreement."</span>)
+<span class="hl-func">16 tokens</span>
+
+&gt;&gt;&gt; tok.decode(tok.encode(text)) == text
+<span class="hl-func">True</span>  <span class="hl-comment"># lossless roundtrip, every time</span></pre>
+        </div>
+      </div>
+      <div>
+        <h3>Why byte-level</h3>
+        <p>The <em>starting</em> alphabet is raw bytes, not Unicode characters - so any input, in any language,
+          including malformed or unexpected text, always encodes to something. There's no "unknown character" failure
+          mode.</p>
+        <h3>Why 16,384, specifically</h3>
+        <p>A bigger vocabulary means fewer tokens per sentence (more efficient) but a bigger embedding table. At 125.8M
+          total parameters, the embedding table is already <code>16,384 × 768 = 12.58M</code> params - about 10% of the
+          whole model. A 50,000-token vocab (typical for much larger models) would eat a disproportionate share of this
+          model's capacity. 16,384 is sized <em>for this model</em>, not inherited from a bigger one.</p>
+        <div class="callout callout-info" style="margin-top:16px">
+          <div class="callout-icon">i</div>
+          <p><strong>Special tokens:</strong> <code>&lt;|bos|&gt;</code> <code>&lt;|eos|&gt;</code>
+            <code>&lt;|pad|&gt;</code> <code>&lt;|unk|&gt;</code>, plus three chat-role tokens
+            (<code>&lt;|user|&gt;</code>, <code>&lt;|assistant|&gt;</code>, <code>&lt;|system|&gt;</code>) reserved but
+            unused during this base pretraining run - present in the vocabulary for a possible future fine-tuning stage.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter" id="arch">
+    <div class="ch-num">Part 2 · Chapter 03 - Architecture</div>
+    <h2>A plain transformer.<br><em>On purpose.</em></h2>
+    <p class="lead">No architectural novelty - a standard LLaMA-style decoder, so every result is attributable to data
+      and training, not a clever model design.</p>
+
+    <div class="two-col fade-up">
+      <div>
+        <div class="blocks-diagram">
+          <div class="blk blk-emb">Token Embedding (16,384 × 768)</div>
+          <div class="blk-arrow">↓</div>
+          <div class="blk-group">
+            <div class="blk blk-norm">RMSNorm</div>
+            <div class="blk blk-attn">Self-Attention · 12 heads, dim 64</div>
+            <div class="blk blk-norm">RMSNorm</div>
+            <div class="blk blk-mlp">SwiGLU MLP · 768 → 3,072 → 768</div>
+          </div>
+          <div class="blk-repeat">↻ repeated 12 times</div>
+          <div class="blk-arrow">↓</div>
+          <div class="blk blk-norm">Final RMSNorm</div>
+          <div class="blk-arrow">↓</div>
+          <div class="blk blk-out">Output projection (tied to embedding)</div>
+        </div>
+      </div>
+      <div>
+        <div class="tw">
+          <table>
+            <tbody>
+              <tr>
+                <td>Parameters</td>
+                <td><strong>125,847,552</strong></td>
+              </tr>
+              <tr>
+                <td>Layers</td>
+                <td>12</td>
+              </tr>
+              <tr>
+                <td>Hidden size</td>
+                <td>768</td>
+              </tr>
+              <tr>
+                <td>Intermediate (MLP)</td>
+                <td>3,072 · SwiGLU</td>
+              </tr>
+              <tr>
+                <td>Attention heads</td>
+                <td>12 · head dim 64</td>
+              </tr>
+              <tr>
+                <td>KV heads</td>
+                <td>12 - plain MHA, not GQA</td>
+              </tr>
+              <tr>
+                <td>Positional encoding</td>
+                <td>RoPE, θ=10,000</td>
+              </tr>
+              <tr>
+                <td>Normalization</td>
+                <td>RMSNorm, ε=1e-5</td>
+              </tr>
+              <tr>
+                <td>Embeddings</td>
+                <td>Tied input/output</td>
+              </tr>
+              <tr>
+                <td>Context length</td>
+                <td>1,024 tokens</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-info" style="margin-top:16px">
+          <div class="callout-icon">i</div>
+          <p><strong>Tied embeddings</strong> means the same 12.58M-parameter matrix is reused for both "token in" and
+            "token out" - saving ~12.6M parameters versus two separate matrices. Small models benefit from this
+            proportionally more than large ones.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Try it - how big would a different shape be?</h3>
+    <p>The real model uses hidden=768, layers=12 (the highlighted cell below). Drag either slider to see how parameter
+      count scales.</p>
+    <div class="calc-box">
+      <div class="calc-title">// Live parameter calculator - same formula as config.py</div>
+      <div class="calc-row"><label>hidden = <strong id="hVal">768</strong></label><input type="range" id="hSlider"
+          min="128" max="2048" value="768" step="128"></div>
+      <div class="calc-row"><label>layers = <strong id="lVal">12</strong></label><input type="range" id="lSlider"
+          min="2" max="32" value="12" step="1"></div>
+      <div class="calc-result">
+        <div class="cr" id="crParams">
+          <div class="crl">Total params</div>
+          <div class="crv">125.8M</div>
+        </div>
+        <div class="cr" id="crEmb">
+          <div class="crl">Embedding share</div>
+          <div class="crv">10.0%</div>
+        </div>
+        <div class="cr hit" id="crMatch">
+          <div class="crl">vs. real model</div>
+          <div class="crv">✓ exact match</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter alt" id="memory">
+    <div class="ch-num">Part 2 · Chapter 04 - What's Actually in GPU Memory</div>
+    <h2>No LoRA. No quantization.<br><em>Didn't need them.</em></h2>
+    <p class="lead">At 125.8M parameters, full-precision full-parameter training fits comfortably in memory - the tricks
+      that make training a 32B model feasible on one GPU exist to solve a problem this model doesn't have.</p>
+
+    <div class="tw fade-up">
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Size</th>
+            <th>What it is</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Model weights (fp32)</td>
+            <td><strong>~503 MB</strong></td>
+            <td>125.8M params × 4 bytes. Kept in fp32 as the "master copy"; bf16 is used only transiently during the
+              forward/backward matmuls (autocast).</td>
+          </tr>
+          <tr>
+            <td>Gradients</td>
+            <td><strong>~503 MB</strong></td>
+            <td>One gradient per parameter, same shape and dtype as the weights - <em>every</em> parameter gets one,
+              since this is full pretraining, not adapter-based.</td>
+          </tr>
+          <tr>
+            <td>AdamW optimizer state</td>
+            <td><strong>~1,006 MB</strong></td>
+            <td>Two extra numbers per parameter (first and second moment estimates, "m" and "v") - this is why AdamW
+              costs 2× the model size on top of the weights themselves.</td>
+          </tr>
+          <tr>
+            <td>Activations (transient)</td>
+            <td><strong>a few GB</strong></td>
+            <td>Intermediate values from the forward pass, held only until backward pass consumes them. Scales with
+              batch size × sequence length × hidden size × layers.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="sl">Fixed, resident</div>
+        <div class="sn">~2 GB</div>
+        <div class="sd">weights + grads + optimizer</div>
+      </div>
+      <div class="stat-card">
+        <div class="sl">H100 available</div>
+        <div class="sn">80 GB</div>
+        <div class="sd">the GPU this ran on</div>
+      </div>
+      <div class="stat-card">
+        <div class="sl">Headroom</div>
+        <div class="sn">huge</div>
+        <div class="sd">this model barely uses the GPU it's on</div>
+      </div>
+    </div>
+
+    <div class="callout callout-info fade-up">
+      <div class="callout-icon">i</div>
+      <p>If you've read about <strong>QLoRA</strong> - 4-bit quantized frozen weights, small trainable LoRA adapters,
+        paged optimizers to survive memory spikes - that machinery exists because a 32-billion-parameter model's full
+        fp32 footprint is ~384GB, more than any single consumer or even datacenter GPU holds. <strong>slm-125m's entire
+          footprint is about 2GB.</strong> This model would likely train fine on a GPU a fraction the size of an H100 -
+        the H100 was chosen for speed, not because anything smaller couldn't fit it.</p>
+    </div>
+
+    <h3>Why 1 GPU, not 8</h3>
+    <p>Compute per epoch ≈ <code>6 × params × tokens</code> = <code>6 × 125.8M × 2.04B ≈ 1.54 × 10¹⁸ FLOPs</code>. A
+      single H100 finishes that in a few hours. Eight GPUs would mean paying for cross-GPU gradient-sync overhead with
+      almost nothing to parallelize against at this parameter count - the original default config assumed 8×, and the
+      math above is why it was changed to 1×. Measured result: ~2.63 seconds/step steady-state, ~2.85 hours total.</p>
+  </div>
+
+  <div class="chapter" id="config">
+    <div class="ch-num">Part 2 · Chapter 05 - Every Setting, Explained</div>
+    <h2>Nothing hardcoded.<br>Everything in <em>one file</em>.</h2>
+    <p class="lead"><code>config.py</code> is the single source of truth - every other file imports from it. Here's
+      every value that mattered, and why it was set that way.</p>
+
+    <div class="accord open" id="a1">
+      <div class="a-head" onclick="tog('a1')">
+        <div class="a-left">
+          <div class="a-icon">M</div>
+          <div>
+            <div class="a-title">ModelConfig</div>
+            <div class="a-sub">architecture - maps 1:1 to transformers.LlamaConfig</div>
+          </div>
+        </div>
+        <div class="a-chev">▶</div>
+      </div>
+      <div class="a-body">
+        <div class="tw" style="border:none">
+          <table>
+            <tbody>
+              <tr>
+                <td>vocab_size</td>
+                <td><strong>16,384</strong></td>
+                <td>sized for a 125M model, not inherited from a bigger one</td>
+              </tr>
+              <tr>
+                <td>hidden_size</td>
+                <td><strong>768</strong></td>
+                <td>residual stream width</td>
+              </tr>
+              <tr>
+                <td>intermediate_size</td>
+                <td><strong>3,072</strong></td>
+                <td>SwiGLU MLP inner dim, 4× hidden</td>
+              </tr>
+              <tr>
+                <td>num_hidden_layers</td>
+                <td><strong>12</strong></td>
+                <td>transformer blocks</td>
+              </tr>
+              <tr>
+                <td>num_attention_heads</td>
+                <td><strong>12</strong></td>
+                <td>head dim 64 (768÷12)</td>
+              </tr>
+              <tr>
+                <td>num_key_value_heads</td>
+                <td><strong>12</strong></td>
+                <td>= heads → plain MHA, not GQA</td>
+              </tr>
+              <tr>
+                <td>max_position_embeddings</td>
+                <td><strong>1,024</strong></td>
+                <td>context length</td>
+              </tr>
+              <tr>
+                <td>rope_theta</td>
+                <td><strong>10,000.0</strong></td>
+                <td>RoPE base frequency</td>
+              </tr>
+              <tr>
+                <td>rms_norm_eps</td>
+                <td><strong>1e-5</strong></td>
+                <td>normalization stability constant</td>
+              </tr>
+              <tr>
+                <td>tie_word_embeddings</td>
+                <td><strong>True</strong></td>
+                <td>saves ~12.6M params</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="accord" id="a2">
+      <div class="a-head" onclick="tog('a2')">
+        <div class="a-left">
+          <div class="a-icon">C</div>
+          <div>
+            <div class="a-title">CleanConfig</div>
+            <div class="a-sub">every threshold in the cleaning pipeline</div>
+          </div>
+        </div>
+        <div class="a-chev">▶</div>
+      </div>
+      <div class="a-body">
+        <div class="tw" style="border:none">
+          <table>
+            <tbody>
+              <tr>
+                <td>min_line_chars</td>
+                <td><strong>40</strong></td>
+                <td>drop lines shorter than this</td>
+              </tr>
+              <tr>
+                <td>max_nonalnum_ratio</td>
+                <td><strong>0.30</strong></td>
+                <td>drop lines that are &gt;30% non-alphanumeric</td>
+              </tr>
+              <tr>
+                <td>min_doc_chars</td>
+                <td><strong>600</strong></td>
+                <td>drop documents shorter than this after cleaning</td>
+              </tr>
+              <tr>
+                <td>repetition_top_k / max_repetition_ratio</td>
+                <td><strong>10 / 0.50</strong></td>
+                <td>drop if the top 10 most common 4-grams cover &gt;50% of the doc</td>
+              </tr>
+              <tr>
+                <td>lang_sample_chars</td>
+                <td><strong>5,000</strong></td>
+                <td>how much text the language-detection gate samples</td>
+              </tr>
+              <tr>
+                <td>nonword_ratio_max</td>
+                <td><strong>0.20</strong></td>
+                <td>OCR gate - drop if &gt;20% of words aren't in the dictionary</td>
+              </tr>
+              <tr>
+                <td>ocr_min_tokens</td>
+                <td><strong>50</strong></td>
+                <td>minimum words before the OCR gate applies at all</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="accord" id="a3">
+      <div class="a-head" onclick="tog('a3')">
+        <div class="a-left">
+          <div class="a-icon">T</div>
+          <div>
+            <div class="a-title">TrainConfig</div>
+            <div class="a-sub">every training hyperparameter</div>
+          </div>
+        </div>
+        <div class="a-chev">▶</div>
+      </div>
+      <div class="a-body">
+        <div class="tw" style="border:none">
+          <table>
+            <tbody>
+              <tr>
+                <td>seq_len</td>
+                <td><strong>1,024</strong></td>
+                <td>tokens per training window</td>
+              </tr>
+              <tr>
+                <td>micro_batch_size</td>
+                <td><strong>32</strong></td>
+                <td>windows per forward/backward pass</td>
+              </tr>
+              <tr>
+                <td>global_batch_tokens</td>
+                <td><strong>524,288</strong></td>
+                <td>= 16 micro-batches accumulated per optimizer step</td>
+              </tr>
+              <tr>
+                <td>lr / min_lr</td>
+                <td><strong>6e-4 / 6e-5</strong></td>
+                <td>cosine schedule peak and floor</td>
+              </tr>
+              <tr>
+                <td>warmup_tokens</td>
+                <td><strong>200,000,000</strong></td>
+                <td>≈381 steps of linear warmup before peak LR</td>
+              </tr>
+              <tr>
+                <td>weight_decay</td>
+                <td><strong>0.1</strong></td>
+                <td>AdamW regularization</td>
+              </tr>
+              <tr>
+                <td>beta1 / beta2</td>
+                <td><strong>0.9 / 0.95</strong></td>
+                <td>AdamW moment decay rates</td>
+              </tr>
+              <tr>
+                <td>grad_clip</td>
+                <td><strong>1.0</strong></td>
+                <td>max gradient norm</td>
+              </tr>
+              <tr>
+                <td>ckpt_every_steps</td>
+                <td><strong>500</strong></td>
+                <td>resumable checkpoint cadence</td>
+              </tr>
+              <tr>
+                <td>eval_every_steps</td>
+                <td><strong>1,000</strong></td>
+                <td>held-out validation loss check</td>
+              </tr>
+              <tr>
+                <td>seed</td>
+                <td><strong>1337</strong></td>
+                <td>data shuffling + weight init</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px">Common errors, hit for real</h3>
+    <div class="pf-grid">
+      <div class="pf">
+        <div class="pf-prob"><strong>Training job died mid-run</strong> - local terminal disconnected, killing a job
+          tied to <code>.remote()</code></div>
+        <div class="pf-fix">use <code>.spawn()</code> + <code>--detach</code></div>
+      </div>
+      <div class="pf">
+        <div class="pf-prob"><strong>422 "missing query parameter"</strong> on the inference endpoint - Pydantic model
+          defined inside the route function, unresolvable under <code>from __future__ import annotations</code></div>
+        <div class="pf-fix">define request models at module scope</div>
+      </div>
+      <div class="pf">
+        <div class="pf-prob"><strong>500 error: unexpected model_kwargs</strong> - tokenizer returns
+          <code>token_type_ids</code>, which <code>generate()</code> doesn't accept</div>
+        <div class="pf-fix"><code>return_token_type_ids=False</code></div>
+      </div>
+      <div class="pf">
+        <div class="pf-prob"><strong>Modal image build fails</strong> - pip/apt installs placed after
+          <code>add_local_python_source(...)</code></div>
+        <div class="pf-fix">installs always come first in the chain</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter alt" id="curve">
+    <div class="ch-num">Part 2 · Chapter 06 - The Real Curve</div>
+    <h2>9.87 to 2.33.<br><em>195 measured points.</em></h2>
+    <p class="lead">Not illustrative this time - every point below is a real logged value from the actual training run.
+    </p>
+
+    <div class="chart-card fade-up">
+      <div class="chart-head">
+        <h4>Training loss - all 3,889 steps</h4>
+        <span class="mono">9.87 → 2.263 nats</span>
+      </div>
+      <svg id="loss-chart" viewBox="0 0 900 320" preserveAspectRatio="none" role="img"
+        aria-label="Loss curve dropping from 9.87 at step 0 to 2.263 at step 3889"></svg>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="sl">Optimizer steps</div>
+        <div class="sn">3,889</div>
+        <div class="sd">1 epoch</div>
+      </div>
+      <div class="stat-card">
+        <div class="sl">Tokens seen</div>
+        <div class="sn">2.04B</div>
+        <div class="sd">~16.2× params - near Chinchilla-optimal ~20×</div>
+      </div>
+      <div class="stat-card">
+        <div class="sl">Wall-clock</div>
+        <div class="sn">2.85hr</div>
+        <div class="sd">1× H100</div>
+      </div>
+      <div class="stat-card">
+        <div class="sl">Total cost</div>
+        <div class="sn">$15.54</div>
+        <div class="sd">every phase, including retries</div>
+      </div>
+    </div>
+
+    <div class="callout callout-info fade-up">
+      <div class="callout-icon">i</div>
+      <p><strong>Warmup then decay:</strong> linear ramp for ~381 steps (jumping straight to peak LR on random weights
+        destabilizes early training), peak <code>6e-4</code>, cosine decay to <code>6e-5</code> by the final step. This
+        exact schedule is what <code>lr_at()</code> in <code>train.py</code> computes at every step.</p>
+    </div>
+  </div>
+
+  <div class="chapter" id="infra">
+    <div class="ch-num">Part 2 · Chapter 07 - Modal &amp; Vercel</div>
+    <h2>Where this<br>actually <em>ran</em>.</h2>
+    <p class="lead">Every phase, in order - each one a small, cheap, resumable cloud job, not one long fragile script.
+    </p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="pipeline-line">
+          <div class="pipeline-dot">0</div>
+          <div class="pipeline-connector"></div>
+        </div>
+        <div class="pipeline-content">
+          <h4>Measure</h4>
+          <p>Sample each source, extrapolate real token yield - the number that rules out 70/20/10 before any spend.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line">
+          <div class="pipeline-dot">1</div>
+          <div class="pipeline-connector"></div>
+        </div>
+        <div class="pipeline-content">
+          <h4>Clean</h4>
+          <p>16 parallel Modal CPU workers, one per data shard. ~718,000 documents streamed, ~97% kept.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line">
+          <div class="pipeline-dot">2</div>
+          <div class="pipeline-connector"></div>
+        </div>
+        <div class="pipeline-content">
+          <h4>Dedup + decontaminate</h4>
+          <p>MinHash near-dup detection, 13-gram overlap check against eval benchmarks. 2.40B tokens remain.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line">
+          <div class="pipeline-dot">3</div>
+          <div class="pipeline-connector"></div>
+        </div>
+        <div class="pipeline-content">
+          <h4>Train the tokenizer</h4>
+          <p>Fresh 16,384-vocab BPE trained on the whole cleaned corpus.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line">
+          <div class="pipeline-dot">4</div>
+          <div class="pipeline-connector"></div>
+        </div>
+        <div class="pipeline-content">
+          <h4>Tokenize + pack</h4>
+          <p>14 parallel workers encode and pack into 1,024-token windows. 2.04B train / 20.6M val tokens.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line">
+          <div class="pipeline-dot">5</div>
+          <div class="pipeline-connector"></div>
+        </div>
+        <div class="pipeline-content">
+          <h4>Pretrain</h4>
+          <p><code>modal run --detach modal_app.py::pretrain --epochs 1.0</code> - 1× H100, ~2.85 hours, ~$12–13.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line">
+          <div class="pipeline-dot">6</div>
+          <div class="pipeline-connector"></div>
+        </div>
+        <div class="pipeline-content">
+          <h4>Push to Hugging Face</h4>
+          <p><code>modal run modal_app.py::deploy</code> - uploads checkpoint, tokenizer, and an auto-generated model
+            card.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line">
+          <div class="pipeline-dot" style="background:#34c759">✓</div>
+        </div>
+        <div class="pipeline-content">
+          <h4>Serve + deploy the demo</h4>
+          <p><code>modal deploy modal_app.py</code> for a persistent inference endpoint,
+            <code>vercel deploy --prod</code> for the static site that calls it directly from the browser.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block fade-up">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <div class="code-lang">setup - both platforms, from zero</div><button class="c-cpy"
+          onclick="cpy(this)">copy</button>
+      </div>
+      <pre><span class="hl-comment"># ── Modal ─────────────────────────────────────────────────</span>
+pip install modal
+modal token new
+
+<span class="hl-comment"># ephemeral - stops when your terminal disconnects</span>
+modal run app.py::main
+
+<span class="hl-comment"># long-running - survives a dropped connection</span>
+modal run --detach app.py::train
+
+<span class="hl-comment"># persistent - gets a stable URL, serves forever</span>
+modal deploy app.py
+
+<span class="hl-comment"># ── Vercel ────────────────────────────────────────────────</span>
+npm install -g vercel
+vercel link --yes --project my-site
+vercel deploy --prod</pre>
+    </div>
+
+    <p class="fade-up">Why two platforms and not one: Modal has no first-class static-site hosting, and Vercel has no
+      GPU compute. Each does the one thing it's actually built for - the browser-side demo calls the Modal endpoint
+      directly via CORS, so there isn't even a server in between.</p>
+  </div>
+
+  <div class="chapter dark">
+    <div class="ch-num" style="color:rgba(245,245,247,.3)">Summary</div>
+    <h2>Three ideas.<br>One trained <em>model</em>.</h2>
+    <div class="three-col stagger" style="margin-top:44px">
+      <div style="padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:16px">
+        <div
+          style="font-size:.68rem;font-family:var(--mono);color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">
+          Shift-by-one</div>
+        <div
+          style="font-family:-apple-system,BlinkMacSystemFont,Helvetica Neue,Arial,sans-serif;font-size:1.2rem;font-weight:700;color:#f5f5f7;margin-bottom:10px">
+          Every token predicts the next</div>
+        <p style="font-size:.86rem;color:rgba(245,245,247,.55);line-height:1.65;margin:0">One sequence, offset by one
+          position, generates a training signal at every position. No labeling, no separate answer key - the text
+          <em>is</em> the supervision.</p>
+      </div>
+      <div style="padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:16px">
+        <div
+          style="font-size:.68rem;font-family:var(--mono);color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">
+          Full pretraining</div>
+        <div
+          style="font-family:-apple-system,BlinkMacSystemFont,Helvetica Neue,Arial,sans-serif;font-size:1.2rem;font-weight:700;color:#f5f5f7;margin-bottom:10px">
+          125.8M parameters, all trained</div>
+        <p style="font-size:.86rem;color:rgba(245,245,247,.55);line-height:1.65;margin:0">No LoRA, no quantization, no
+          frozen base - small enough that full fp32 training fits in ~2GB, comfortably inside any modern GPU.</p>
+      </div>
+      <div style="padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:16px">
+        <div
+          style="font-size:.68rem;font-family:var(--mono);color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">
+          Measured, not assumed</div>
+        <div
+          style="font-family:-apple-system,BlinkMacSystemFont,Helvetica Neue,Arial,sans-serif;font-size:1.2rem;font-weight:700;color:#f5f5f7;margin-bottom:10px">
+          9.87 → 2.326, real numbers</div>
+        <p style="font-size:.86rem;color:rgba(245,245,247,.55);line-height:1.65;margin:0">The data mix, the GPU count,
+          and every hyperparameter above trace back to a measurement, not a guess - that's what makes the $15.54 total
+          cost repeatable.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>slm-125m - a beginner's guide, not deployed, for personal reference</p>
+  </footer>
+
+  <script>
+    // PROGRESS BAR
+    const prog = document.getElementById('prog');
+    window.addEventListener('scroll', () => {
+      const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+      prog.style.width = (pct * 100) + '%';
+    }, { passive: true });
+
+    // NAV SCROLLSPY
+    const sectIds = ['p1s1', 'p1s2', 'p1s3', 'p1s5', 'data', 'bpe', 'arch', 'memory', 'config', 'curve', 'infra'];
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY + 120;
+      sectIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const link = document.querySelector(`.nav-link[href="#${id}"]`);
+        if (!link) return;
+        const inView = el.offsetTop <= y && el.offsetTop + el.offsetHeight > y;
+        link.classList.toggle('on', inView);
+      });
+    }, { passive: true });
+
+    // REVEAL: ft-section-inner
+    const ftObs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.ft-section-inner').forEach(el => ftObs.observe(el));
+
+    // REVEAL: fade-up / stagger (chapters)
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+    }, { threshold: 0, rootMargin: '0px 0px 140px 0px' });
+    document.querySelectorAll('.fade-up, .stagger').forEach(el => obs.observe(el));
+
+    // COUNTER ANIMATION
+    const cntObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.querySelectorAll('.cnt').forEach(el => {
+          const to = parseFloat(el.dataset.to), suf = el.dataset.suffix || '';
+          let start = null;
+          const step = ts => {
+            if (!start) start = ts;
+            const p = Math.min((ts - start) / 1200, 1);
+            const ease = 1 - Math.pow(1 - p, 3);
+            const cur = (ease * to);
+            el.textContent = (to % 1 === 0 ? Math.round(cur) : cur.toFixed(1)) + suf;
+            if (p < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        });
+        cntObs.unobserve(e.target);
+      }, { threshold: 0.5 });
+    });
+    const heroStats = document.querySelector('.hero-stat-row');
+    if (heroStats) cntObs.observe(heroStats);
+
+    // TOKEN FLOW ANIMATION
+    let tokenAnimated = false;
+    const tokenObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !tokenAnimated) {
+          tokenAnimated = true;
+          document.querySelectorAll('#tokenFlow .token, #idFlow .token').forEach(tok => {
+            const delay = parseInt(tok.dataset.delay || 0);
+            setTimeout(() => tok.classList.add('animated'), delay);
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+    const tokenFlowEl = document.getElementById('tokenFlow');
+    if (tokenFlowEl) tokenObs.observe(tokenFlowEl);
+
+    // SHIFT-BY-ONE ANIMATION
+    const shiftTokens = ['<bos>', 'The', 'plain-', 'tiff', 'shall', 'bear', 'the', 'burden', '.'];
+    const shiftTargets = ['The', 'plain-', 'tiff', 'shall', 'bear', 'the', 'burden', '.', '<eos>'];
+    const trainPositions = [4, 5, 6];
+    let shiftAnimated = false;
+    const shiftObs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting && !shiftAnimated) { shiftAnimated = true; buildShiftAnim(); } });
+    }, { threshold: 0.3 });
+    const shiftEl = document.getElementById('shiftAnim');
+    if (shiftEl) shiftObs.observe(shiftEl);
+
+    function buildShiftAnim() {
+      const posRow = document.getElementById('shiftPosRow');
+      const inputRow = document.getElementById('shiftInputRow');
+      const targetRow = document.getElementById('shiftTargetRow');
+      shiftTokens.forEach((tok, i) => {
+        const posCell = document.createElement('div');
+        posCell.className = 'shift-cell';
+        posCell.style.cssText = 'background:transparent;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);font-size:.56rem;opacity:0';
+        posCell.textContent = i;
+        posRow.appendChild(posCell);
+        const inCell = document.createElement('div');
+        inCell.className = 'shift-cell input-cell';
+        inCell.style.opacity = '0';
+        inCell.textContent = tok;
+        inputRow.appendChild(inCell);
+        const tCell = document.createElement('div');
+        tCell.className = 'shift-cell target-cell';
+        tCell.textContent = shiftTargets[i];
+        targetRow.appendChild(tCell);
+        setTimeout(() => { posCell.style.transition = 'opacity .3s ease'; posCell.style.opacity = '1'; inCell.style.transition = 'opacity .4s ease'; inCell.style.opacity = '1'; }, i * 80);
+        setTimeout(() => {
+          tCell.classList.add('shifted');
+          if (trainPositions.includes(i)) setTimeout(() => { inCell.classList.add('active-train'); tCell.classList.add('active-train'); }, 300);
+        }, shiftTokens.length * 80 + 400 + i * 60);
+      });
+      setTimeout(() => document.getElementById('shiftAnim').classList.add('animated'), shiftTokens.length * 80 + 200);
+    }
+
+    // MASK ROW ANIMATION (all-trained illustration)
+    let maskAnimated = false;
+    const maskObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !maskAnimated) {
+          maskAnimated = true;
+          document.querySelectorAll('#maskTokenRow .mask-cell').forEach((cell, i) => {
+            setTimeout(() => { cell.classList.add('pop'); setTimeout(() => cell.classList.add('glow'), 250); }, i * 70);
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+    const maskRow = document.getElementById('maskTokenRow');
+    if (maskRow) maskObs.observe(maskRow);
+
+    // LOSS CARD ANIMATION
+    const lossObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          setTimeout(() => e.target.querySelectorAll('.prob-bar').forEach(bar => bar.style.width = bar.dataset.width), 350);
+        }
+      });
+    }, { threshold: 0.25 });
+    document.querySelectorAll('.loss-card').forEach(el => lossObs.observe(el));
+
+    // MEMORY BARS
+    const mobs = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting) return;
+      document.querySelectorAll('.mem-fill').forEach((f, i) => setTimeout(() => f.style.width = f.dataset.t + '%', i * 180));
+      mobs.disconnect();
+    }, { threshold: 0.4 });
+    const mc = document.querySelector('.mem-cmp');
+    if (mc) mobs.observe(mc);
+
+    // PIPELINE STEP ANIMATION
+    const pipeObs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.2, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.pipeline-step').forEach(el => pipeObs.observe(el));
+
+    // ACCORDIONS
+    function tog(id) { document.getElementById(id).classList.toggle('open'); }
+
+    // CODE COPY
+    function cpy(btn) {
+      const code = btn.closest('.code-block').querySelector('pre').innerText;
+      navigator.clipboard.writeText(code).then(() => { btn.textContent = 'copied!'; setTimeout(() => btn.textContent = 'copy', 1800); });
+    }
+
+    // ARCHITECTURE PARAM CALCULATOR - same formula as config.py ModelConfig.approx_params()
+    const VOCAB = 16384;
+    function calcParams(h, layers) {
+      const kv = h; // MHA: kv heads == heads
+      const attn = h * h + 2 * (h * kv) + h * h;
+      const intermediate = h * 4; // this project's ratio: intermediate = 4x hidden
+      const mlp = 3 * h * intermediate;
+      const perLayer = attn + mlp + 2 * h;
+      const emb = VOCAB * h;
+      return { total: emb + layers * perLayer, emb };
+    }
+    function fmtParams(n) {
+      if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+      if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+      return n.toString();
+    }
+    function updateCalc() {
+      const h = parseInt(document.getElementById('hSlider').value);
+      const l = parseInt(document.getElementById('lSlider').value);
+      document.getElementById('hVal').textContent = h;
+      document.getElementById('lVal').textContent = l;
+      const { total, emb } = calcParams(h, l);
+      document.getElementById('crParams').querySelector('.crv').textContent = fmtParams(total);
+      document.getElementById('crEmb').querySelector('.crv').textContent = ((emb / total) * 100).toFixed(1) + '%';
+      const isMatch = (h === 768 && l === 12);
+      const matchCard = document.getElementById('crMatch');
+      matchCard.classList.toggle('hit', isMatch);
+      matchCard.querySelector('.crv').textContent = isMatch ? '✓ exact match' : 'try 768 / 12';
+      document.getElementById('crParams').classList.toggle('hit', isMatch);
+    }
+    const hS = document.getElementById('hSlider'), lS = document.getElementById('lSlider');
+    if (hS && lS) { hS.addEventListener('input', updateCalc); lS.addEventListener('input', updateCalc); updateCalc(); }
+
+    // LOSS CHART - real 195-point curve
+    const LOSS_DATA = [[0, 9.8706], [20, 8.489], [40, 7.8689], [60, 7.2584], [80, 6.8434], [100, 6.3699], [120, 5.9615], [140, 5.6181], [160, 5.3817], [180, 5.1293], [200, 4.8701], [220, 4.7528], [240, 4.6347], [260, 4.4314], [280, 4.3433], [300, 4.2999], [320, 4.13], [340, 4.0139], [360, 3.9603], [380, 3.8459], [400, 3.6857], [420, 3.6136], [440, 3.5466], [460, 3.4598], [480, 3.3713], [500, 3.3353], [520, 3.2273], [540, 3.1945], [560, 3.181], [580, 3.1183], [600, 3.1802], [620, 3.0456], [640, 3.082], [660, 3.0175], [680, 2.9854], [700, 2.9528], [720, 2.9739], [740, 2.8982], [760, 2.8727], [780, 2.9312], [800, 2.9412], [820, 2.9264], [840, 2.8429], [860, 2.8207], [880, 2.8426], [900, 2.811], [920, 2.7842], [940, 2.7871], [960, 2.8194], [980, 2.7326], [1000, 2.8125], [1020, 2.7489], [1040, 2.645], [1060, 2.7193], [1080, 2.7152], [1100, 2.7448], [1120, 2.7212], [1140, 2.724], [1160, 2.7608], [1180, 2.7042], [1200, 2.6707], [1220, 2.6313], [1240, 2.6371], [1260, 2.6589], [1280, 2.6729], [1300, 2.6354], [1320, 2.6659], [1340, 2.6361], [1360, 2.5834], [1380, 2.5976], [1400, 2.6209], [1420, 2.585], [1440, 2.6244], [1460, 2.6091], [1480, 2.5408], [1500, 2.582], [1520, 2.5899], [1540, 2.6164], [1560, 2.6009], [1580, 2.5888], [1600, 2.5149], [1620, 2.5709], [1640, 2.5819], [1660, 2.5422], [1680, 2.5873], [1700, 2.6168], [1720, 2.553], [1740, 2.5301], [1760, 2.5767], [1780, 2.5546], [1800, 2.4937], [1820, 2.5045], [1840, 2.5487], [1860, 2.5453], [1880, 2.5078], [1900, 2.5057], [1920, 2.4625], [1940, 2.4606], [1960, 2.5106], [1980, 2.4573], [2000, 2.547], [2020, 2.4629], [2040, 2.5232], [2060, 2.4763], [2080, 2.4617], [2100, 2.4522], [2120, 2.4848], [2140, 2.4387], [2160, 2.4315], [2180, 2.488], [2200, 2.5089], [2220, 2.5062], [2240, 2.4351], [2260, 2.4288], [2280, 2.4496], [2300, 2.44], [2320, 2.4117], [2340, 2.4261], [2360, 2.4674], [2380, 2.395], [2400, 2.4706], [2420, 2.4176], [2440, 2.3248], [2460, 2.4005], [2480, 2.4012], [2500, 2.3877], [2520, 2.3884], [2540, 2.4197], [2560, 2.4038], [2580, 2.3908], [2600, 2.3214], [2620, 2.3783], [2640, 2.3949], [2660, 2.3577], [2680, 2.4021], [2700, 2.4329], [2720, 2.3737], [2740, 2.3495], [2760, 2.3981], [2780, 2.3804], [2800, 2.322], [2820, 2.3306], [2840, 2.3794], [2860, 2.3761], [2880, 2.3444], [2900, 2.3393], [2920, 2.2954], [2940, 2.2995], [2960, 2.3517], [2980, 2.2987], [3000, 2.3893], [3020, 2.3072], [3040, 2.3728], [3060, 2.3233], [3080, 2.3101], [3100, 2.3033], [3120, 2.3389], [3140, 2.2975], [3160, 2.2926], [3180, 2.3472], [3200, 2.3661], [3220, 2.3677], [3240, 2.2983], [3260, 2.2957], [3280, 2.3166], [3300, 2.3106], [3320, 2.2818], [3340, 2.2956], [3360, 2.3406], [3380, 2.2706], [3400, 2.3473], [3420, 2.2945], [3440, 2.2075], [3460, 2.2811], [3480, 2.2823], [3500, 2.3197], [3520, 2.3589], [3540, 2.3649], [3560, 2.4109], [3580, 2.3625], [3600, 2.3305], [3620, 2.2986], [3640, 2.3045], [3660, 2.328], [3680, 2.3499], [3700, 2.3233], [3720, 2.3533], [3740, 2.335], [3760, 2.2812], [3780, 2.3025], [3800, 2.3236], [3820, 2.2947], [3840, 2.3417], [3860, 2.3249], [3880, 2.2633]];
+    (function renderChart() {
+      const svg = document.getElementById('loss-chart');
+      if (!svg) return;
+      const W = 900, H = 320, PAD_L = 44, PAD_R = 14, PAD_T = 18, PAD_B = 30;
+      const xMax = Math.max(...LOSS_DATA.map(d => d[0]));
+      const yMax = Math.ceil(Math.max(...LOSS_DATA.map(d => d[1])));
+      const x = s => PAD_L + (s / xMax) * (W - PAD_L - PAD_R);
+      const y = l => PAD_T + (1 - l / yMax) * (H - PAD_T - PAD_B);
+      const ns = 'http://www.w3.org/2000/svg';
+      const el = (tag, attrs) => { const n = document.createElementNS(ns, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
+      const defs = el('defs', {});
+      const grad = el('linearGradient', { id: 'lg2', x1: 0, y1: 0, x2: 0, y2: 1 });
+      grad.innerHTML = '<stop offset="0%" stop-color="#0071e3" stop-opacity="0.16"/><stop offset="100%" stop-color="#0071e3" stop-opacity="0"/>';
+      defs.appendChild(grad); svg.appendChild(defs);
+      for (let gy = 0; gy <= yMax; gy += 2) {
+        svg.appendChild(el('line', { x1: PAD_L, x2: W - PAD_R, y1: y(gy), y2: y(gy), stroke: '#e8e8ed', 'stroke-width': 1 }));
+        const t = el('text', { x: PAD_L - 8, y: y(gy) + 4, 'text-anchor': 'end', 'font-family': 'DM Mono,monospace', 'font-size': 10, fill: '#6e6e73' });
+        t.textContent = gy; svg.appendChild(t);
+      }
+      [0, 1000, 2000, 3000, xMax].forEach(sx => {
+        const t = el('text', { x: x(sx), y: H - 6, 'text-anchor': 'middle', 'font-family': 'DM Mono,monospace', 'font-size': 10, fill: '#6e6e73' });
+        t.textContent = sx; svg.appendChild(t);
+      });
+      const linePts = LOSS_DATA.map(([s, l]) => `${x(s)},${y(l)}`).join(' L ');
+      svg.appendChild(el('path', { d: `M ${x(0)},${y(0)} L ${linePts} L ${x(xMax)},${y(0)} Z`, fill: 'url(#lg2)', stroke: 'none' }));
+      svg.appendChild(el('path', { d: `M ${linePts}`, fill: 'none', stroke: '#0071e3', 'stroke-width': 2, 'stroke-linejoin': 'round' }));
+      const start = LOSS_DATA[0], end = LOSS_DATA[LOSS_DATA.length - 1];
+      [start, end].forEach(([s, l]) => svg.appendChild(el('circle', { cx: x(s), cy: y(l), r: 3.5, fill: '#fff', stroke: '#0071e3', 'stroke-width': 2 })));
+      const t1 = el('text', { x: x(start[0]) + 8, y: y(start[1]) - 8, 'font-family': 'DM Mono,monospace', 'font-size': 11, fill: '#6e6e73' });
+      t1.textContent = `${start[1]} · random init`; svg.appendChild(t1);
+      const t2 = el('text', { x: x(end[0]) - 8, y: y(end[1]) - 10, 'text-anchor': 'end', 'font-family': 'DM Mono,monospace', 'font-size': 11, fill: '#0071e3', 'font-weight': 600 });
+      t2.textContent = `${end[1]} final`; svg.appendChild(t2);
+    })();
+  </script>
+</body>
+
+</html>

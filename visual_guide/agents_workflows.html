@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workflows &amp; Agents - Building Effective AI Agents, Visually</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Literata:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ── TOKENS ─────────────────────────────────── */
+    :root {
+      --white: #ffffff;
+      --f7: #f7f7f7;
+      --f5: #f5f5f7;
+      --f0: #f0f0f2;
+      --e8: #e8e8ed;
+      --d2: #d2d2d7;
+      --6e: #6e6e73;
+      --1d: #1d1d1f;
+      --blue: #0071e3;
+      --blue-l: #147ce5;
+      --blue-bg: #f0f6ff;
+      --blue-bd: rgba(0, 113, 227, 0.18);
+      --green: #1c8a3e;
+      --green-bg: #f0faf3;
+      --orange: #b45309;
+      --orange-bg: #fffbeb;
+      --red: #c0392b;
+      --red-bg: #fff5f5;
+      --purple: #6d28d9;
+      --purple-bg: #f5f3ff;
+
+      /* concept colours */
+      --aug: #0ea5e9;
+      --aug-bg: rgba(14, 165, 233, 0.07);
+      --wf: #059669;
+      --wf-bg: rgba(5, 150, 105, 0.07);
+      --agt: #e76d36;
+      --agt-bg: rgba(231, 109, 54, 0.07);
+      --react: #7c3aed;
+      --react-bg: rgba(124, 58, 237, 0.07);
+
+      --r: 16px;
+      --r-sm: 10px;
+      --r-xs: 6px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+      --serif: 'Literata', Georgia, serif;
+      --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06), 0 2px 12px rgba(0, 0, 0, 0.04);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.07), 0 8px 32px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08), 0 24px 64px rgba(0, 0, 0, 0.06);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--white);
+      color: var(--1d);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background: rgba(0, 113, 227, 0.15);
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--d2);
+      border-radius: 2px;
+    }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 52px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 0.5px solid var(--e8);
+      display: flex;
+      align-items: center;
+      padding: 0 44px;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--1d);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0;
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--6e);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover {
+      color: var(--1d);
+      background: var(--f5);
+    }
+
+    .nav-tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--f5);
+      border: 0.5px solid var(--e8);
+      color: var(--6e);
+      letter-spacing: 0.02em;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
+    /* ── HERO ─────────────────────────────────────── */
+    .hero {
+      padding: 132px 44px 80px;
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.1s ease-out forwards;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 6.5vw, 68px);
+      font-weight: 700;
+      letter-spacing: -2.5px;
+      line-height: 1.04;
+      color: var(--1d);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.22s ease-out forwards;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--blue);
+    }
+
+    .hero-sub {
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 300;
+      color: var(--6e);
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto 48px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.34s ease-out forwards;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.46s ease-out forwards;
+    }
+
+    .pkg-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid;
+      font-family: var(--mono);
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .pkg-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pkg-badge.aug {
+      color: var(--aug);
+      border-color: rgba(14, 165, 233, 0.25);
+      background: var(--aug-bg);
+    }
+
+    .pkg-badge.wf {
+      color: var(--wf);
+      border-color: rgba(5, 150, 105, 0.22);
+      background: var(--wf-bg);
+    }
+
+    .pkg-badge.agt {
+      color: var(--agt);
+      border-color: rgba(231, 109, 54, 0.22);
+      background: var(--agt-bg);
+    }
+
+    .pkg-badge.react {
+      color: var(--react);
+      border-color: rgba(124, 58, 237, 0.22);
+      background: var(--react-bg);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── CONTENT WRAPPER ─────────────────────────── */
+    .content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 44px;
+    }
+
+    .section {
+      padding: 80px 0;
+    }
+
+    .section+.section {
+      border-top: 0.5px solid var(--e8);
+    }
+
+    .sec-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+
+    .sec-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      color: var(--1d);
+    }
+
+    .sec-sub {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--6e);
+      line-height: 1.6;
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    /* ── PYRAMID / LAYER STACK ───────────────────── */
+    .pyramid-wrap {
+      margin-bottom: 48px;
+    }
+
+    .py-layer {
+      display: grid;
+      grid-template-columns: 200px 1fr 170px;
+      gap: 0;
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      background: var(--white);
+      margin-bottom: 4px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .py-layer:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .py-name {
+      padding: 18px 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-right: 0.5px solid var(--e8);
+    }
+
+    .py-desc {
+      padding: 18px 24px;
+      font-size: 13px;
+      color: var(--6e);
+      line-height: 1.55;
+      border-right: 0.5px solid var(--e8);
+    }
+
+    .py-role {
+      padding: 18px 16px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--6e);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    .py-layer.l-agt .py-name {
+      background: var(--agt-bg);
+      color: var(--agt);
+    }
+
+    .py-layer.l-wf .py-name {
+      background: var(--wf-bg);
+      color: var(--wf);
+    }
+
+    .py-layer.l-aug .py-name {
+      background: var(--aug-bg);
+      color: var(--aug);
+    }
+
+    .py-layer.l-sys .py-name {
+      background: var(--f5);
+      color: var(--6e);
+      font-style: italic;
+    }
+
+    .py-layer.l-sys {
+      border-style: dashed;
+    }
+
+    /* ── DETAIL CARDS ────────────────────── */
+    .pkg-detail {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .pkg-detail-header {
+      padding: 28px 32px 24px;
+      border-bottom: 0.5px solid var(--e8);
+      position: relative;
+    }
+
+    .pkg-accent-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .pkg-detail-name {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      margin-top: 16px;
+    }
+
+    .pkg-detail-tagline {
+      font-size: 14px;
+      color: var(--6e);
+      font-family: var(--serif);
+      font-weight: 300;
+    }
+
+    .pkg-ver {
+      position: absolute;
+      top: 28px;
+      right: 32px;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      background: var(--f5);
+      border: 0.5px solid var(--e8);
+      border-radius: var(--r-xs);
+      color: var(--6e);
+    }
+
+    .pkg-body-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 0;
+    }
+
+    .pkg-col {
+      padding: 24px 32px;
+    }
+
+    .pkg-col+.pkg-col {
+      border-left: 0.5px solid var(--e8);
+    }
+
+    .col-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--6e);
+      margin-bottom: 14px;
+    }
+
+    .feat-list {
+      list-style: none;
+    }
+
+    .feat-list li {
+      font-size: 13px;
+      color: var(--6e);
+      padding: 7px 0;
+      border-bottom: 0.5px solid var(--f0);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+
+    .feat-list li:last-child {
+      border-bottom: none;
+    }
+
+    .feat-list li::before {
+      content: '›';
+      color: var(--d2);
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-size: 14px;
+    }
+
+    .feat-list li strong {
+      color: var(--1d);
+      font-weight: 500;
+    }
+
+    /* ── WHEN-TO-USE BOX ─────────────────────────── */
+    .when-box {
+      margin: 0 32px 24px;
+      padding: 14px 18px;
+      background: var(--f5);
+      border-radius: var(--r-sm);
+      border: 0.5px solid var(--e8);
+      font-size: 13px;
+      color: var(--6e);
+      line-height: 1.65;
+    }
+
+    .when-box strong {
+      color: var(--1d);
+    }
+
+    .when-box .wlabel {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--6e);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* ── DIAGRAM: linear flow ─────────────────────── */
+    .flow-wrap {
+      margin: 0 32px 28px;
+      padding: 28px 24px;
+      background: var(--f7);
+      border: 0.5px solid var(--e8);
+      border-radius: var(--r-sm);
+      overflow-x: auto;
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      min-width: max-content;
+    }
+
+    .flow-node {
+      background: #fff;
+      border: 1.5px solid var(--e8);
+      border-radius: var(--r-sm);
+      padding: 12px 18px;
+      font-size: 12.5px;
+      font-weight: 500;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      min-width: 92px;
+      color: var(--1d);
+      line-height: 1.4;
+    }
+
+    .flow-node small {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 400;
+      color: var(--6e);
+      margin-top: 2px;
+    }
+
+    .flow-node.accent {
+      border-color: var(--blue-bd);
+      background: var(--blue-bg);
+      color: var(--blue);
+    }
+
+    .flow-arrow {
+      color: var(--d2);
+      font-size: 18px;
+      padding: 0 10px;
+      flex-shrink: 0;
+    }
+
+    .flow-caption {
+      text-align: center;
+      font-size: 11px;
+      color: var(--6e);
+      margin-top: 14px;
+      font-family: var(--mono);
+    }
+
+    /* branching */
+    .branch-diagram {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .branch-pre {
+      display: flex;
+      align-items: center;
+    }
+
+    .branch-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-left: 1.5px solid var(--e8);
+      padding-left: 18px;
+      margin-left: 10px;
+    }
+
+    .branch-item {
+      background: #fff;
+      border: 1px solid var(--e8);
+      border-radius: var(--r-xs);
+      padding: 8px 14px;
+      font-size: 11.5px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* fan-out / fan-in (parallel) */
+    .fan-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fan-row {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 6px 0;
+    }
+
+    /* loop note */
+    .loop-note {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--6e);
+    }
+
+    .loop-note .lbl {
+      font-family: var(--mono);
+      background: #fff;
+      border: 1px dashed var(--d2);
+      border-radius: var(--r-xs);
+      padding: 4px 10px;
+      color: var(--orange);
+    }
+
+    /* ── TRAINER/CARD GRID (reused for variations) ── */
+    .trainer-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .tc {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .tc:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .tc-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+
+    .tc-name {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      margin-top: 6px;
+    }
+
+    .tc-use {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .tc-desc {
+      font-size: 12px;
+      color: var(--6e);
+      line-height: 1.6;
+    }
+
+    .tc-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-family: var(--mono);
+    }
+
+    /* ── CODE BLOCK ──────────────────────────────── */
+    .code-win {
+      background: #1e1e2e;
+      border-radius: var(--r);
+      overflow: hidden;
+      margin: 24px 0;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .code-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 12px 20px;
+      background: #2a2a3e;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .cdot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .cdot-r {
+      background: #ff5f57;
+    }
+
+    .cdot-y {
+      background: #febc2e;
+    }
+
+    .cdot-g {
+      background: #28c840;
+    }
+
+    .code-filename {
+      margin-left: 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .code-pre {
+      padding: 24px 28px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 2.0;
+      overflow-x: auto;
+      color: #cdd6f4;
+      tab-size: 4;
+      white-space: pre;
+    }
+
+    .t-kw {
+      color: #cba6f7;
+    }
+
+    .t-fn {
+      color: #89b4fa;
+    }
+
+    .t-cls {
+      color: #f9e2af;
+    }
+
+    .t-str {
+      color: #a6e3a1;
+    }
+
+    .t-num {
+      color: #fab387;
+    }
+
+    .t-cm {
+      color: #585b70;
+      font-style: italic;
+    }
+
+    .t-pn {
+      color: #89dceb;
+    }
+
+    .t-op {
+      color: #94e2d5;
+    }
+
+    .t-deco {
+      color: #f38ba8;
+    }
+
+    .t-sec {
+      color: #6c7086;
+      font-style: italic;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── CALLOUT ─────────────────────────────────── */
+    .callout {
+      display: flex;
+      gap: 14px;
+      padding: 16px 20px;
+      border-radius: var(--r-sm);
+      margin: 20px 0;
+      font-size: 13px;
+      line-height: 1.65;
+      border-left: 3px solid;
+    }
+
+    .callout-icon {
+      flex-shrink: 0;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .callout.info {
+      background: var(--blue-bg);
+      border-color: var(--blue);
+      color: #1a4b8a;
+    }
+
+    .callout.warn {
+      background: var(--orange-bg);
+      border-color: var(--orange);
+      color: #7c4b0a;
+    }
+
+    .callout.good {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: #145228;
+    }
+
+    .callout.pur {
+      background: var(--purple-bg);
+      border-color: var(--purple);
+      color: #4c1d95;
+    }
+
+    .callout strong {
+      font-weight: 600;
+    }
+
+    .callout code {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: rgba(0, 0, 0, 0.07);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* ── PIPELINE FLOW (vertical steps) ───────────── */
+    .pipeline {
+      margin: 32px 0;
+    }
+
+    .pipeline-step {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding-bottom: 28px;
+      position: relative;
+    }
+
+    .pipeline-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 42px;
+      bottom: 0;
+      width: 1px;
+      background: var(--e8);
+    }
+
+    .pipeline-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+      border: 1.5px solid var(--e8);
+      background: var(--white);
+      color: var(--6e);
+      position: relative;
+      z-index: 1;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pipeline-dot.blue {
+      background: var(--blue-bg);
+      border-color: var(--blue-bd);
+      color: var(--blue);
+    }
+
+    .pipeline-dot.green {
+      background: var(--green-bg);
+      border-color: rgba(28, 138, 62, 0.2);
+      color: var(--green);
+    }
+
+    .pipeline-dot.agt {
+      background: var(--agt-bg);
+      border-color: rgba(231, 109, 54, 0.2);
+      color: var(--agt);
+    }
+
+    .pipeline-dot.wf {
+      background: var(--wf-bg);
+      border-color: rgba(5, 150, 105, 0.2);
+      color: var(--wf);
+    }
+
+    .pipeline-dot.react {
+      background: var(--react-bg);
+      border-color: rgba(124, 58, 237, 0.2);
+      color: var(--react);
+    }
+
+    .pipeline-content {
+      padding-top: 8px;
+      flex: 1;
+    }
+
+    .pipeline-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+      color: var(--1d);
+    }
+
+    .pipeline-content p {
+      font-size: 14px;
+      color: var(--6e);
+      line-height: 1.6;
+    }
+
+    .pipeline-content p code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--f5);
+      border: 0.5px solid var(--e8);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--1d);
+    }
+
+    /* ── MATRIX ─────────────────────── */
+    .matrix-wrap {
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin: 32px 0;
+      overflow-x: auto;
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .matrix-table th {
+      padding: 14px 16px;
+      background: var(--f5);
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--6e);
+      border-bottom: 1px solid var(--e8);
+      white-space: nowrap;
+    }
+
+    .matrix-table td {
+      padding: 14px 16px;
+      border-bottom: 0.5px solid var(--f0);
+      vertical-align: middle;
+      color: var(--6e);
+      font-size: 13px;
+    }
+
+    .matrix-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .matrix-table tr:hover td {
+      background: var(--f7);
+    }
+
+    .uc-name {
+      font-weight: 600;
+      color: var(--1d);
+      white-space: nowrap;
+      font-size: 14px;
+    }
+
+    .chk {
+      color: var(--green);
+      font-size: 16px;
+    }
+
+    .dash {
+      color: var(--d2);
+      font-size: 16px;
+    }
+
+    .primary-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--r-xs);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .pp-agt {
+      background: var(--agt-bg);
+      color: var(--agt);
+    }
+
+    .pp-wf {
+      background: var(--wf-bg);
+      color: var(--wf);
+    }
+
+    .pp-aug {
+      background: var(--aug-bg);
+      color: var(--aug);
+    }
+
+    /* ── PARAM TABLE (also used for ReAct mapping) ── */
+    .param-wrap {
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .param-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--6e);
+      background: var(--f5);
+      border-bottom: 1px solid var(--e8);
+    }
+
+    .param-table td {
+      padding: 12px 16px;
+      border-bottom: 0.5px solid var(--f0);
+      vertical-align: top;
+      color: var(--6e);
+      line-height: 1.5;
+    }
+
+    .param-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .param-table tr:hover td {
+      background: var(--f7);
+    }
+
+    .param-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--1d);
+      font-weight: 500;
+    }
+
+    .param-type {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--react);
+    }
+
+    /* ── DECISION TREE ───────────────────────────── */
+    .dt-box {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-sm);
+      padding: 32px;
+    }
+
+    .dt-q {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--1d);
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dt-q::before {
+      content: '?';
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--blue-bg);
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .dt-branch {
+      margin-left: 34px;
+      padding-left: 20px;
+      border-left: 1.5px solid var(--e8);
+      margin-bottom: 24px;
+    }
+
+    .dt-row {
+      padding: 10px 14px;
+      border-radius: var(--r-xs);
+      font-size: 13px;
+      color: var(--6e);
+      line-height: 1.6;
+      margin-bottom: 6px;
+      background: var(--f5);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .dt-arrow {
+      color: var(--d2);
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+
+    .dt-row strong {
+      color: var(--1d);
+      font-weight: 600;
+    }
+
+    .dt-row code {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    .hdivider {
+      border: none;
+      height: 0.5px;
+      background: var(--e8);
+      margin: 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 56px 44px;
+      border-top: 0.5px solid var(--e8);
+      color: var(--6e);
+      font-size: 13px;
+    }
+
+    footer a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    footer p.refs {
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .reveal.vis {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        padding: 0 20px;
+      }
+
+      .nav-links,
+      .nav-tag {
+        display: none;
+      }
+
+      .content {
+        padding: 0 20px;
+      }
+
+      .hero {
+        padding: 100px 20px 60px;
+      }
+
+      .py-layer {
+        grid-template-columns: 1fr;
+      }
+
+      .py-desc,
+      .py-role {
+        border-left: none;
+        border-top: 0.5px solid var(--e8);
+      }
+
+      .pkg-body-2col {
+        grid-template-columns: 1fr;
+      }
+
+      .pkg-col+.pkg-col {
+        border-left: none;
+        border-top: 0.5px solid var(--e8);
+      }
+
+      .trainer-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .matrix-table {
+        font-size: 12px;
+      }
+
+      .flow-row {
+        flex-direction: column;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+        padding: 6px 0;
+      }
+
+      .branch-diagram {
+        flex-direction: column;
+      }
+
+      .branch-pre {
+        flex-direction: column;
+      }
+    }
+
+    .itag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 500;
+      vertical-align: baseline;
+    }
+
+    .itag.aug {
+      background: var(--aug-bg);
+      color: var(--aug);
+    }
+
+    .itag.wf {
+      background: var(--wf-bg);
+      color: var(--wf);
+    }
+
+    .itag.agt {
+      background: var(--agt-bg);
+      color: var(--agt);
+    }
+
+    .itag.react {
+      background: var(--react-bg);
+      color: var(--react);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAV ───────────────────────────────────── -->
+  <nav class="nav">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="index.html"
+        style="font-size:12px;color:var(--d2);text-decoration:none;display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1px solid var(--e8);transition:all 0.2s;"
+        onmouseover="this.style.color='var(--blue)';this.style.borderColor='rgba(0,113,227,0.3)'"
+        onmouseout="this.style.color='var(--d2)';this.style.borderColor='var(--e8)'">← Guides</a>
+      <div class="nav-brand">Workflows &amp; Agents</div>
+    </div>
+    <div class="nav-links">
+      <a class="nav-link" href="#taxonomy">Taxonomy</a>
+      <a class="nav-link" href="#augmented">Augmented LLM</a>
+      <a class="nav-link" href="#workflows">Workflows</a>
+      <a class="nav-link" href="#agent">The Agent</a>
+      <a class="nav-link" href="#compare">Compare</a>
+      <a class="nav-link" href="#decide">Decision Guide</a>
+    </div>
+    <div class="nav-tag">Anthropic · ReAct (Yao et al. 2022)</div>
+  </nav>
+
+  <!-- ── HERO ──────────────────────────────────── -->
+  <div class="hero">
+    <div class="hero-eyebrow">A Visual Guide for GenAI Builders</div>
+    <h1>Workflows have fixed paths.<br><em>Agents choose their own.</em></h1>
+    <p class="hero-sub">A practical map of every pattern in Anthropic's <em
+        style="font-style:normal;color:var(--1d);font-weight:500;">Building Effective Agents</em> - from a single tool
+      call to a full ReAct loop - with the diagram and the Python for each one.</p>
+    <div class="badge-row">
+      <a class="pkg-badge aug" href="#augmented">⚙ Augmented LLM</a>
+      <a class="pkg-badge wf" href="#workflows">🔗 Workflows</a>
+      <a class="pkg-badge agt" href="#agent">🤖 Agent</a>
+      <a class="pkg-badge react" href="#react">📚 ReAct</a>
+    </div>
+  </div>
+
+  <!-- ── TAXONOMY ───────────────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="taxonomy">
+      <div class="reveal">
+        <div class="sec-label">The Taxonomy</div>
+        <h2 class="sec-title">Three layers, one building block</h2>
+        <p class="sec-sub">Read ten blog posts about "AI agents" and you'll see the word used to describe ten different
+          things. Anthropic's taxonomy fixes that: every workflow and every agent is built from the same atomic unit -
+          an augmented LLM call - composed differently.</p>
+      </div>
+
+      <div class="pyramid-wrap reveal">
+        <div class="py-layer l-agt">
+          <div class="py-name">🤖 Agent</div>
+          <div class="py-desc">An LLM <strong>in a loop</strong>, deciding which tools to call, in what order, and when
+            to stop. The control flow is decided <em>at runtime</em>, by the model. Unbounded but capped with
+            <code>max_steps</code>.</div>
+          <div class="py-role">Model decides steps</div>
+        </div>
+        <div class="py-layer l-wf">
+          <div class="py-name">🔗 Workflow</div>
+          <div class="py-desc">Multiple LLM calls wired together in a <strong>predefined</strong> structure: chains,
+            routers, parallel branches, capped generate/evaluate loops. You write the control flow; the LLM just fills
+            in each step.</div>
+          <div class="py-role">You decide steps, at design time</div>
+        </div>
+        <div class="py-layer l-aug">
+          <div class="py-name">⚙ Augmented LLM</div>
+          <div class="py-desc">One LLM call that can use <strong>tools</strong>, <strong>retrieval</strong>, or
+            <strong>memory</strong>. The smallest unit in the stack - every workflow step and every agent step is one of
+            these.</div>
+          <div class="py-role">One round trip</div>
+        </div>
+        <div class="py-layer l-sys">
+          <div class="py-name">Plain LLM</div>
+          <div class="py-desc">Text in, text out. A sealed box - no tools, no external state, no way to act on the
+            world.</div>
+          <div class="py-role">Foundation</div>
+        </div>
+      </div>
+
+      <div class="callout info reveal">
+        <div class="callout-icon">💡</div>
+        <div><strong>Mental shortcut:</strong> <strong>workflows have fixed code paths, agents have dynamic
+            ones.</strong> Most production "AI products" today are workflows - they just get marketed as agents. That's
+          not a problem: workflows are predictable, cheap, and debuggable. You pay the "agent tax" only when the task's
+          shape genuinely depends on its input.</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── AUGMENTED LLM ───────────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="augmented">
+      <div class="reveal">
+        <div class="sec-label">The Atomic Unit</div>
+        <h2 class="sec-title">The Augmented LLM</h2>
+        <p class="sec-sub">A plain LLM can't check today's weather, query your database, or reliably multiply two
+          numbers - none of that lives in the weights. Cut a door into the box with tools, retrieval, or memory, and you
+          get an augmented LLM.</p>
+      </div>
+
+      <div class="pkg-detail reveal" id="sec-aug">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--aug)"></div>
+          <div class="pkg-ver">one round trip</div>
+          <div class="pkg-detail-name" style="color: var(--aug)">⚙ Tool calling, the primitive everything else is built
+            on</div>
+          <div class="pkg-detail-tagline">Every workflow step and every agent step is one of these, repeated.</div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">The tool-calling shape</div>
+            <ul class="feat-list">
+              <li><strong>1. Describe</strong> - you give the model a JSON schema for each tool (name, description,
+                parameters)</li>
+              <li><strong>2. Decide</strong> - the model either answers directly, or returns <code>tool_calls</code>
+                asking to invoke one</li>
+              <li><strong>3. Execute</strong> - <em>you</em> run the tool in plain Python and get a result</li>
+              <li><strong>4. Resolve</strong> - you feed the result back as a <code>tool</code> message; the model
+                writes the final answer</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">The three classic augmentations</div>
+            <ul class="feat-list">
+              <li><strong>Tools</strong> - request a function call, get a result back (calculators, APIs, code
+                execution)</li>
+              <li><strong>Retrieval</strong> - fetch external documents (RAG over a vector store)</li>
+              <li><strong>Memory</strong> - read and write persistent state across turns</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">Why this matters</span>
+          <strong>Burn this sequence into memory</strong> - describe → decide → execute → resolve. Every "agent
+          framework" you'll ever use is a wrapper around this exact loop, just dressed up with extra abstractions.
+        </div>
+
+        <div class="flow-wrap">
+          <div class="flow-row">
+            <div class="flow-node accent">User question<small>"What is (1289×47)−312?"</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">LLM call<small>decides: needs a tool</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">Execute tool<small>your Python code runs</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">LLM call<small>writes final answer</small></div>
+          </div>
+          <div class="flow-caption">one user turn → at most one tool round → one final answer</div>
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">augmented_llm.py - a calculator tool, end to end</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">import</span> <span class="t-fn">json</span>
+              <span class="t-kw">import</span> <span class="t-fn">cohere</span>
+
+              co = cohere.<span class="t-cls">ClientV2</span>(<span class="t-pn">api_key</span>=api_key)
+              MODEL = <span class="t-str">"command-a-03-2025"</span>
+
+              <span class="t-sec"># ── 1. Describe: the schema the model sees ─────────────────────────────────</span>
+              tools = [{
+              <span class="t-str">"type"</span>: <span class="t-str">"function"</span>,
+              <span class="t-str">"function"</span>: {
+              <span class="t-str">"name"</span>: <span class="t-str">"calculator"</span>,
+              <span class="t-str">"description"</span>: <span class="t-str">"Evaluates a math expression and returns the
+                result."</span>,
+              <span class="t-str">"parameters"</span>: {
+              <span class="t-str">"type"</span>: <span class="t-str">"object"</span>,
+              <span class="t-str">"properties"</span>: {<span class="t-str">"expression"</span>: {<span
+                class="t-str">"type"</span>: <span class="t-str">"string"</span>}},
+              <span class="t-str">"required"</span>: [<span class="t-str">"expression"</span>],
+              },
+              },
+              }]
+
+              <span class="t-kw">def</span> <span class="t-fn">calculator</span>(expression: <span
+                class="t-cls">str</span>) -> <span class="t-cls">dict</span>:
+              <span class="t-cm"># NEVER use eval() on untrusted input in real code - demo only.</span>
+              <span class="t-kw">return</span> {<span class="t-str">"result"</span>: <span
+                class="t-fn">eval</span>(expression, {<span class="t-str">"__builtins__"</span>: {}}, {})}
+
+              TOOL_REGISTRY = {<span class="t-str">"calculator"</span>: calculator}
+
+              <span class="t-sec"># ── 2. Decide: first call, model chooses ────────────────────────────────────</span>
+              messages = [{<span class="t-str">"role"</span>: <span class="t-str">"user"</span>, <span
+                class="t-str">"content"</span>: <span class="t-str">"What is (1289 * 47) - 312?"</span>}]
+              resp = co.<span class="t-fn">chat</span>(<span class="t-pn">model</span>=MODEL, <span
+                class="t-pn">messages</span>=messages, <span class="t-pn">tools</span>=tools)
+
+              <span class="t-kw">if</span> resp.message.tool_calls:
+              messages.<span class="t-fn">append</span>({
+              <span class="t-str">"role"</span>: <span class="t-str">"assistant"</span>,
+              <span class="t-str">"tool_calls"</span>: resp.message.tool_calls,
+              <span class="t-str">"tool_plan"</span>: resp.message.tool_plan,
+              })
+
+              <span class="t-sec"># ── 3. Execute: run the tool yourself ───────────────────────────────────</span>
+              <span class="t-kw">for</span> tc <span class="t-kw">in</span> resp.message.tool_calls:
+              args = json.<span class="t-fn">loads</span>(tc.function.arguments)
+              result = TOOL_REGISTRY[tc.function.name](**args)
+              messages.<span class="t-fn">append</span>({
+              <span class="t-str">"role"</span>: <span class="t-str">"tool"</span>,
+              <span class="t-str">"tool_call_id"</span>: tc.id,
+              <span class="t-str">"content"</span>: json.<span class="t-fn">dumps</span>(result),
+              })
+
+              <span class="t-sec"># ── 4. Resolve: second call, model writes the final answer ──────────────</span>
+              resp = co.<span class="t-fn">chat</span>(<span class="t-pn">model</span>=MODEL, <span
+                class="t-pn">messages</span>=messages, <span class="t-pn">tools</span>=tools)
+
+              <span class="t-fn">print</span>(resp.message.content[<span class="t-num">0</span>].text)
+              <span class="t-cm"># → "(1289 * 47) - 312 = 60271"</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── WORKFLOWS ───────────────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="workflows">
+      <div class="reveal">
+        <div class="sec-label">Predefined Control Flow</div>
+        <h2 class="sec-title">Four workflow patterns</h2>
+        <p class="sec-sub">Real tasks rarely fit in one round trip. A workflow composes several augmented LLM calls in a
+          structure <em>you</em> design upfront. Pick the pattern that matches your input/output shape.</p>
+      </div>
+
+      <!-- PROMPT CHAINING -->
+      <div class="pkg-detail reveal" id="sec-chain">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--wf)"></div>
+          <div class="pkg-ver">simplest workflow</div>
+          <div class="pkg-detail-name" style="color: var(--wf)">🔗 Prompt Chaining</div>
+          <div class="pkg-detail-tagline">Sequential LLM calls where each step's output becomes the next step's input.
+          </div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">Why split into steps</div>
+            <ul class="feat-list">
+              <li>One giant prompt doing 5 things underperforms 5 small prompts doing 1 thing each</li>
+              <li>Each step's instructions are short and unambiguous - more attention per task</li>
+              <li>Debuggable: a bad step 2 output means you only fix step 2's prompt</li>
+              <li>Swappable: replace any step with a different model, or even a regex</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">Production upgrade</div>
+            <ul class="feat-list">
+              <li><strong>Validation gates</strong> - add a cheap check between steps ("is this the right shape?") and
+                abort early if not</li>
+              <li>Catches problems close to where they happen, instead of three steps downstream</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">When to use</span>
+          The task naturally decomposes into a <strong>fixed sequence</strong> of sub-tasks where step N always needs
+          step N−1's output. Marketing copy generation, multi-stage document summarization, structured data extraction →
+          formatting → validation.
+        </div>
+
+        <div class="flow-wrap">
+          <div class="flow-row">
+            <div class="flow-node accent">Product description</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">LLM A<small>extract top 3 features</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">LLM B<small>write a tagline</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">LLM C<small>write Instagram post</small></div>
+          </div>
+          <div class="flow-caption">input → [LLM A] → [LLM B] → [LLM C] → final output</div>
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">prompt_chaining.py - marketing copy in 3 steps</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">def</span> <span class="t-fn">llm</span>(prompt: <span
+                class="t-cls">str</span>, system: <span class="t-cls">str</span> = <span class="t-str">""</span>) ->
+              <span class="t-cls">str</span>:
+              msgs = ([{<span class="t-str">"role"</span>: <span class="t-str">"system"</span>, <span
+                class="t-str">"content"</span>: system}] <span class="t-kw">if</span> system <span
+                class="t-kw">else</span> [])
+              msgs.<span class="t-fn">append</span>({<span class="t-str">"role"</span>: <span
+                class="t-str">"user"</span>, <span class="t-str">"content"</span>: prompt})
+              <span class="t-kw">return</span> co.<span class="t-fn">chat</span>(<span class="t-pn">model</span>=MODEL,
+              <span class="t-pn">messages</span>=msgs).message.content[<span class="t-num">0</span>].text.<span
+                class="t-fn">strip</span>()
+
+              product = (
+              <span class="t-str">"NoiseNest is a $129 portable white-noise machine with 30 ambient sounds, "</span>
+              <span class="t-str">"a 40-hour battery, an app-free design, and a child-safe lock."</span>
+              )
+
+              <span class="t-sec"># ── Step 1: extract features ────────────────────────────────────────────</span>
+              features = <span class="t-fn">llm</span>(
+              <span class="t-fn">f</span><span class="t-str">"Extract the 3 most marketable features from this
+                product:\n\n{product}\n\n"</span>
+              <span class="t-str">"Return a short bulleted list."</span>
+              )
+
+              <span class="t-sec"># ── Step 2: tagline - uses features from step 1 ─────────────────────────</span>
+              tagline = <span class="t-fn">llm</span>(<span class="t-fn">f</span><span class="t-str">"Write a single
+                punchy tagline (max 10 words) for:\n\n{features}"</span>)
+
+              <span class="t-sec"># ── Step 3: social post - uses tagline from step 2 ──────────────────────</span>
+              post = <span class="t-fn">llm</span>(<span class="t-fn">f</span><span class="t-str">"Expand this tagline
+                into a 2-sentence Instagram caption:\n\nTagline: {tagline}"</span>)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROUTING -->
+      <div class="pkg-detail reveal" id="sec-route">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--wf)"></div>
+          <div class="pkg-ver">classify, then dispatch</div>
+          <div class="pkg-detail-name" style="color: var(--wf)">🔀 Routing</div>
+          <div class="pkg-detail-tagline">A small classifier decides what kind of input arrived, then dispatches to a
+            specialist prompt.</div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">Why bother routing</div>
+            <ul class="feat-list">
+              <li>One generic prompt handling billing + technical + sales is a compromise - specialized prompts are
+                sharper</li>
+              <li>Routing buys specialization <strong>without making the user pick a category</strong></li>
+              <li>You can tune (and test) each branch independently</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">Two production tips</div>
+            <ul class="feat-list">
+              <li><strong>Use a small/cheap model for the classifier</strong> - classification is easier than
+                generation, don't pay flagship prices for it</li>
+              <li><strong>Always have a safe default.</strong> Classifiers occasionally return <code>"BILLING"</code> or
+                <code>"billing-related"</code> - your dispatch code must not crash on those</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">When to use</span>
+          Distinct categories of input that genuinely benefit from different tone, instructions, or even different
+          models/tools - customer support triage, content moderation tiers, query complexity routing (cheap model vs.
+          flagship model).
+        </div>
+
+        <div class="flow-wrap">
+          <div class="branch-diagram">
+            <div class="branch-pre">
+              <div class="flow-node accent">User message</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node">Classifier<small>cheap model</small></div>
+            </div>
+            <div class="branch-stack">
+              <div class="branch-item">→ <strong>billing</strong> specialist prompt</div>
+              <div class="branch-item">→ <strong>technical</strong> specialist prompt</div>
+              <div class="branch-item">→ <strong>general</strong> specialist prompt (safe default)</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">routing.py - customer-support triage</span>
+            </div>
+            <div class="code-pre">ROUTES = {
+              <span class="t-str">"billing"</span>: <span class="t-str">"You are a billing specialist. Be precise about
+                amounts and refund policies."</span>,
+              <span class="t-str">"technical"</span>: <span class="t-str">"You are a senior support engineer. Diagnose
+                issues step by step. Be concise."</span>,
+              <span class="t-str">"general"</span>: <span class="t-str">"You are a friendly first-line support rep.
+                Answer warmly and briefly."</span>,
+              }
+
+              <span class="t-kw">def</span> <span class="t-fn">route</span>(user_msg: <span class="t-cls">str</span>) ->
+              <span class="t-cls">str</span>:
+              <span class="t-str">"""Tiny classifier - returns one of: billing, technical, general."""</span>
+              label = <span class="t-fn">llm</span>(
+              <span class="t-fn">f</span><span class="t-str">"Classify into exactly one of: billing, technical,
+                general.\n\n"</span>
+              <span class="t-fn">f</span><span class="t-str">"Message: {user_msg!r}\n\nReturn ONLY the label,
+                lowercase."</span>
+              ).<span class="t-fn">lower</span>().<span class="t-fn">strip</span>()
+              <span class="t-cm"># Defensive default - never trust the classifier blindly.</span>
+              <span class="t-kw">return</span> label <span class="t-kw">if</span> label <span class="t-kw">in</span>
+              ROUTES <span class="t-kw">else</span> <span class="t-str">"general"</span>
+
+              <span class="t-kw">def</span> <span class="t-fn">handle</span>(user_msg: <span class="t-cls">str</span>)
+              -> <span class="t-cls">str</span>:
+              label = <span class="t-fn">route</span>(user_msg)
+              <span class="t-kw">return</span> <span class="t-fn">llm</span>(user_msg, <span
+                class="t-pn">system</span>=ROUTES[label])
+
+              <span class="t-fn">handle</span>(<span class="t-str">"Why was I charged twice this month?"</span>)
+              <span class="t-cm"># → routed to "billing", precise tone, refund-policy aware</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARALLELIZATION -->
+      <div class="pkg-detail reveal" id="sec-parallel">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--wf)"></div>
+          <div class="pkg-ver">independent calls, run together</div>
+          <div class="pkg-detail-name" style="color: var(--wf)">⇶ Parallelization</div>
+          <div class="pkg-detail-tagline">When LLM calls are independent, run them concurrently instead of sequentially
+            - then synthesize.</div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">Two flavors</div>
+            <ul class="feat-list">
+              <li><strong>Sectioning</strong> - split a task into <em>different</em> subtasks, each handled by a
+                specialist, then merge. (security / performance / style code review)</li>
+              <li><strong>Voting</strong> - run the <em>same</em> prompt N times and aggregate (majority vote, pick
+                best). Useful when reliability beats cost.</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">Two distinct wins</div>
+            <ul class="feat-list">
+              <li><strong>Latency</strong> - wall-clock time ≈ one call, not three. Use <code>ThreadPoolExecutor</code>
+                since API calls are I/O-bound</li>
+              <li><strong>Quality</strong> - each specialist has one job; the aggregator gets a richer, less confused
+                signal than one model trying to do everything</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">When to use</span>
+          Subtasks that don't depend on each other's output. Don't forget the <strong>aggregator step</strong> -
+          parallel branches still need synthesis into one final answer.
+        </div>
+
+        <div class="flow-wrap">
+          <div class="fan-wrap">
+            <div class="flow-node accent">Code snippet</div>
+            <div class="flow-arrow" style="transform:rotate(90deg)">→</div>
+            <div class="fan-row">
+              <div class="flow-node small">Security<br>reviewer</div>
+              <div class="flow-node small">Performance<br>reviewer</div>
+              <div class="flow-node small">Style<br>reviewer</div>
+            </div>
+            <div class="flow-arrow" style="transform:rotate(90deg)">→</div>
+            <div class="flow-node accent">Aggregator<small>consolidated, prioritized list</small></div>
+          </div>
+          <div class="flow-caption">3 reviewers run concurrently (~2s total, not ~6s) → 1 synthesis call</div>
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">parallelization.py - sectioning: parallel code review</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">from</span> <span class="t-fn">concurrent.futures</span> <span
+                class="t-kw">import</span> <span class="t-cls">ThreadPoolExecutor</span>
+
+              REVIEWERS = {
+              <span class="t-str">"security"</span>: <span class="t-str">"You are a security reviewer. ONLY flag
+                security issues. Be terse."</span>,
+              <span class="t-str">"performance"</span>: <span class="t-str">"You are a performance reviewer. ONLY flag
+                performance issues. Be terse."</span>,
+              <span class="t-str">"style"</span>: <span class="t-str">"You are a code-style reviewer. ONLY flag style
+                issues. Be terse."</span>,
+              }
+
+              <span class="t-kw">def</span> <span class="t-fn">review</span>(name_system):
+              name, system = name_system
+              <span class="t-kw">return</span> name, <span class="t-fn">llm</span>(<span class="t-fn">f</span><span
+                class="t-str">"Review this code:\n\n```python\n{code_snippet}\n```"</span>, system)
+
+              <span class="t-sec"># ── Run all three reviewers concurrently - I/O-bound, threads are enough ───</span>
+              <span class="t-kw">with</span> <span class="t-cls">ThreadPoolExecutor</span>(<span
+                class="t-pn">max_workers</span>=<span class="t-num">3</span>) <span class="t-kw">as</span> pool:
+              reviews = <span class="t-fn">dict</span>(pool.<span class="t-fn">map</span>(review, REVIEWERS.items()))
+
+              <span class="t-sec"># ── Aggregator: one more call that synthesizes the parallel branches ──────</span>
+              merged = <span class="t-str">"\n\n"</span>.<span class="t-fn">join</span>(<span class="t-fn">f</span><span
+                class="t-str">"## {n}\n{t}"</span> <span class="t-kw">for</span> n, t <span class="t-kw">in</span>
+              reviews.items())
+              summary = <span class="t-fn">llm</span>(
+              <span class="t-str">"Consolidate these parallel reviews into one prioritized list "</span>
+              <span class="t-str">"(highest severity first). Don't repeat overlapping findings.\n\n"</span> + merged
+              )
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVALUATOR-OPTIMIZER -->
+      <div class="pkg-detail reveal" id="sec-evalopt">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--wf)"></div>
+          <div class="pkg-ver">a capped loop, still a workflow</div>
+          <div class="pkg-detail-name" style="color: var(--wf)">🔁 Evaluator–Optimizer</div>
+          <div class="pkg-detail-tagline">Two LLMs in disagreement: a generator drafts, an evaluator grades against a
+            rubric, repeat until approved or capped.</div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">Why two roles beat one</div>
+            <ul class="feat-list">
+              <li>LLMs are usually <strong>better at judging</strong> text than at producing text that satisfies every
+                constraint in one shot</li>
+              <li>The generator focuses on writing; the evaluator focuses on the rubric - neither does both jobs at once
+              </li>
+              <li>Shines on tasks with a clear quality signal that's hard to encode in a single prompt</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">Why it's still a workflow, not an agent</div>
+            <ul class="feat-list">
+              <li>The loop shape is <strong>fixed</strong>: always generate → evaluate. The model can't skip evaluation
+                or call a new tool</li>
+              <li>The stopping criterion is <strong>yours</strong>: evaluator says approved, or you hit
+                <code>MAX_ROUNDS</code>. The model never chooses to stop</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">When to use</span>
+          Translation quality, JSON validity, tone matching, code passing tests - anything where grading is easier than
+          one-shot generation.
+        </div>
+
+        <div class="flow-wrap">
+          <div class="flow-row">
+            <div class="flow-node accent">Brief</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">Generator<small>draft</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">Evaluator<small>approved?</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node accent">Output</div>
+          </div>
+          <div class="loop-note">↺ <span class="lbl">not approved → feedback fed into next draft</span> · capped at
+            <span class="lbl">MAX_ROUNDS = 3</span></div>
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">evaluator_optimizer.py - copywriter + critic</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">def</span> <span class="t-fn">generate</span>(brief: <span
+                class="t-cls">str</span>, feedback: <span class="t-cls">str</span> = <span class="t-str">""</span>) ->
+              <span class="t-cls">str</span>:
+              prompt = <span class="t-fn">f</span><span class="t-str">"Write a 2-sentence product description for:
+                {brief}"</span>
+              <span class="t-kw">if</span> feedback:
+              prompt += <span class="t-fn">f</span><span class="t-str">"\n\nRevise to address this
+                feedback:\n{feedback}"</span>
+              <span class="t-kw">return</span> <span class="t-fn">llm</span>(prompt, <span
+                class="t-pn">system</span>=<span class="t-str">"You are a copywriter. Avoid clichés."</span>)
+
+              <span class="t-kw">def</span> <span class="t-fn">evaluate</span>(text: <span class="t-cls">str</span>) ->
+              <span class="t-cls">dict</span>:
+              raw = <span class="t-fn">llm</span>(
+              <span class="t-fn">f</span><span class="t-str">"Evaluate this copy: {text!r}\n\n"</span>
+              <span class="t-str">"Criteria: no clichés; contains a concrete number; exactly 2 sentences.\n"</span>
+              <span class="t-str">'Respond ONLY as JSON: {"approved": bool, "feedback": "..."}'</span>
+              )
+              <span class="t-kw">return</span> json.<span class="t-fn">loads</span>(raw.<span
+                class="t-fn">strip</span>(<span class="t-str">"`"</span>))
+
+              <span class="t-sec"># ── The loop: fixed shape, hard cap - this is the part that's NOT agentic ──</span>
+              feedback, MAX_ROUNDS = <span class="t-str">""</span>, <span class="t-num">3</span>
+              <span class="t-kw">for</span> i <span class="t-kw">in</span> <span class="t-fn">range</span>(<span
+                class="t-num">1</span>, MAX_ROUNDS + <span class="t-num">1</span>):
+              draft = <span class="t-fn">generate</span>(brief, feedback)
+              verdict = <span class="t-fn">evaluate</span>(draft)
+              <span class="t-kw">if</span> verdict[<span class="t-str">"approved"</span>]:
+              <span class="t-kw">break</span>
+              feedback = verdict[<span class="t-str">"feedback"</span>]
+              <span class="t-kw">else</span>:
+              <span class="t-cm"># for/else: only runs if we never broke out - i.e. hit MAX_ROUNDS unapproved</span>
+              <span class="t-fn">print</span>(<span class="t-str">"⚠️ hit max rounds without approval - ship last draft
+                or escalate"</span>)
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- ── THE AGENT ───────────────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="agent">
+      <div class="reveal">
+        <div class="sec-label">Dynamic Control Flow</div>
+        <h2 class="sec-title">The Agent</h2>
+        <p class="sec-sub">Every workflow above had a shape <em>you</em> designed at coding time. An agent hands that
+          decision to the model: "look at the situation, decide what to do next, do it, observe, repeat until done."</p>
+      </div>
+
+      <div class="pkg-detail reveal" id="sec-agent">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--agt)"></div>
+          <div class="pkg-ver">unbounded, capped with max_steps</div>
+          <div class="pkg-detail-name" style="color: var(--agt)">🤖 The Agent Loop</div>
+          <div class="pkg-detail-tagline">An LLM in a loop, picking which tool to call - or deciding to stop - at every
+            step.</div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">What makes it an agent, not a workflow</div>
+            <ul class="feat-list">
+              <li>You don't know upfront <strong>how many calls</strong> it'll make, in what order, or with what
+                arguments</li>
+              <li>The model plans its own sequence - handles problems whose <em>shape</em> depends on the input</li>
+              <li>Powerful, but costs and failure modes become open-ended</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">The loop, in ~20 lines</div>
+            <ul class="feat-list">
+              <li>Send messages + tools to the LLM</li>
+              <li>No <code>tool_calls</code> in the response → done, return the answer</li>
+              <li>Otherwise execute every tool call, append results, loop</li>
+              <li>Cap iterations with <code>max_steps</code> - a confused model can't burn money forever</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">When to use</span>
+          Tasks whose steps genuinely depend on the input in a way you can't predict at design time - open-ended
+          research, multi-fact lookups with unknown order, anything where the "right" sequence changes per request.
+        </div>
+
+        <div class="flow-wrap">
+          <div class="flow-row">
+            <div class="flow-node accent">User question<small>needs 3 different tools</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">LLM ⇄ tools<small>loop, model-directed</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node accent">Final answer</div>
+          </div>
+          <div class="loop-note">↺ <span class="lbl">model decides: call another tool, or stop</span> · capped at <span
+              class="lbl">max_steps = 8</span></div>
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">agent.py - the core loop every agent framework wraps</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">def</span> <span class="t-fn">run_agent</span>(user_question: <span
+                class="t-cls">str</span>, max_steps: <span class="t-cls">int</span> = <span class="t-num">8</span>) ->
+              <span class="t-cls">str</span>:
+              messages = [
+              {<span class="t-str">"role"</span>: <span class="t-str">"system"</span>, <span
+                class="t-str">"content"</span>: <span class="t-str">"Use tools to gather facts and do arithmetic.
+                "</span>
+              <span class="t-str">"Stop calling tools once you have enough information."</span>},
+              {<span class="t-str">"role"</span>: <span class="t-str">"user"</span>, <span
+                class="t-str">"content"</span>: user_question},
+              ]
+
+              <span class="t-kw">for</span> step <span class="t-kw">in</span> <span class="t-fn">range</span>(<span
+                class="t-num">1</span>, max_steps + <span class="t-num">1</span>):
+              resp = co.<span class="t-fn">chat</span>(<span class="t-pn">model</span>=MODEL, <span
+                class="t-pn">messages</span>=messages, <span class="t-pn">tools</span>=tools)
+
+              <span class="t-kw">if</span> <span class="t-kw">not</span> resp.message.tool_calls:
+              <span class="t-kw">return</span> resp.message.content[<span class="t-num">0</span>].text <span
+                class="t-cm"># model chose to stop</span>
+
+              messages.<span class="t-fn">append</span>({
+              <span class="t-str">"role"</span>: <span class="t-str">"assistant"</span>,
+              <span class="t-str">"tool_calls"</span>: resp.message.tool_calls,
+              <span class="t-str">"tool_plan"</span>: resp.message.tool_plan, <span class="t-cm"># the model's
+                "Thought"</span>
+              })
+
+              <span class="t-kw">for</span> tc <span class="t-kw">in</span> resp.message.tool_calls: <span
+                class="t-cm"># the model's "Action(s)"</span>
+              args = json.<span class="t-fn">loads</span>(tc.function.arguments)
+              result = TOOL_REGISTRY[tc.function.name](**args)
+              messages.<span class="t-fn">append</span>({ <span class="t-cm"># the "Observation"</span>
+              <span class="t-str">"role"</span>: <span class="t-str">"tool"</span>, <span
+                class="t-str">"tool_call_id"</span>: tc.id,
+              <span class="t-str">"content"</span>: json.<span class="t-fn">dumps</span>(result),
+              })
+
+              <span class="t-kw">return</span> <span class="t-str">"⚠️ Hit max steps without producing a final
+                answer."</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout warn" style="margin: 0 32px 28px">
+          <div class="callout-icon">⚠️</div>
+          <div><strong>The <code>max_steps</code> cap is load-bearing infrastructure</strong>, not a debug-only knob.
+            There is no other safety net - a confused agent will happily call <code>lookup</code> with random keys
+            forever if you let it. Other guardrails real agents need: a <strong>dollar/token budget</strong>,
+            <strong>tool-call argument validation</strong>, <strong>step-by-step logging</strong>, and
+            <strong>human-in-the-loop</strong> for destructive actions.</div>
+        </div>
+      </div>
+
+      <!-- REACT -->
+      <div class="pkg-detail reveal" id="react">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--react)"></div>
+          <div class="pkg-ver">Yao et al., 2022 · arXiv:2210.03629</div>
+          <div class="pkg-detail-name" style="color: var(--react)">📚 This pattern has a name: ReAct</div>
+          <div class="pkg-detail-tagline">Reasoning + Acting - the most common agent pattern in the wild, and the one
+            you just built above.</div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">The three ingredients, in a loop</div>
+            <ul class="feat-list">
+              <li><strong>Thought</strong> - the model reasons about what to do next</li>
+              <li><strong>Action</strong> - the model picks a tool and its arguments</li>
+              <li><strong>Observation</strong> - the tool's result is fed back to the model</li>
+            </ul>
+            <p style="font-size:13px;color:var(--6e);line-height:1.6;margin-top:14px">…then it loops until the model
+              decides it has enough information to answer. That's the whole pattern.</p>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">2022 paper vs. modern APIs</div>
+            <ul class="feat-list">
+              <li>The original paper had the model emit Thought/Action/Observation as <strong>structured text</strong>
+                that <em>you</em> parsed by hand</li>
+              <li>Modern function-calling - Cohere's <code>tool_plan</code> + <code>tool_calls</code>, OpenAI's
+                <code>reasoning</code> + <code>tool_calls</code>, Anthropic's <code>thinking</code> +
+                <code>tool_use</code> - bakes the same loop directly into the API</li>
+              <li>No more text parsing. <strong>Same shape underneath.</strong></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="param-wrap" style="margin: 0 32px 24px; width: calc(100% - 64px);">
+          <table class="param-table">
+            <thead>
+              <tr>
+                <th>ReAct step</th>
+                <th>Where it lives in the code</th>
+                <th>What it looks like in a trace</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="param-name">Thought</td>
+                <td class="param-type">resp.message.tool_plan</td>
+                <td>"I need to look up the price per ticket…"</td>
+              </tr>
+              <tr>
+                <td class="param-name">Action</td>
+                <td class="param-type">resp.message.tool_calls</td>
+                <td><code
+                    style="font-family:var(--mono);font-size:11.5px;background:var(--f5);padding:1px 5px;border-radius:3px;">lookup({'key': 'attendees'})</code>
+                </td>
+              </tr>
+              <tr>
+                <td class="param-name">Observation</td>
+                <td class="param-type">{"role": "tool", "content": …}</td>
+                <td><code
+                    style="font-family:var(--mono);font-size:11.5px;background:var(--f5);padding:1px 5px;border-radius:3px;">= {'value': 47, ...}</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout pur" style="margin: 0 32px 28px">
+          <div class="callout-icon">🎯</div>
+          <div><strong>One line to take with you:</strong> ReAct is the <em>pattern</em>. Function calling is the
+            <em>implementation</em> of that pattern in modern LLM APIs. Plan-and-Execute (plan all steps upfront, then
+            run them), Reflexion (add a self-critique pass after each action), and multi-agent setups are all
+            <strong>variations on the ReAct loop</strong>, not replacements for it.</div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- ── COMPARISON ───────────────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="compare">
+      <div class="reveal">
+        <div class="sec-label">Side by Side</div>
+        <h2 class="sec-title">The whole guide, on one page</h2>
+        <p class="sec-sub">Same underlying primitive - the augmented LLM call - composed three different ways.</p>
+      </div>
+
+      <div class="matrix-wrap reveal">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Augmented LLM</th>
+              <th>Workflow</th>
+              <th>Agent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="uc-name">Calls per request</div>
+              </td>
+              <td>1 (+1 per tool round)</td>
+              <td>Fixed N</td>
+              <td>Unbounded (capped)</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Control flow</div>
+              </td>
+              <td>Trivial</td>
+              <td><span class="primary-pill pp-wf">Hardcoded by you</span></td>
+              <td><span class="primary-pill pp-agt">Decided by the model</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Predictability</div>
+              </td>
+              <td>Very high</td>
+              <td>High</td>
+              <td>Low</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Cost ceiling</div>
+              </td>
+              <td>Tight</td>
+              <td>Tight</td>
+              <td>Open-ended</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Debuggability</div>
+              </td>
+              <td>Easy</td>
+              <td>Step-by-step</td>
+              <td>Trace-required</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Best for</div>
+              </td>
+              <td>One-shot tasks with a clear tool need</td>
+              <td>Tasks you can decompose upfront</td>
+              <td>Tasks whose shape depends on the input</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout good reveal">
+        <div class="callout-icon">✅</div>
+        <div><strong>A rule of thumb to take with you:</strong> start with the simplest thing that works. If a single
+          augmented LLM call solves the task, ship it. If not, design a workflow. Only reach for an agent when the steps
+          themselves depend on the input in a way you can't predict.</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── DECISION GUIDE ─────────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="decide">
+      <div class="reveal">
+        <div class="sec-label">Decision Guide</div>
+        <h2 class="sec-title">Pick your pattern<br>in three questions</h2>
+        <p class="sec-sub">Answer each question in order. By question 3 you know exactly what to build.</p>
+      </div>
+
+      <div class="dt-box reveal">
+        <div class="dt-q">Does the task fit in one round trip?</div>
+        <div class="dt-branch">
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Yes, with maybe one tool call → <strong>Augmented
+                LLM</strong> - describe, decide, execute, resolve. Ship it.</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>No, it needs several distinct steps → keep going to
+              question 2</span></div>
+        </div>
+
+        <div class="dt-q">Can you predict the sequence of steps at design time?</div>
+        <div class="dt-branch">
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Fixed sequence, output of one feeds the next →
+              <strong>Prompt Chaining</strong></span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>First step depends on input category →
+              <strong>Routing</strong> (classify, then dispatch)</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Steps are independent of each other →
+              <strong>Parallelization</strong> (sectioning or voting)</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Quality is easy to grade but hard to one-shot →
+              <strong>Evaluator–Optimizer</strong> (capped retry loop)</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>No - the right sequence changes per input and you
+              can't predict it upfront → go to question 3</span></div>
+        </div>
+
+        <div class="dt-q">Are you ready to pay the agent tax?</div>
+        <div class="dt-branch">
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Yes - build a <strong>ReAct agent</strong>: LLM in a
+              loop, model picks tools, hard <code>max_steps</code> cap, plus a token/dollar budget and full step
+              logging</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Not yet - most "agentic" products in the wild are
+              actually well-designed workflows. Re-check question 2 before reaching for the loop.</span></div>
+        </div>
+      </div>
+
+      <div class="callout pur reveal" style="margin-top:24px">
+        <div class="callout-icon">🎯</div>
+        <div><strong>Set <code>max_steps=1</code> on any agent and re-run it.</strong> Watch the answer degrade - that's
+          proof the loop is doing real work, and a good way to sanity-check that you actually needed an agent and not a
+          workflow.</div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <p>Workflows &amp; Agents - a Visual Guide</p>
+    <p class="refs">Based on Anthropic's <a href="https://www.anthropic.com/research/building-effective-agents"
+        target="_blank" rel="noopener noreferrer">Building Effective Agents</a> · ReAct: Yao et al., <a
+        href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener noreferrer">arXiv:2210.03629</a></p>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+    }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    document.querySelectorAll('.pyramid-wrap .py-layer, .trainer-cards .tc').forEach((el, i) => {
+      el.style.transitionDelay = (i * 0.06) + 's';
+    });
+  </script>
+</body>
+
+</html>

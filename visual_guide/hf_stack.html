@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The HuggingFace Training Stack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Literata:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ── TOKENS ─────────────────────────────────── */
+    :root {
+      --white: #ffffff;
+      --f7: #f7f7f7;
+      --f5: #f5f5f7;
+      --f0: #f0f0f2;
+      --e8: #e8e8ed;
+      --d2: #d2d2d7;
+      --6e: #6e6e73;
+      --1d: #1d1d1f;
+      --blue: #0071e3;
+      --blue-l: #147ce5;
+      --blue-bg: #f0f6ff;
+      --blue-bd: rgba(0, 113, 227, 0.18);
+      --green: #1c8a3e;
+      --green-bg: #f0faf3;
+      --orange: #b45309;
+      --orange-bg: #fffbeb;
+      --red: #c0392b;
+      --red-bg: #fff5f5;
+      --purple: #6d28d9;
+      --purple-bg: #f5f3ff;
+
+      /* package colours */
+      --hf: #e76d36;
+      --hf-bg: rgba(231, 109, 54, 0.07);
+      --tr: #0066cc;
+      --tr-bg: rgba(0, 102, 204, 0.07);
+      --trl: #7c3aed;
+      --trl-bg: rgba(124, 58, 237, 0.07);
+      --peft: #0ea5e9;
+      --peft-bg: rgba(14, 165, 233, 0.07);
+      --uns: #059669;
+      --uns-bg: rgba(5, 150, 105, 0.07);
+
+      --r: 16px;
+      --r-sm: 10px;
+      --r-xs: 6px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+      --serif: 'Literata', Georgia, serif;
+      --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06), 0 2px 12px rgba(0, 0, 0, 0.04);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.07), 0 8px 32px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08), 0 24px 64px rgba(0, 0, 0, 0.06);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--white);
+      color: var(--1d);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background: rgba(0, 113, 227, 0.15);
+    }
+
+    /* ── SCROLLBAR ───────────────────────────────── */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--d2);
+      border-radius: 2px;
+    }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 52px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 0.5px solid var(--e8);
+      display: flex;
+      align-items: center;
+      padding: 0 44px;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--1d);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0;
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--6e);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav-link:hover {
+      color: var(--1d);
+      background: var(--f5);
+    }
+
+    .nav-tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--f5);
+      border: 0.5px solid var(--e8);
+      color: var(--6e);
+      letter-spacing: 0.02em;
+      margin-left: 8px;
+    }
+
+    /* ── HERO ─────────────────────────────────────── */
+    .hero {
+      padding: 132px 44px 80px;
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.1s ease-out forwards;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 6.5vw, 72px);
+      font-weight: 700;
+      letter-spacing: -2.5px;
+      line-height: 1.04;
+      color: var(--1d);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.22s ease-out forwards;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--blue);
+    }
+
+    .hero-sub {
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 300;
+      color: var(--6e);
+      line-height: 1.6;
+      max-width: 560px;
+      margin: 0 auto 48px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.34s ease-out forwards;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.46s ease-out forwards;
+    }
+
+    .pkg-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid;
+      font-family: var(--mono);
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .pkg-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pkg-badge.hf {
+      color: var(--hf);
+      border-color: rgba(231, 109, 54, 0.25);
+      background: var(--hf-bg);
+    }
+
+    .pkg-badge.tr {
+      color: var(--tr);
+      border-color: rgba(0, 102, 204, 0.22);
+      background: var(--tr-bg);
+    }
+
+    .pkg-badge.trl {
+      color: var(--trl);
+      border-color: rgba(124, 58, 237, 0.22);
+      background: var(--trl-bg);
+    }
+
+    .pkg-badge.pft {
+      color: var(--peft);
+      border-color: rgba(14, 165, 233, 0.22);
+      background: var(--peft-bg);
+    }
+
+    .pkg-badge.uns {
+      color: var(--uns);
+      border-color: rgba(5, 150, 105, 0.22);
+      background: var(--uns-bg);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── CONTENT WRAPPER ─────────────────────────── */
+    .content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 44px;
+    }
+
+    /* ── SECTION CHROME ──────────────────────────── */
+    .section {
+      padding: 80px 0;
+    }
+
+    .section+.section {
+      border-top: 0.5px solid var(--e8);
+    }
+
+    .sec-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+
+    .sec-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      color: var(--1d);
+    }
+
+    .sec-sub {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--6e);
+      line-height: 1.6;
+      max-width: 560px;
+      margin-bottom: 48px;
+    }
+
+    /* ── PYRAMID / LAYER STACK ───────────────────── */
+    .pyramid-wrap {
+      margin-bottom: 48px;
+    }
+
+    .py-layer {
+      display: grid;
+      grid-template-columns: 180px 1fr 160px;
+      gap: 0;
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      background: var(--white);
+      margin-bottom: 4px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .py-layer:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .py-name {
+      padding: 18px 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-right: 0.5px solid var(--e8);
+    }
+
+    .py-desc {
+      padding: 18px 24px;
+      font-size: 13px;
+      color: var(--6e);
+      line-height: 1.55;
+      display: flex;
+      align-items: center;
+      border-right: 0.5px solid var(--e8);
+    }
+
+    .py-role {
+      padding: 18px 16px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--6e);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    .py-layer.l-hf .py-name {
+      background: var(--hf-bg);
+      color: var(--hf);
+    }
+
+    .py-layer.l-tr .py-name {
+      background: var(--tr-bg);
+      color: var(--tr);
+    }
+
+    .py-layer.l-trl .py-name {
+      background: var(--trl-bg);
+      color: var(--trl);
+    }
+
+    .py-layer.l-pft .py-name {
+      background: var(--peft-bg);
+      color: var(--peft);
+    }
+
+    .py-layer.l-uns .py-name {
+      background: var(--uns-bg);
+      color: var(--uns);
+    }
+
+    .py-layer.l-sys .py-name {
+      background: var(--f5);
+      color: var(--6e);
+      font-style: italic;
+    }
+
+    .py-layer.l-sys {
+      border-style: dashed;
+    }
+
+    /* ── PACKAGE DETAIL CARDS ────────────────────── */
+    .pkg-detail {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .pkg-detail-header {
+      padding: 28px 32px 24px;
+      border-bottom: 0.5px solid var(--e8);
+      position: relative;
+    }
+
+    .pkg-accent-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .pkg-detail-name {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      margin-top: 16px;
+    }
+
+    .pkg-detail-tagline {
+      font-size: 14px;
+      color: var(--6e);
+      font-family: var(--serif);
+      font-weight: 300;
+    }
+
+    .pkg-ver {
+      position: absolute;
+      top: 28px;
+      right: 32px;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      background: var(--f5);
+      border: 0.5px solid var(--e8);
+      border-radius: var(--r-xs);
+      color: var(--6e);
+    }
+
+    .pkg-body-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 0;
+    }
+
+    .pkg-col {
+      padding: 24px 32px;
+    }
+
+    .pkg-col+.pkg-col {
+      border-left: 0.5px solid var(--e8);
+    }
+
+    .col-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--6e);
+      margin-bottom: 14px;
+    }
+
+    .feat-list {
+      list-style: none;
+    }
+
+    .feat-list li {
+      font-size: 13px;
+      color: var(--6e);
+      padding: 7px 0;
+      border-bottom: 0.5px solid var(--f0);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+
+    .feat-list li:last-child {
+      border-bottom: none;
+    }
+
+    .feat-list li::before {
+      content: '›';
+      color: var(--d2);
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-size: 14px;
+    }
+
+    .feat-list li strong {
+      color: var(--1d);
+      font-weight: 500;
+    }
+
+    /* ── WHEN-TO-USE BOX ─────────────────────────── */
+    .when-box {
+      margin: 0 32px 24px;
+      padding: 14px 18px;
+      background: var(--f5);
+      border-radius: var(--r-sm);
+      border: 0.5px solid var(--e8);
+      font-size: 13px;
+      color: var(--6e);
+      line-height: 1.65;
+    }
+
+    .when-box strong {
+      color: var(--1d);
+    }
+
+    .when-box .wlabel {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--6e);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* ── TRAINER CARDS (TRL variations) ─────────────── */
+    .trainer-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .tc {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .tc:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .tc-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+
+    .tc-name {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      margin-top: 6px;
+    }
+
+    .tc-use {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .tc-desc {
+      font-size: 12px;
+      color: var(--6e);
+      line-height: 1.6;
+    }
+
+    .tc-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-family: var(--mono);
+    }
+
+    /* ── CODE BLOCK ──────────────────────────────── */
+    .code-win {
+      background: #1e1e2e;
+      border-radius: var(--r);
+      overflow: hidden;
+      margin: 24px 0;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .code-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 12px 20px;
+      background: #2a2a3e;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .cdot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .cdot-r {
+      background: #ff5f57;
+    }
+
+    .cdot-y {
+      background: #febc2e;
+    }
+
+    .cdot-g {
+      background: #28c840;
+    }
+
+    .code-filename {
+      margin-left: 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .code-pre {
+      padding: 24px 28px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 2.0;
+      overflow-x: auto;
+      color: #cdd6f4;
+      tab-size: 4;
+      white-space: pre;
+      /* preserve Python indentation */
+    }
+
+    /* syntax tokens */
+    .t-kw {
+      color: #cba6f7;
+    }
+
+    /* keyword: import, from, def, if, for, return */
+    .t-fn {
+      color: #89b4fa;
+    }
+
+    /* function name */
+    .t-cls {
+      color: #f9e2af;
+    }
+
+    /* class name */
+    .t-str {
+      color: #a6e3a1;
+    }
+
+    /* string */
+    .t-num {
+      color: #fab387;
+    }
+
+    /* number / bool */
+    .t-cm {
+      color: #585b70;
+      font-style: italic;
+    }
+
+    /* comment */
+    .t-pn {
+      color: #89dceb;
+    }
+
+    /* param name (keyword argument) */
+    .t-op {
+      color: #94e2d5;
+    }
+
+    /* operator = */
+    .t-deco {
+      color: #f38ba8;
+    }
+
+    /* decorator */
+    /* section comment headers in code */
+    .t-sec {
+      color: #6c7086;
+      font-style: italic;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── PARAM TABLE ─────────────────────────────── */
+    .param-wrap {
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .param-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--6e);
+      background: var(--f5);
+      border-bottom: 1px solid var(--e8);
+    }
+
+    .param-table td {
+      padding: 12px 16px;
+      border-bottom: 0.5px solid var(--f0);
+      vertical-align: top;
+      color: var(--6e);
+      line-height: 1.5;
+    }
+
+    .param-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .param-table tr:hover td {
+      background: var(--f7);
+    }
+
+    .param-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--1d);
+      font-weight: 500;
+    }
+
+    .param-type {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--peft);
+    }
+
+    .param-default {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--6e);
+    }
+
+    /* ── CALLOUT ─────────────────────────────────── */
+    .callout {
+      display: flex;
+      gap: 14px;
+      padding: 16px 20px;
+      border-radius: var(--r-sm);
+      margin: 20px 0;
+      font-size: 13px;
+      line-height: 1.65;
+      border-left: 3px solid;
+    }
+
+    .callout-icon {
+      flex-shrink: 0;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .callout.info {
+      background: var(--blue-bg);
+      border-color: var(--blue);
+      color: #1a4b8a;
+    }
+
+    .callout.warn {
+      background: var(--orange-bg);
+      border-color: var(--orange);
+      color: #7c4b0a;
+    }
+
+    .callout.good {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: #145228;
+    }
+
+    .callout.pur {
+      background: var(--purple-bg);
+      border-color: var(--purple);
+      color: #4c1d95;
+    }
+
+    .callout strong {
+      font-weight: 600;
+    }
+
+    .callout code {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: rgba(0, 0, 0, 0.07);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* ── PIPELINE FLOW ───────────────────────────── */
+    .pipeline {
+      margin: 32px 0;
+    }
+
+    .pipeline-step {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding-bottom: 28px;
+      position: relative;
+    }
+
+    .pipeline-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 42px;
+      bottom: 0;
+      width: 1px;
+      background: var(--e8);
+    }
+
+    .pipeline-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+      border: 1.5px solid var(--e8);
+      background: var(--white);
+      color: var(--6e);
+      position: relative;
+      z-index: 1;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pipeline-dot.blue {
+      background: var(--blue-bg);
+      border-color: var(--blue-bd);
+      color: var(--blue);
+    }
+
+    .pipeline-dot.green {
+      background: var(--green-bg);
+      border-color: rgba(28, 138, 62, 0.2);
+      color: var(--green);
+    }
+
+    .pipeline-dot.trl {
+      background: var(--trl-bg);
+      border-color: rgba(124, 58, 237, 0.2);
+      color: var(--trl);
+    }
+
+    .pipeline-dot.pft {
+      background: var(--peft-bg);
+      border-color: rgba(14, 165, 233, 0.2);
+      color: var(--peft);
+    }
+
+    .pipeline-dot.uns {
+      background: var(--uns-bg);
+      border-color: rgba(5, 150, 105, 0.2);
+      color: var(--uns);
+    }
+
+    .pipeline-dot.hf {
+      background: var(--hf-bg);
+      border-color: rgba(231, 109, 54, 0.2);
+      color: var(--hf);
+    }
+
+    .pipeline-content {
+      padding-top: 8px;
+      flex: 1;
+    }
+
+    .pipeline-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+      color: var(--1d);
+    }
+
+    .pipeline-content p {
+      font-size: 14px;
+      color: var(--6e);
+      line-height: 1.6;
+    }
+
+    .pipeline-content p code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--f5);
+      border: 0.5px solid var(--e8);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--1d);
+    }
+
+    /* ── USE CASE MATRIX ─────────────────────────── */
+    .matrix-wrap {
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+      margin: 32px 0;
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .matrix-table th {
+      padding: 14px 16px;
+      background: var(--f5);
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--6e);
+      border-bottom: 1px solid var(--e8);
+      white-space: nowrap;
+    }
+
+    .matrix-table td {
+      padding: 14px 16px;
+      border-bottom: 0.5px solid var(--f0);
+      vertical-align: middle;
+      color: var(--6e);
+      font-size: 13px;
+    }
+
+    .matrix-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .matrix-table tr:hover td {
+      background: var(--f7);
+    }
+
+    .uc-name {
+      font-weight: 600;
+      color: var(--1d);
+      white-space: nowrap;
+      font-size: 14px;
+    }
+
+    .chk {
+      color: var(--green);
+      font-size: 16px;
+    }
+
+    .dash {
+      color: var(--d2);
+      font-size: 16px;
+    }
+
+    .primary-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--r-xs);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .pp-trl {
+      background: var(--trl-bg);
+      color: var(--trl);
+    }
+
+    .pp-hf {
+      background: var(--tr-bg);
+      color: var(--tr);
+    }
+
+    .pp-uns {
+      background: var(--uns-bg);
+      color: var(--uns);
+    }
+
+    /* ── DECISION TREE ───────────────────────────── */
+    .dt-box {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-sm);
+      padding: 32px;
+    }
+
+    .dt-q {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--1d);
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dt-q::before {
+      content: '?';
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--blue-bg);
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .dt-branch {
+      margin-left: 34px;
+      padding-left: 20px;
+      border-left: 1.5px solid var(--e8);
+      margin-bottom: 24px;
+    }
+
+    .dt-row {
+      padding: 10px 14px;
+      border-radius: var(--r-xs);
+      font-size: 13px;
+      color: var(--6e);
+      line-height: 1.6;
+      margin-bottom: 6px;
+      background: var(--f5);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .dt-arrow {
+      color: var(--d2);
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+
+    .dt-row strong {
+      color: var(--1d);
+      font-weight: 600;
+    }
+
+    .dt-row code {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* ── DIVIDER ─────────────────────────────────── */
+    .hdivider {
+      border: none;
+      height: 0.5px;
+      background: var(--e8);
+      margin: 0;
+    }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 56px 44px;
+      border-top: 0.5px solid var(--e8);
+      color: var(--6e);
+      font-size: 13px;
+    }
+
+    footer a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── REVEAL ANIMATION ────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .reveal.vis {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav {
+        padding: 0 20px;
+      }
+
+      .nav-links,
+      .nav-tag {
+        display: none;
+      }
+
+      .content {
+        padding: 0 20px;
+      }
+
+      .hero {
+        padding: 100px 20px 60px;
+      }
+
+      .py-layer {
+        grid-template-columns: 1fr;
+      }
+
+      .py-desc,
+      .py-role {
+        border-left: none;
+        border-top: 0.5px solid var(--e8);
+      }
+
+      .pkg-body-2col {
+        grid-template-columns: 1fr;
+      }
+
+      .pkg-col+.pkg-col {
+        border-left: none;
+        border-top: 0.5px solid var(--e8);
+      }
+
+      .trainer-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .matrix-table {
+        font-size: 12px;
+      }
+    }
+
+    /* ── INLINE TAG ──────────────────────────────── */
+    .itag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 500;
+      vertical-align: baseline;
+    }
+
+    .itag.hf {
+      background: var(--hf-bg);
+      color: var(--hf);
+    }
+
+    .itag.tr {
+      background: var(--tr-bg);
+      color: var(--tr);
+    }
+
+    .itag.trl {
+      background: var(--trl-bg);
+      color: var(--trl);
+    }
+
+    .itag.pft {
+      background: var(--peft-bg);
+      color: var(--peft);
+    }
+
+    .itag.uns {
+      background: var(--uns-bg);
+      color: var(--uns);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAV ───────────────────────────────────── -->
+  <nav class="nav">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="index.html"
+        style="font-size:12px;color:var(--d2);text-decoration:none;display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1px solid var(--e8);transition:all 0.2s;"
+        onmouseover="this.style.color='var(--acc)';this.style.borderColor='rgba(0,113,227,0.3)'"
+        onmouseout="this.style.color='var(--d2)';this.style.borderColor='var(--e8)'">← Guides</a>
+      <div class="nav-brand">HF Training Stack</div>
+    </div>
+    <div class="nav-links">
+      <a class="nav-link" href="#architecture">Architecture</a>
+      <a class="nav-link" href="#packages">Packages</a>
+      <a class="nav-link" href="#pipeline">Pipeline</a>
+      <a class="nav-link" href="#trainers">Trainers</a>
+      <a class="nav-link" href="#usecases">Use Cases</a>
+      <a class="nav-link" href="#decide">Decision Guide</a>
+    </div>
+    <div class="nav-tag">Qwen 2.5 Coder · QLoRA</div>
+  </nav>
+
+  <!-- ── HERO ──────────────────────────────────── -->
+  <div class="hero">
+    <div class="hero-eyebrow">Complete Reference Guide</div>
+    <h1>Five packages.<br><em>One training stack.</em></h1>
+    <p class="hero-sub">transformers, Trainer, TRL, PEFT, and Unsloth - each has a distinct job in the hierarchy.
+      Understand the stack once, and the confusion disappears.</p>
+    <div class="badge-row">
+      <a class="pkg-badge hf" href="#sec-hf">🤗 transformers</a>
+      <a class="pkg-badge tr" href="#sec-tr">⚙ Trainer</a>
+      <a class="pkg-badge trl" href="#sec-trl">🎯 TRL</a>
+      <a class="pkg-badge pft" href="#sec-peft">🔌 PEFT</a>
+      <a class="pkg-badge uns" href="#sec-uns">🦥 Unsloth</a>
+    </div>
+  </div>
+
+  <!-- ── ARCHITECTURE ───────────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="architecture">
+      <div class="reveal">
+        <div class="sec-label">The Stack</div>
+        <h2 class="sec-title">How the packages layer together</h2>
+        <p class="sec-sub">Think of it as a pyramid. Lower layers are more fundamental. Higher layers are more
+          convenient but more opinionated. They are not alternatives - they are layers.</p>
+      </div>
+
+      <div class="pyramid-wrap reveal">
+        <div class="py-layer l-uns">
+          <div class="py-name">🦥 Unsloth</div>
+          <div class="py-desc">Optional speed layer. Replaces attention, cross-entropy, RoPE, LoRA matmul with
+            hand-written Triton kernels. 2× faster, 70% less VRAM, zero accuracy change.</div>
+          <div class="py-role">Speed &amp; VRAM</div>
+        </div>
+        <div class="py-layer l-trl">
+          <div class="py-name">🎯 TRL</div>
+          <div class="py-desc">Task-specific training objectives: SFTTrainer (instruction tuning), DPOTrainer
+            (preference), GRPOTrainer (RL without critic), PPOTrainer (RLHF), ORPOTrainer, KTOTrainer…</div>
+          <div class="py-role">Training Recipes</div>
+        </div>
+        <div class="py-layer l-tr">
+          <div class="py-name">⚙ Trainer</div>
+          <div class="py-desc">Generic training loop: gradient accumulation, mixed precision, distributed training,
+            checkpointing, logging, evaluation. All TRL trainers subclass this directly.</div>
+          <div class="py-role">Training Loop</div>
+        </div>
+        <div class="py-layer l-pft">
+          <div class="py-name">🔌 PEFT</div>
+          <div class="py-desc">Injects low-rank adapter matrices (LoRA, DoRA, IA³…) into frozen base layers. Controls
+            which weights are trainable. Manages adapter saving, loading, and merging.</div>
+          <div class="py-role">Adapter Layer</div>
+        </div>
+        <div class="py-layer l-hf">
+          <div class="py-name">🤗 transformers</div>
+          <div class="py-desc">The actual model: architecture code, pre-trained weights, tokenizer, quantization
+            (BitsAndBytes), and generation. Every other package sits on top of this.</div>
+          <div class="py-role">Model Foundation</div>
+        </div>
+        <div class="py-layer l-sys">
+          <div class="py-name">PyTorch / CUDA</div>
+          <div class="py-desc">Tensor ops, autograd engine, GPU kernels. All packages run on top of this runtime.</div>
+          <div class="py-role">Runtime</div>
+        </div>
+      </div>
+
+      <div class="callout info reveal">
+        <div class="callout-icon">💡</div>
+        <div><strong>The key mental model:</strong> You always need <code>transformers</code> (the model). You usually
+          need <code>PEFT</code> (adapters). You need exactly one trainer - bare <code>Trainer</code> for raw CPT, or a
+          TRL task-specific trainer for everything else. Wrap with <code>Unsloth</code> on single GPU for free speed
+          gains. None of these are alternatives to each other.</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── PACKAGES ────────────────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="packages">
+      <div class="reveal">
+        <div class="sec-label">Package Reference</div>
+        <h2 class="sec-title">Each package, in depth</h2>
+        <p class="sec-sub">What it does, what it doesn't do, and the parameters you'll actually use.</p>
+      </div>
+
+      <!-- TRANSFORMERS -->
+      <div class="pkg-detail reveal" id="sec-hf">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--hf)"></div>
+          <div class="pkg-ver">pip install transformers</div>
+          <div class="pkg-detail-name" style="color: var(--hf)">🤗 transformers</div>
+          <div class="pkg-detail-tagline">Layer 1 - the model itself. Architecture, weights, tokenizer, quantization,
+            generation.</div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">What it contains</div>
+            <ul class="feat-list">
+              <li><strong>AutoModelForCausalLM</strong> - loads any LLM (Qwen, Llama, Mistral…)</li>
+              <li><strong>AutoTokenizer</strong> - text ↔ token IDs, chat templates</li>
+              <li><strong>BitsAndBytesConfig</strong> - 4-bit / 8-bit quantization config</li>
+              <li><strong>TrainingArguments</strong> - all training hyperparameters (inherited by ALL trainers)</li>
+              <li><strong>GenerationConfig</strong> - sampling, beam search, temperature for inference</li>
+            </ul>
+            <div class="col-title" style="margin-top:20px">What you do here</div>
+            <ul class="feat-list">
+              <li>Load the model with quantization config</li>
+              <li>Load and configure the tokenizer</li>
+              <li>That's it - adapters and training are handled above</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">Key parameters</div>
+            <ul class="feat-list">
+              <li><strong>quantization_config</strong> - pass BitsAndBytesConfig for 4-bit NF4</li>
+              <li><strong>torch_dtype=torch.bfloat16</strong> - BF16 for non-quantized loads</li>
+              <li><strong>device_map="auto"</strong> - auto-spread across GPUs</li>
+              <li><strong>attn_implementation="flash_attention_2"</strong> - FA2 speedup</li>
+              <li><strong>trust_remote_code=True</strong> - required for custom arch models</li>
+            </ul>
+            <div class="col-title" style="margin-top:20px">BitsAndBytesConfig params</div>
+            <ul class="feat-list">
+              <li><strong>load_in_4bit=True</strong> - 4-bit NF4 weight storage</li>
+              <li><strong>bnb_4bit_quant_type="nf4"</strong> - NormalFloat-4 (optimal for weights)</li>
+              <li><strong>bnb_4bit_use_double_quant=True</strong> - compress scale constants too</li>
+              <li><strong>bnb_4bit_compute_dtype=bfloat16</strong> - dequantization compute dtype</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">When to use</span>
+          <strong>Always.</strong> Every other package requires transformers. Your only work here is loading the model +
+          tokenizer with the right quantization config. Never call the model's forward pass directly during fine-tuning
+          - that's the trainer's job.
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">step_1_load_model.py - transformers</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">from</span> <span class="t-fn">transformers</span> <span
+                class="t-kw">import</span> <span class="t-cls">AutoModelForCausalLM</span>, <span
+                class="t-cls">AutoTokenizer</span>, <span class="t-cls">BitsAndBytesConfig</span>
+              <span class="t-kw">import</span> <span class="t-fn">torch</span>
+
+              <span class="t-sec"># ── 1. Configure 4-bit quantization ──────────────────────────────────────</span>
+              bnb_config = <span class="t-cls">BitsAndBytesConfig</span>(
+              <span class="t-pn">load_in_4bit</span> = <span class="t-num">True</span>,
+              <span class="t-pn">bnb_4bit_quant_type</span> = <span class="t-str">"nf4"</span>, <span class="t-cm">#
+                NormalFloat-4 - optimal for weights</span>
+              <span class="t-pn">bnb_4bit_use_double_quant</span> = <span class="t-num">True</span>, <span
+                class="t-cm"># compress scale constants too</span>
+              <span class="t-pn">bnb_4bit_compute_dtype</span> = torch.<span class="t-fn">bfloat16</span>, <span
+                class="t-cm"># dequant compute in BF16</span>
+              )
+
+              <span class="t-sec"># ── 2. Load model ────────────────────────────────────────────────────────</span>
+              model = <span class="t-cls">AutoModelForCausalLM</span>.<span class="t-fn">from_pretrained</span>(
+              <span class="t-str">"Qwen/Qwen2.5-Coder-32B-Instruct"</span>,
+              <span class="t-pn">quantization_config</span> = bnb_config,
+              <span class="t-pn">device_map</span> = <span class="t-str">"auto"</span>, <span class="t-cm"># spread
+                across all GPUs</span>
+              <span class="t-pn">attn_implementation</span> = <span class="t-str">"flash_attention_2"</span>,
+              <span class="t-pn">torch_dtype</span> = torch.<span class="t-fn">bfloat16</span>,
+              )
+
+              <span class="t-sec"># ── 3. Load tokenizer ────────────────────────────────────────────────────</span>
+              tokenizer = <span class="t-cls">AutoTokenizer</span>.<span class="t-fn">from_pretrained</span>(<span
+                class="t-str">"Qwen/Qwen2.5-Coder-32B-Instruct"</span>)
+              tokenizer.padding_side = <span class="t-str">"right"</span> <span class="t-cm"># right-pad for causal LM
+                training</span>
+
+              <span class="t-cm"># This is ALL you do with transformers directly.</span>
+              <span class="t-cm"># Adapters → PEFT Training loop → Trainer/TRL Speed → Unsloth</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRAINER -->
+      <div class="pkg-detail reveal" id="sec-tr">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--tr)"></div>
+          <div class="pkg-ver">included in transformers</div>
+          <div class="pkg-detail-name" style="color: var(--tr)">⚙ HuggingFace Trainer</div>
+          <div class="pkg-detail-tagline">Layer 2 - the generic training loop. All TRL trainers are subclasses of this.
+          </div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">What it handles</div>
+            <ul class="feat-list">
+              <li><strong>Gradient accumulation</strong> - accumulates across N mini-batches before optimizer step</li>
+              <li><strong>Mixed precision</strong> - bf16/fp16 automatic casting via AMP</li>
+              <li><strong>Distributed training</strong> - DDP, FSDP, DeepSpeed ZeRO integration</li>
+              <li><strong>Checkpointing</strong> - save_steps, save_total_limit, resume_from_checkpoint</li>
+              <li><strong>Evaluation &amp; logging</strong> - eval loop, WandB/TensorBoard, metric computation</li>
+              <li><strong>LR scheduling</strong> - warmup, cosine/linear decay built-in</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">Most important TrainingArguments</div>
+            <ul class="feat-list">
+              <li><strong>per_device_train_batch_size</strong> - samples per GPU per step (keep 1–4 for large models)
+              </li>
+              <li><strong>gradient_accumulation_steps</strong> - N mini-batches before optimizer.step()</li>
+              <li><strong>num_train_epochs</strong> - full dataset passes</li>
+              <li><strong>learning_rate</strong> - 2e-4 for LoRA, 1e-5 for full FT, 1e-5 for CPT</li>
+              <li><strong>lr_scheduler_type</strong> - "cosine" standard for SFT/RL</li>
+              <li><strong>warmup_ratio</strong> - 0.03–0.05 to prevent early divergence</li>
+              <li><strong>optim="adamw_8bit"</strong> - BnB 8-bit Adam halves optimizer VRAM</li>
+              <li><strong>gradient_checkpointing</strong> - frees activations, ~30% compute overhead</li>
+              <li><strong>bf16=True</strong> - mixed precision on Ampere+ GPUs</li>
+              <li><strong>max_grad_norm=0.3</strong> - gradient clip (QLoRA paper recommendation)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">When to use bare Trainer directly</span>
+          For <strong>continued pre-training (CPT)</strong> on raw text with no chat template, no RL, no preference -
+          just next-token prediction on a corpus. For everything else (instruction tuning, preference alignment, RL),
+          use a TRL trainer instead - it adds the task-specific loss on top of this same loop.
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">bare_trainer_cpt.py - Continued Pre-Training</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">from</span> <span class="t-fn">transformers</span> <span
+                class="t-kw">import</span> <span class="t-cls">Trainer</span>, <span
+                class="t-cls">TrainingArguments</span>, <span class="t-cls">DataCollatorForLanguageModeling</span>
+
+              <span class="t-sec"># ── TrainingArguments: shared by ALL trainers (Trainer, SFTTrainer, DPOTrainer…)
+                ─</span>
+              training_args = <span class="t-cls">TrainingArguments</span>(
+              <span class="t-pn">output_dir</span> = <span class="t-str">"./cpt-output"</span>,
+
+              <span class="t-cm"># batch &amp; accumulation</span>
+              <span class="t-pn">per_device_train_batch_size</span> = <span class="t-num">2</span>,
+              <span class="t-pn">gradient_accumulation_steps</span> = <span class="t-num">16</span>, <span
+                class="t-cm"># effective batch = 32</span>
+
+              <span class="t-cm"># epochs &amp; learning rate</span>
+              <span class="t-pn">num_train_epochs</span> = <span class="t-num">1</span>, <span class="t-cm"># CPT: 1–2
+                epochs</span>
+              <span class="t-pn">learning_rate</span> = <span class="t-num">1e-5</span>, <span class="t-cm"># lower than
+                SFT for CPT</span>
+              <span class="t-pn">lr_scheduler_type</span> = <span class="t-str">"cosine"</span>,
+              <span class="t-pn">warmup_ratio</span> = <span class="t-num">0.05</span>,
+
+              <span class="t-cm"># memory &amp; precision</span>
+              <span class="t-pn">bf16</span> = <span class="t-num">True</span>,
+              <span class="t-pn">gradient_checkpointing</span> = <span class="t-num">True</span>,
+              <span class="t-pn">gradient_checkpointing_kwargs</span> = {<span class="t-str">"use_reentrant"</span>:
+              <span class="t-num">False</span>},
+              <span class="t-pn">optim</span> = <span class="t-str">"adamw_8bit"</span>,
+              <span class="t-pn">max_grad_norm</span> = <span class="t-num">1.0</span>,
+
+              <span class="t-cm"># logging &amp; saving</span>
+              <span class="t-pn">logging_steps</span> = <span class="t-num">10</span>,
+              <span class="t-pn">save_strategy</span> = <span class="t-str">"steps"</span>,
+              <span class="t-pn">save_steps</span> = <span class="t-num">500</span>,
+              <span class="t-pn">save_total_limit</span> = <span class="t-num">2</span>,
+              <span class="t-pn">report_to</span> = <span class="t-str">"wandb"</span>,
+              )
+
+              <span class="t-sec"># ── DataCollatorForLanguageModeling: handles next-token targets ────────────</span>
+              <span class="t-cm"># mlm=False → causal LM (GPT-style), not masked LM (BERT-style)</span>
+              collator = <span class="t-cls">DataCollatorForLanguageModeling</span>(<span
+                class="t-pn">tokenizer</span>=tokenizer, <span class="t-pn">mlm</span>=<span class="t-num">False</span>)
+
+              <span class="t-sec"># ── Trainer: plain text corpus, no chat template ───────────────────────────</span>
+              trainer = <span class="t-cls">Trainer</span>(
+              <span class="t-pn">model</span> = model,
+              <span class="t-pn">args</span> = training_args,
+              <span class="t-pn">train_dataset</span> = raw_text_dataset, <span class="t-cm"># just tokenized text, no
+                messages column</span>
+              <span class="t-pn">data_collator</span> = collator,
+              )
+              trainer.<span class="t-fn">train</span>()
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PEFT -->
+      <div class="pkg-detail reveal" id="sec-peft">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--peft)"></div>
+          <div class="pkg-ver">pip install peft</div>
+          <div class="pkg-detail-name" style="color: var(--peft)">🔌 PEFT</div>
+          <div class="pkg-detail-tagline">Layer 3 - Parameter-Efficient Fine-Tuning. Injects tiny trainable LoRA
+            matrices into a frozen base model.</div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">What it does</div>
+            <ul class="feat-list">
+              <li><strong>Freezes</strong> all base model weights (the 32B stays frozen)</li>
+              <li><strong>Injects</strong> small A and B adapter matrices into chosen layers</li>
+              <li><strong>Only A, B are trained</strong> - ~0.4% of total parameters</li>
+              <li><strong>Manages</strong> adapter saving (~100 MB), loading, and merging</li>
+              <li><strong>Supports</strong> LoRA, DoRA, IA³, Prefix Tuning, and more</li>
+            </ul>
+            <div class="col-title" style="margin-top:20px">How the math works</div>
+            <ul class="feat-list">
+              <li>Weight update: <strong>ΔW = B · A</strong> where A ∈ ℝʳˣᵏ, B ∈ ℝᵈˣʳ</li>
+              <li>Forward pass: <strong>h = W₀x + (α/r) · BAx</strong></li>
+              <li>B initialised to zero → ΔW starts at zero, stable training</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">LoraConfig key parameters</div>
+            <ul class="feat-list">
+              <li><strong>r (rank)</strong> - inner adapter dimension. 8–64. Start at 16.</li>
+              <li><strong>lora_alpha</strong> - scaling factor. Convention: alpha = r → multiplier = 1</li>
+              <li><strong>target_modules</strong> - which layers get adapters:
+                ["q_proj","k_proj","v_proj","o_proj","gate_proj","up_proj","down_proj"] or "all-linear"</li>
+              <li><strong>lora_dropout</strong> - 0.0 (required for Unsloth), 0.05–0.1 otherwise</li>
+              <li><strong>bias="none"</strong> - required for Unsloth; recommended generally</li>
+              <li><strong>use_dora</strong> - DoRA: decomposes into magnitude + direction. Slightly better quality at
+                same rank</li>
+              <li><strong>use_rslora</strong> - Rank-Stabilised LoRA: better at high ranks (r ≥ 64)</li>
+              <li><strong>modules_to_save</strong> - full layers saved alongside adapter (e.g. lm_head if expanding
+                vocab)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">Direct usage vs. via SFTTrainer</span>
+          <strong>You rarely call PEFT directly when using TRL.</strong> Pass <code>peft_config=LoraConfig(...)</code>
+          to SFTTrainer and it calls <code>prepare_model_for_kbit_training()</code> and <code>get_peft_model()</code>
+          internally. Only write PEFT code directly for bare Trainer (CPT with LoRA) or custom training loops.
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">peft_direct.py - manual PEFT usage</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">from</span> <span class="t-fn">peft</span> <span
+                class="t-kw">import</span> <span class="t-cls">LoraConfig</span>, <span
+                class="t-cls">get_peft_model</span>, <span class="t-cls">prepare_model_for_kbit_training</span>, <span
+                class="t-cls">PeftModel</span>
+
+              <span class="t-sec"># ── 1. Prepare: enable grad checkpointing + cast LayerNorm to FP32 ─────────</span>
+              model = <span class="t-fn">prepare_model_for_kbit_training</span>(
+              model,
+              <span class="t-pn">use_gradient_checkpointing</span> = <span class="t-num">True</span>,
+              <span class="t-pn">gradient_checkpointing_kwargs</span> = {<span class="t-str">"use_reentrant"</span>:
+              <span class="t-num">False</span>},
+              )
+              <span class="t-cm"># ^ also calls model.enable_input_require_grads() - critical for frozen base +
+                LoRA</span>
+
+              <span class="t-sec"># ── 2. Define LoRA config ──────────────────────────────────────────────────</span>
+              lora_config = <span class="t-cls">LoraConfig</span>(
+              <span class="t-pn">r</span> = <span class="t-num">16</span>,
+              <span class="t-pn">lora_alpha</span> = <span class="t-num">16</span>, <span class="t-cm"># alpha/r = 1.0 →
+                neutral scaling</span>
+              <span class="t-pn">target_modules</span> = [
+              <span class="t-str">"q_proj"</span>, <span class="t-str">"k_proj"</span>, <span
+                class="t-str">"v_proj"</span>, <span class="t-str">"o_proj"</span>, <span class="t-cm">#
+                attention</span>
+              <span class="t-str">"gate_proj"</span>, <span class="t-str">"up_proj"</span>, <span
+                class="t-str">"down_proj"</span>, <span class="t-cm"># MLP</span>
+              ],
+              <span class="t-pn">lora_dropout</span> = <span class="t-num">0.0</span>, <span class="t-cm"># 0.0 required
+                for Unsloth</span>
+              <span class="t-pn">bias</span> = <span class="t-str">"none"</span>, <span class="t-cm"># "none" required
+                for Unsloth</span>
+              <span class="t-pn">task_type</span> = <span class="t-str">"CAUSAL_LM"</span>,
+              <span class="t-pn">use_dora</span> = <span class="t-num">False</span>, <span class="t-cm"># True → DoRA
+                (better, small overhead)</span>
+              <span class="t-pn">use_rslora</span> = <span class="t-num">False</span>, <span class="t-cm"># True →
+                stable at r >= 64</span>
+              )
+
+              <span class="t-sec"># ── 3. Inject adapters → freezes base, adds trainable A and B matrices ────</span>
+              model = <span class="t-fn">get_peft_model</span>(model, lora_config)
+              model.<span class="t-fn">print_trainable_parameters</span>()
+              <span class="t-cm"># trainable params: 134,217,728 || all params: 32,894,390,272 || trainable%:
+                0.4080</span>
+
+              <span class="t-sec"># ── After training: three save strategies ─────────────────────────────────</span>
+
+              <span class="t-cm"># Option A - adapter only (~100 MB, fast, swappable)</span>
+              model.<span class="t-fn">save_pretrained</span>(<span class="t-str">"./adapter_only"</span>)
+
+              <span class="t-cm"># Option B - merge adapter into base weights (zero inference overhead)</span>
+              merged = model.<span class="t-fn">merge_and_unload</span>()
+              merged.<span class="t-fn">save_pretrained</span>(<span class="t-str">"./merged_model"</span>)
+
+              <span class="t-cm"># Option C - load adapter on top of base at inference time</span>
+              base = <span class="t-cls">AutoModelForCausalLM</span>.<span class="t-fn">from_pretrained</span>(<span
+                class="t-str">"Qwen/Qwen2.5-Coder-32B-Instruct"</span>)
+              model = <span class="t-cls">PeftModel</span>.<span class="t-fn">from_pretrained</span>(base, <span
+                class="t-str">"./adapter_only"</span>)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRL -->
+      <div class="pkg-detail reveal" id="sec-trl">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--trl)"></div>
+          <div class="pkg-ver">pip install trl</div>
+          <div class="pkg-detail-name" style="color: var(--trl)">🎯 TRL - Transformer Reinforcement Learning</div>
+          <div class="pkg-detail-tagline">Layer 4 - task-specific training recipes. Pick exactly one trainer based on
+            what you're training for.</div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">What TRL adds on top of Trainer</div>
+            <ul class="feat-list">
+              <li><strong>SFTTrainer</strong> - chat template application, loss masking, packing, PEFT auto-wrap</li>
+              <li><strong>DPOTrainer</strong> - preference alignment from (chosen, rejected) pairs</li>
+              <li><strong>GRPOTrainer</strong> - RL from reward functions without a critic model</li>
+              <li><strong>PPOTrainer</strong> - classic RLHF with trained reward model</li>
+              <li><strong>ORPOTrainer</strong> - SFT + preference alignment in a single pass</li>
+              <li><strong>KTOTrainer</strong> - preference from unpaired (prompt, completion, good/bad) labels</li>
+              <li><strong>RewardTrainer</strong> - trains the reward model for PPO</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">SFTConfig: TRL-specific params (adds to TrainingArguments)</div>
+            <ul class="feat-list">
+              <li><strong>max_length</strong> - max tokens per example (was max_seq_length in &lt;0.17)</li>
+              <li><strong>packing=True</strong> - pack multiple short examples into one sequence. Big throughput win.
+              </li>
+              <li><strong>dataset_text_field="text"</strong> - column with pre-formatted text</li>
+              <li><strong>dataset_num_proc=8</strong> - parallel CPU workers for dataset.map()</li>
+              <li><strong>assistant_only_loss=True</strong> - mask user/system tokens with -100</li>
+              <li><strong>peft_config</strong> - pass LoraConfig here → auto-wraps model in PEFT</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">The important distinction</span>
+          <strong>SFT is the training objective</strong> (supervised learning on instruction pairs). <strong>LoRA is the
+            parameter update strategy</strong> (which weights receive gradients). They work together: you do SFT
+          <em>with</em> LoRA/QLoRA, not instead of it. TRL's SFTTrainer handles the SFT objective; PEFT handles the LoRA
+          injection.
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">sft_trainer.py - SFTTrainer (most common fine-tuning)</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">from</span> <span class="t-fn">trl</span> <span
+                class="t-kw">import</span> <span class="t-cls">SFTTrainer</span>, <span class="t-cls">SFTConfig</span>
+              <span class="t-kw">from</span> <span class="t-fn">peft</span> <span class="t-kw">import</span> <span
+                class="t-cls">LoraConfig</span>
+
+              <span class="t-sec"># ── SFTConfig = TrainingArguments + SFT-specific params ────────────────────</span>
+              sft_config = <span class="t-cls">SFTConfig</span>(
+              <span class="t-pn">output_dir</span> = <span class="t-str">"./sft-output"</span>,
+
+              <span class="t-cm"># inherited from TrainingArguments</span>
+              <span class="t-pn">per_device_train_batch_size</span> = <span class="t-num">2</span>,
+              <span class="t-pn">gradient_accumulation_steps</span> = <span class="t-num">8</span>, <span class="t-cm">#
+                effective batch = 16</span>
+              <span class="t-pn">num_train_epochs</span> = <span class="t-num">3</span>,
+              <span class="t-pn">learning_rate</span> = <span class="t-num">2e-4</span>, <span class="t-cm"># higher
+                than full FT (adapters start at zero)</span>
+              <span class="t-pn">lr_scheduler_type</span> = <span class="t-str">"cosine"</span>,
+              <span class="t-pn">warmup_ratio</span> = <span class="t-num">0.03</span>,
+              <span class="t-pn">bf16</span> = <span class="t-num">True</span>,
+              <span class="t-pn">gradient_checkpointing</span> = <span class="t-num">True</span>,
+              <span class="t-pn">gradient_checkpointing_kwargs</span> = {<span class="t-str">"use_reentrant"</span>:
+              <span class="t-num">False</span>},
+              <span class="t-pn">optim</span> = <span class="t-str">"adamw_8bit"</span>,
+              <span class="t-pn">max_grad_norm</span> = <span class="t-num">0.3</span>,
+              <span class="t-pn">report_to</span> = <span class="t-str">"wandb"</span>,
+
+              <span class="t-cm"># SFT-specific (added by TRL)</span>
+              <span class="t-pn">max_length</span> = <span class="t-num">4096</span>, <span class="t-cm"># max tokens
+                per example</span>
+              <span class="t-pn">packing</span> = <span class="t-num">True</span>, <span class="t-cm"># pack short
+                examples → throughput win</span>
+              <span class="t-pn">dataset_num_proc</span> = <span class="t-num">8</span>, <span class="t-cm"># parallel
+                dataset tokenization</span>
+              <span class="t-pn">assistant_only_loss</span> = <span class="t-num">True</span>, <span class="t-cm"># mask
+                user/system tokens → loss only on assistant</span>
+              )
+
+              <span class="t-sec"># ── Pass peft_config: SFTTrainer calls get_peft_model() internally ─────────</span>
+              lora_config = <span class="t-cls">LoraConfig</span>(
+              <span class="t-pn">r</span> = <span class="t-num">16</span>,
+              <span class="t-pn">lora_alpha</span> = <span class="t-num">16</span>,
+              <span class="t-pn">target_modules</span> = [<span class="t-str">"q_proj"</span>, <span
+                class="t-str">"k_proj"</span>, <span class="t-str">"v_proj"</span>, <span class="t-str">"o_proj"</span>,
+              <span class="t-str">"gate_proj"</span>, <span class="t-str">"up_proj"</span>, <span
+                class="t-str">"down_proj"</span>],
+              <span class="t-pn">lora_dropout</span> = <span class="t-num">0.0</span>,
+              <span class="t-pn">bias</span> = <span class="t-str">"none"</span>,
+              <span class="t-pn">task_type</span> = <span class="t-str">"CAUSAL_LM"</span>,
+              )
+
+              <span class="t-sec"># ── Dataset: "messages" column → SFTTrainer auto-applies Qwen's ChatML
+                template</span>
+              <span class="t-cm"># Each row: {"messages": [{"role": "system",...}, {"role": "user",...}, {"role":
+                "assistant",...}]}</span>
+
+              trainer = <span class="t-cls">SFTTrainer</span>(
+              <span class="t-pn">model</span> = model,
+              <span class="t-pn">tokenizer</span> = tokenizer,
+              <span class="t-pn">train_dataset</span> = dataset, <span class="t-cm"># "messages" column triggers auto
+                chat-template</span>
+              <span class="t-pn">args</span> = sft_config,
+              <span class="t-pn">peft_config</span> = lora_config, <span class="t-cm"># SFTTrainer wraps model in PEFT
+                for you</span>
+              )
+              trainer.<span class="t-fn">train</span>()
+            </div>
+          </div>
+
+          <div class="code-win" style="margin-top: 16px">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">grpo_trainer.py - GRPO (RL training, no critic model needed)</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">from</span> <span class="t-fn">trl</span> <span
+                class="t-kw">import</span> <span class="t-cls">GRPOTrainer</span>, <span class="t-cls">GRPOConfig</span>
+
+              <span class="t-sec"># ── Define reward functions - these drive the RL signal ────────────────────</span>
+              <span class="t-kw">def</span> <span class="t-fn">format_reward</span>(prompts, completions, **kwargs) ->
+              list[float]:
+              <span class="t-str">"""Reward 1.0 if response has &lt;think&gt;...&lt;/think&gt; structure."""</span>
+              rewards = []
+              <span class="t-kw">for</span> completion <span class="t-kw">in</span> completions:
+              has_think = <span class="t-str">"&lt;think&gt;"</span> <span class="t-kw">in</span> completion <span
+                class="t-kw">and</span> <span class="t-str">"&lt;/think&gt;"</span> <span class="t-kw">in</span>
+              completion
+              rewards.<span class="t-fn">append</span>(<span class="t-num">1.0</span> <span class="t-kw">if</span>
+              has_think <span class="t-kw">else</span> <span class="t-num">0.0</span>)
+              <span class="t-kw">return</span> rewards
+
+              <span class="t-kw">def</span> <span class="t-fn">correctness_reward</span>(prompts, completions, answer,
+              **kwargs) -> list[float]:
+              <span class="t-str">"""Reward 2.0 if extracted answer matches ground truth."""</span>
+              rewards = []
+              <span class="t-kw">for</span> completion, gt <span class="t-kw">in</span> <span
+                class="t-fn">zip</span>(completions, answer):
+              extracted = <span class="t-fn">extract_answer</span>(completion) <span class="t-cm"># your parsing
+                logic</span>
+              rewards.<span class="t-fn">append</span>(<span class="t-num">2.0</span> <span class="t-kw">if</span>
+              extracted == gt <span class="t-kw">else</span> <span class="t-num">0.0</span>)
+              <span class="t-kw">return</span> rewards
+
+              <span class="t-sec"># ── GRPOConfig: TrainingArguments + GRPO-specific params ───────────────────</span>
+              grpo_config = <span class="t-cls">GRPOConfig</span>(
+              <span class="t-pn">output_dir</span> = <span class="t-str">"./grpo-output"</span>,
+              <span class="t-pn">per_device_train_batch_size</span> = <span class="t-num">1</span>,
+              <span class="t-pn">gradient_accumulation_steps</span> = <span class="t-num">8</span>,
+              <span class="t-pn">num_train_epochs</span> = <span class="t-num">2</span>,
+              <span class="t-pn">learning_rate</span> = <span class="t-num">1e-5</span>, <span class="t-cm"># lower than
+                SFT - RL is sensitive</span>
+              <span class="t-pn">bf16</span> = <span class="t-num">True</span>,
+
+              <span class="t-cm"># GRPO-specific</span>
+              <span class="t-pn">num_generations</span> = <span class="t-num">8</span>, <span class="t-cm"># N samples
+                per prompt for group baseline</span>
+              <span class="t-pn">max_completion_length</span> = <span class="t-num">1024</span>, <span class="t-cm">#
+                longer for reasoning chains</span>
+              <span class="t-pn">beta</span> = <span class="t-num">0.04</span>, <span class="t-cm"># KL penalty -
+                prevents reward hacking</span>
+              <span class="t-pn">epsilon</span> = <span class="t-num">0.2</span>, <span class="t-cm"># PPO-style policy
+                ratio clipping</span>
+              <span class="t-pn">use_vllm</span> = <span class="t-num">False</span>, <span class="t-cm"># True = 3-5×
+                faster generation step</span>
+              )
+
+              trainer = <span class="t-cls">GRPOTrainer</span>(
+              <span class="t-pn">model</span> = model,
+              <span class="t-pn">tokenizer</span> = tokenizer,
+              <span class="t-pn">train_dataset</span> = dataset,
+              <span class="t-pn">reward_funcs</span> = [format_reward, correctness_reward], <span class="t-cm"># mix
+                multiple signals</span>
+              <span class="t-pn">args</span> = grpo_config,
+              )
+              trainer.<span class="t-fn">train</span>()
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UNSLOTH -->
+      <div class="pkg-detail reveal" id="sec-uns">
+        <div class="pkg-detail-header">
+          <div class="pkg-accent-bar" style="background: var(--uns)"></div>
+          <div class="pkg-ver">pip install unsloth</div>
+          <div class="pkg-detail-name" style="color: var(--uns)">🦥 Unsloth</div>
+          <div class="pkg-detail-tagline">Layer 5 (optional) - replaces the slow hot paths with hand-written Triton
+            kernels. Same results, 2× faster, 70% less VRAM.</div>
+        </div>
+        <div class="pkg-body-2col">
+          <div class="pkg-col">
+            <div class="col-title">What Unsloth replaces internally</div>
+            <ul class="feat-list">
+              <li><strong>AutoModelForCausalLM</strong> → FastLanguageModel.from_pretrained()</li>
+              <li><strong>BitsAndBytesConfig</strong> → baked into load_in_4bit=True</li>
+              <li><strong>prepare_model_for_kbit_training()</strong> → done internally</li>
+              <li><strong>get_peft_model()</strong> → FastLanguageModel.get_peft_model() with Triton kernels</li>
+              <li><strong>gradient_checkpointing</strong> → use_gradient_checkpointing="unsloth"</li>
+              <li><strong>SFTTrainer / GRPOTrainer</strong> → same API underneath, just faster</li>
+            </ul>
+          </div>
+          <div class="pkg-col">
+            <div class="col-title">Performance vs. vanilla stack</div>
+            <ul class="feat-list">
+              <li><strong>Training throughput:</strong> ~2× faster tokens/sec</li>
+              <li><strong>Activation VRAM:</strong> ~70% less vs no checkpointing</li>
+              <li><strong>vs HF checkpointing:</strong> ~30% less VRAM, no speed penalty</li>
+              <li><strong>Inference:</strong> 2× via for_inference() mode</li>
+              <li><strong>Download size:</strong> 4× smaller (pre-quantized NF4 repos)</li>
+            </ul>
+            <div class="col-title" style="margin-top:20px">Hard constraints (Triton kernel requirements)</div>
+            <ul class="feat-list">
+              <li><strong>lora_dropout must be 0</strong> - Triton kernel path requirement</li>
+              <li><strong>bias must be "none"</strong> - Triton kernel path requirement</li>
+              <li><strong>Single GPU</strong> - multi-GPU requires Unsloth Pro or vanilla PEFT+TRL</li>
+              <li><strong>Don't set gradient_checkpointing=True in args</strong> - conflicts with Unsloth's hooks</li>
+            </ul>
+          </div>
+        </div>
+        <div class="when-box">
+          <span class="wlabel">When to use Unsloth vs vanilla stack</span>
+          Use Unsloth on <strong>single A100/H100</strong> - it's a pure win with no code complexity cost. Skip Unsloth
+          for <strong>multi-GPU FSDP / DeepSpeed</strong> runs - those require vanilla transformers + PEFT + TRL with
+          accelerate. Unsloth is optional; remove it and your code still runs correctly (just slower).
+        </div>
+
+        <div style="padding: 0 32px 28px">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cdot cdot-r"></div>
+              <div class="cdot cdot-y"></div>
+              <div class="cdot cdot-g"></div>
+              <span class="code-filename">unsloth_sft.py - full Unsloth SFT workflow</span>
+            </div>
+            <div class="code-pre"><span class="t-kw">from</span> <span class="t-fn">unsloth</span> <span
+                class="t-kw">import</span> <span class="t-cls">FastLanguageModel</span>
+              <span class="t-kw">from</span> <span class="t-fn">trl</span> <span class="t-kw">import</span> <span
+                class="t-cls">SFTTrainer</span>, <span class="t-cls">SFTConfig</span>
+
+              <span class="t-sec"># ── 1. Load (replaces AutoModelForCausalLM + BitsAndBytesConfig) ───────────</span>
+              model, tokenizer = <span class="t-cls">FastLanguageModel</span>.<span class="t-fn">from_pretrained</span>(
+              <span class="t-pn">model_name</span> = <span
+                class="t-str">"unsloth/Qwen2.5-Coder-32B-Instruct-bnb-4bit"</span>,
+              <span class="t-pn">max_seq_length</span> = <span class="t-num">4096</span>,
+              <span class="t-pn">dtype</span> = <span class="t-num">None</span>, <span class="t-cm"># auto: BF16 on
+                Ampere+, FP16 otherwise</span>
+              <span class="t-pn">load_in_4bit</span> = <span class="t-num">True</span>, <span class="t-cm"># NF4 +
+                double_quant baked in</span>
+              )
+
+              <span class="t-sec"># ── 2. Attach LoRA (replaces prepare_model_for_kbit_training + get_peft_model)</span>
+              model = <span class="t-cls">FastLanguageModel</span>.<span class="t-fn">get_peft_model</span>(
+              model,
+              <span class="t-pn">r</span> = <span class="t-num">16</span>,
+              <span class="t-pn">target_modules</span> = [<span class="t-str">"q_proj"</span>, <span
+                class="t-str">"k_proj"</span>, <span class="t-str">"v_proj"</span>, <span class="t-str">"o_proj"</span>,
+              <span class="t-str">"gate_proj"</span>, <span class="t-str">"up_proj"</span>, <span
+                class="t-str">"down_proj"</span>],
+              <span class="t-pn">lora_alpha</span> = <span class="t-num">16</span>,
+              <span class="t-pn">lora_dropout</span> = <span class="t-num">0</span>, <span class="t-cm"># must be 0 for
+                Triton kernels</span>
+              <span class="t-pn">bias</span> = <span class="t-str">"none"</span>, <span class="t-cm"># must be "none"
+                for Triton kernels</span>
+              <span class="t-pn">use_gradient_checkpointing</span> = <span class="t-str">"unsloth"</span>, <span
+                class="t-cm"># "unsloth" > True > False</span>
+              <span class="t-pn">random_state</span> = <span class="t-num">42</span>,
+              )
+
+              <span class="t-sec"># ── 3. Train - same SFTTrainer API, Unsloth kernel underneath ──────────────</span>
+              trainer = <span class="t-cls">SFTTrainer</span>(
+              <span class="t-pn">model</span> = model,
+              <span class="t-pn">tokenizer</span> = tokenizer,
+              <span class="t-pn">train_dataset</span> = dataset,
+              <span class="t-pn">args</span> = <span class="t-cls">SFTConfig</span>(
+              <span class="t-pn">per_device_train_batch_size</span> = <span class="t-num">2</span>,
+              <span class="t-pn">gradient_accumulation_steps</span> = <span class="t-num">8</span>,
+              <span class="t-pn">num_train_epochs</span> = <span class="t-num">3</span>,
+              <span class="t-pn">learning_rate</span> = <span class="t-num">2e-4</span>,
+              <span class="t-pn">bf16</span> = <span class="t-num">True</span>,
+              <span class="t-cm"># do NOT set gradient_checkpointing=True here - Unsloth handles it above</span>
+              <span class="t-pn">optim</span> = <span class="t-str">"adamw_8bit"</span>,
+              <span class="t-pn">max_length</span> = <span class="t-num">4096</span>,
+              <span class="t-pn">packing</span> = <span class="t-num">True</span>,
+              <span class="t-pn">assistant_only_loss</span> = <span class="t-num">True</span>,
+              <span class="t-pn">output_dir</span> = <span class="t-str">"./unsloth-output"</span>,
+              ),
+              )
+              trainer.<span class="t-fn">train</span>()
+
+              <span class="t-sec"># ── 4. Export: adapter / merged / GGUF ────────────────────────────────────</span>
+              <span class="t-cls">FastLanguageModel</span>.<span class="t-fn">for_inference</span>(model) <span
+                class="t-cm"># 2× faster inference</span>
+              model.<span class="t-fn">save_pretrained</span>(<span class="t-str">"lora_adapter"</span>) <span
+                class="t-cm"># adapter only</span>
+              model.<span class="t-fn">save_pretrained_gguf</span>(<span class="t-str">"model_q4"</span>, tokenizer,
+              <span class="t-cm"># GGUF for Ollama</span>
+              <span class="t-pn">quantization_method</span> = <span class="t-str">"q4_k_m"</span>)
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- ── TRAINING PIPELINE ────────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="pipeline">
+      <div class="reveal">
+        <div class="sec-label">End-to-End Training Pipeline</div>
+        <h2 class="sec-title">Where each package lives<br>in the pipeline</h2>
+        <p class="sec-sub">From raw data to saved adapter - every step mapped to its owning package.</p>
+      </div>
+
+      <div class="pipeline reveal">
+        <div class="pipeline-step">
+          <div class="pipeline-dot hf">🤗</div>
+          <div class="pipeline-content">
+            <h4>Load model &amp; tokenizer <span class="itag hf">transformers</span></h4>
+            <p><code>AutoModelForCausalLM.from_pretrained()</code> with <code>BitsAndBytesConfig</code> for 4-bit NF4
+              loading. <code>AutoTokenizer.from_pretrained()</code> to load the tokenizer. This is your only interaction
+              with transformers directly during setup.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot pft">🔌</div>
+          <div class="pipeline-content">
+            <h4>Inject LoRA adapters <span class="itag pft">PEFT</span></h4>
+            <p><code>prepare_model_for_kbit_training()</code> + <code>get_peft_model(model, LoraConfig)</code>. Freezes
+              the 32B base weights, injects trainable A and B matrices into the 7 attention + MLP linear layers. ~134M
+              trainable parameters out of 32.9B total. If using SFTTrainer, skip this step - pass
+              <code>peft_config=LoraConfig(...)</code> and it handles PEFT internally.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot trl">📝</div>
+          <div class="pipeline-content">
+            <h4>Prepare dataset <span class="itag trl">TRL / SFTTrainer</span></h4>
+            <p>Dataset with <code>"messages"</code> column - each row contains a list of <code>{role, content}</code>
+              dicts. SFTTrainer automatically applies <code>tokenizer.apply_chat_template()</code> to format as Qwen's
+              ChatML. Sets <code>-100</code> on all non-assistant token positions so loss is computed only on assistant
+              responses.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot blue">⚙</div>
+          <div class="pipeline-content">
+            <h4>Configure training loop <span class="itag tr">Trainer / SFTConfig</span></h4>
+            <p><code>SFTConfig</code> holds all hyperparameters. <code>TrainingArguments</code> params (lr, batch size,
+              accumulation steps, scheduler, checkpointing) are inherited from <code>Trainer</code>. SFT-specific params
+              (<code>max_length</code>, <code>packing</code>, <code>assistant_only_loss</code>) are added by TRL on top.
+            </p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot uns">🦥</div>
+          <div class="pipeline-content">
+            <h4>Speed optimisation (optional) <span class="itag uns">Unsloth</span></h4>
+            <p>Replace <code>AutoModelForCausalLM</code> with <code>FastLanguageModel.from_pretrained()</code> and
+              <code>get_peft_model</code> with
+              <code>FastLanguageModel.get_peft_model(use_gradient_checkpointing="unsloth")</code>. The SFTTrainer call
+              stays identical - Unsloth plugs in at the kernel level, not the API level.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot trl">▶</div>
+          <div class="pipeline-content">
+            <h4>Train <span class="itag trl">SFTTrainer.train()</span></h4>
+            <p>For each batch: (1) forward pass through model, (2) cross-entropy loss on assistant token positions only,
+              (3) backward pass → gradients flow only into LoRA A and B matrices, (4) optimizer step on adapters, (5)
+              zero_grad. Repeated across gradient_accumulation_steps before each optimizer step. Base model stays frozen
+              and bit-identical throughout.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot green">💾</div>
+          <div class="pipeline-content">
+            <h4>Save &amp; export <span class="itag pft">PEFT</span></h4>
+            <p><code>model.save_pretrained("adapter")</code> saves only the ~100 MB adapter weights.
+              <code>model.merge_and_unload()</code> folds B·A into W₀ for zero inference overhead. Unsloth additionally
+              supports <code>save_pretrained_gguf()</code> for Ollama-compatible GGUF files.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── TRAINER COMPARISON ─────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="trainers">
+      <div class="reveal">
+        <div class="sec-label">TRL Trainer Variations</div>
+        <h2 class="sec-title">Pick exactly one trainer<br>based on your objective</h2>
+        <p class="sec-sub">All TRL trainers extend HF Trainer. They differ only in their training objective - what loss
+          function they use and what data they expect.</p>
+      </div>
+
+      <div class="trainer-cards reveal">
+        <div class="tc">
+          <div class="tc-accent" style="background:var(--blue)"></div>
+          <div class="tc-badge" style="background:var(--blue-bg);color:var(--blue)">Stage 1</div>
+          <div class="tc-name">SFTTrainer + SFTConfig</div>
+          <div class="tc-use" style="color:var(--blue)">Supervised Fine-Tuning</div>
+          <div class="tc-desc">Trains on (prompt → response) pairs. Uses cross-entropy loss on assistant tokens only.
+            Auto-applies chat templates, packs sequences, wraps PEFT. The starting point for almost every fine-tuning
+            project. Dataset: <code>{"messages": [...]}</code>.</div>
+        </div>
+        <div class="tc">
+          <div class="tc-accent" style="background:var(--trl)"></div>
+          <div class="tc-badge" style="background:var(--trl-bg);color:var(--trl)">Stage 2 - Preference</div>
+          <div class="tc-name">DPOTrainer + DPOConfig</div>
+          <div class="tc-use" style="color:var(--trl)">Direct Preference Optimization</div>
+          <div class="tc-desc">Aligns model to human preferences from (prompt, chosen, rejected) triples. No reward
+            model needed. Maximizes log-probability ratio of chosen vs rejected against a reference model (usually the
+            SFT checkpoint). Run <em>after</em> SFT - DPO on a base model rarely works. Key param:
+            <code>beta=0.1</code>.</div>
+        </div>
+        <div class="tc">
+          <div class="tc-accent" style="background:var(--uns)"></div>
+          <div class="tc-badge" style="background:var(--uns-bg);color:var(--uns)">Stage 2 - RL (no critic)</div>
+          <div class="tc-name">GRPOTrainer + GRPOConfig</div>
+          <div class="tc-use" style="color:var(--uns)">Group Relative Policy Optimization</div>
+          <div class="tc-desc">DeepSeek-R1's RL algorithm. Estimates baseline from N sampled responses per prompt - no
+            separate value/critic model needed. You provide reward functions (format check, code execution, math
+            correctness). Key params: <code>num_generations=8</code>, <code>beta=0.04</code>,
+            <code>max_completion_length=1024</code>.</div>
+        </div>
+        <div class="tc">
+          <div class="tc-accent" style="background:var(--hf)"></div>
+          <div class="tc-badge" style="background:var(--hf-bg);color:var(--hf)">Stage 2+3 in one pass</div>
+          <div class="tc-name">ORPOTrainer + ORPOConfig</div>
+          <div class="tc-use" style="color:var(--hf)">Odds-Ratio Preference Optimization</div>
+          <div class="tc-desc">Combines SFT + preference alignment in a single training pass. No reference model
+            required. Trains chosen responses with SFT loss + penalises rejected responses via odds-ratio. Most
+            VRAM-efficient alignment method - one model, no frozen reference copy. Dataset:
+            <code>{"prompt", "chosen", "rejected"}</code>.</div>
+        </div>
+        <div class="tc">
+          <div class="tc-accent" style="background:#dc2626"></div>
+          <div class="tc-badge" style="background:#fff5f5;color:#dc2626">Stage 2 - Classic RLHF</div>
+          <div class="tc-name">PPOTrainer + PPOConfig</div>
+          <div class="tc-use" style="color:#dc2626">Proximal Policy Optimization</div>
+          <div class="tc-desc">Classic RLHF (InstructGPT / ChatGPT). Requires: (1) trained reward model, (2)
+            value/critic model, (3) reference policy. Most complex, most VRAM-hungry. Key params:
+            <code>kl_penalty</code>, <code>init_kl_coef=0.2</code>, <code>target_kl=6.0</code>. For most use cases,
+            prefer GRPO or DPO.</div>
+        </div>
+        <div class="tc">
+          <div class="tc-accent" style="background:#7c3aed"></div>
+          <div class="tc-badge" style="background:var(--trl-bg);color:var(--trl)">Stage 2 - Unpaired</div>
+          <div class="tc-name">KTOTrainer + KTOConfig</div>
+          <div class="tc-use" style="color:var(--trl)">Kahneman-Tversky Optimization</div>
+          <div class="tc-desc">Works with unpaired feedback - just label each (prompt, response) as good or bad. Based
+            on prospect theory from behavioural economics. No need to pair chosen/rejected. Useful when you can't
+            guarantee you have pairs. Dataset: <code>{"prompt", "completion", "label": true/false}</code>.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── USE CASES MATRIX ───────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="usecases">
+      <div class="reveal">
+        <div class="sec-label">Use Case Matrix</div>
+        <h2 class="sec-title">Right package for<br>every training scenario</h2>
+        <p class="sec-sub">Every combination of objective × technique mapped to its optimal configuration.</p>
+      </div>
+
+      <div class="matrix-wrap reveal">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Training Scenario</th>
+              <th>transformers</th>
+              <th>PEFT / LoRA</th>
+              <th>Primary Trainer</th>
+              <th>Unsloth</th>
+              <th>Key Config Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="uc-name">Continued Pre-Training (CPT)</div>
+              </td>
+              <td><span class="chk">✓</span></td>
+              <td>full weights</td>
+              <td><span class="primary-pill pp-hf">Trainer</span></td>
+              <td><span class="dash">-</span></td>
+              <td>DataCollatorForLM, no chat template, lr=1e-5, 1–2 epochs</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">CPT with LoRA</div>
+              </td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="primary-pill pp-hf">Trainer</span></td>
+              <td>optional</td>
+              <td>Same as CPT + LoraConfig. Less catastrophic forgetting risk</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Instruction Fine-Tuning (SFT)</div>
+              </td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="chk">✓</span> LoRA/QLoRA</td>
+              <td><span class="primary-pill pp-trl">SFTTrainer</span></td>
+              <td>recommended</td>
+              <td>messages column, assistant_only_loss=True, packing=True</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Full Fine-Tuning (SFT)</div>
+              </td>
+              <td><span class="chk">✓</span></td>
+              <td>no adapters</td>
+              <td><span class="primary-pill pp-trl">SFTTrainer</span></td>
+              <td>no (multi-GPU)</td>
+              <td>FSDP / DeepSpeed ZeRO-3 required for 32B+, bf16=True</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Preference Alignment (DPO)</div>
+              </td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="primary-pill pp-trl">DPOTrainer</span></td>
+              <td>optional</td>
+              <td>Apply after SFT checkpoint. beta=0.1, loss_type="sigmoid"</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">SFT + Alignment in one pass (ORPO)</div>
+              </td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="primary-pill pp-trl">ORPOTrainer</span></td>
+              <td>optional</td>
+              <td>No ref model → most VRAM-efficient alignment. lambda=0.1</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">RL from reward functions (GRPO)</div>
+              </td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="primary-pill pp-trl">GRPOTrainer</span></td>
+              <td><span class="primary-pill pp-uns">yes (Unsloth GRPO)</span></td>
+              <td>reward_funcs list, num_generations=8, lr=1e-5, after SFT</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Classic RLHF (PPO)</div>
+              </td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="primary-pill pp-trl">PPOTrainer</span></td>
+              <td><span class="dash">-</span></td>
+              <td>Needs separate trained reward model + critic. Prefer GRPO.</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Unpaired feedback (KTO)</div>
+              </td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="primary-pill pp-trl">KTOTrainer</span></td>
+              <td>optional</td>
+              <td>No pairs needed. Just {prompt, completion, label: good/bad}</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="uc-name">Train reward model (for PPO)</div>
+              </td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="primary-pill pp-trl">RewardTrainer</span></td>
+              <td>optional</td>
+              <td>AutoModelForSequenceClassification, outputs scalar rewards</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── DECISION GUIDE ─────────────────────────── -->
+  <div class="hdivider"></div>
+  <div class="content">
+    <section class="section" id="decide">
+      <div class="reveal">
+        <div class="sec-label">Decision Guide</div>
+        <h2 class="sec-title">Pick your stack<br>in four questions</h2>
+        <p class="sec-sub">Answer each question sequentially. By question 4 you have your exact configuration.</p>
+      </div>
+
+      <div class="dt-box reveal">
+        <div class="dt-q">What is your training objective?</div>
+        <div class="dt-branch">
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Instruction following / code generation / domain
+              adaptation → <strong>SFTTrainer</strong> (TRL)</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Pre-train on raw text corpus, no instruction format →
+              <strong>bare Trainer</strong> (HF)</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Align to human preferences from (chosen, rejected)
+              pairs → <strong>DPOTrainer</strong> or <strong>ORPOTrainer</strong></span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Optimise with a custom reward signal (code
+              correctness, format) → <strong>GRPOTrainer</strong></span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Classic RLHF with a trained reward model →
+              <strong>PPOTrainer</strong> (rarely needed)</span></div>
+        </div>
+
+        <div class="dt-q">Update all weights or just adapters?</div>
+        <div class="dt-branch">
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Adapters (LoRA/QLoRA) → <strong>add PEFT
+                LoraConfig</strong>, pass as <code>peft_config=</code> to SFTTrainer. Saves ~99.5% of optimizer
+              VRAM.</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>All weights (full fine-tune) → <strong>no
+                PEFT</strong>. Requires FSDP or DeepSpeed ZeRO-3. 4× model VRAM for optimizer state on 32B.</span></div>
+        </div>
+
+        <div class="dt-q">Single GPU or multi-GPU?</div>
+        <div class="dt-branch">
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Single A100/H100 → <strong>Unsloth</strong>: replace
+              <code>AutoModelForCausalLM</code> with <code>FastLanguageModel</code>. Set <code>lora_dropout=0</code>,
+              <code>bias="none"</code>, <code>use_gradient_checkpointing="unsloth"</code>. Free 2× speedup.</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Multi-GPU FSDP / DeepSpeed → <strong>vanilla
+                transformers + PEFT + TRL</strong> with <code>accelerate</code>. Add
+              <code>gradient_checkpointing=True</code>, <code>optim="adamw_8bit"</code>.</span></div>
+        </div>
+
+        <div class="dt-q">Where in the training pipeline are you?</div>
+        <div class="dt-branch">
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Starting from scratch → CPT on domain text (Trainer)
+              → SFT on instruction pairs (SFTTrainer)</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Have SFT checkpoint → DPO / ORPO for preference, then
+              GRPO for RL-based task polish</span></div>
+          <div class="dt-row"><span class="dt-arrow">→</span><span>Going to production → <code>merge_and_unload()</code>
+              for zero inference overhead, or <code>save_pretrained_gguf()</code> for Ollama</span></div>
+        </div>
+      </div>
+
+      <div class="callout pur reveal" style="margin-top:24px">
+        <div class="callout-icon">🎯</div>
+        <div><strong>For Qwen 2.5 Coder 32B spec-to-code:</strong> <code>transformers</code> (BnB 4-bit NF4 load) →
+          <code>PEFT</code> (LoraConfig r=16, all 7 linear modules) → <code>TRL SFTTrainer</code> (SFTConfig with
+          <code>max_length=4096</code>, <code>packing=True</code>, <code>assistant_only_loss=True</code>,
+          <code>messages</code> column for auto-ChatML) → <code>Unsloth</code> for single-GPU speed, or vanilla
+          accelerate + FSDP for multi-A100. After SFT benchmark passes, layer <code>GRPOTrainer</code> with a code
+          execution reward function for the RL alignment stage.</div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <p>HuggingFace Training Stack - Complete Reference</p>
+    <p style="margin-top:6px">transformers · Trainer · TRL · PEFT · Unsloth · for Qwen 2.5 Coder 32B QLoRA</p>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+    }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Staggered children in reveal blocks
+    document.querySelectorAll('.pyramid-wrap .py-layer, .trainer-cards .tc').forEach((el, i) => {
+      el.style.transitionDelay = (i * 0.06) + 's';
+    });
+  </script>
+</body>
+
+</html>

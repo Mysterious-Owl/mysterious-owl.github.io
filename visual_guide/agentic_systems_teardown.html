@@ -1,0 +1,2305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Agentic Systems Teardown</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Literata:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      themeVariables: {
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+      }
+    });
+  </script>
+
+  <style>
+    /* ── TOKENS ─────────────────────────────────── */
+    :root {
+      --white: #ffffff;
+      --f7: #f7f7f7;
+      --f5: #f5f5f7;
+      --f0: #f0f0f2;
+      --e8: #e8e8ed;
+      --d2: #d2d2d7;
+      --6e: #6e6e73;
+      --1d: #1d1d1f;
+      --blue: #0071e3;
+      --blue-l: #147ce5;
+      --blue-bg: #f0f6ff;
+      --blue-bd: rgba(0, 113, 227, 0.18);
+      --green: #1c8a3e;
+      --green-bg: #f0faf3;
+      --orange: #b45309;
+      --orange-bg: #fffbeb;
+      --red: #c0392b;
+      --red-bg: #fff5f5;
+      --purple: #6d28d9;
+      --purple-bg: #f5f3ff;
+
+      /* concept colours */
+      --aug: #0ea5e9;
+      --aug-bg: rgba(14, 165, 233, 0.07);
+      --wf: #059669;
+      --wf-bg: rgba(5, 150, 105, 0.07);
+      --agt: #e76d36;
+      --agt-bg: rgba(231, 109, 54, 0.07);
+      --react: #7c3aed;
+      --react-bg: rgba(124, 58, 237, 0.07);
+
+      --r: 16px;
+      --r-sm: 10px;
+      --r-xs: 6px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+      --serif: 'Literata', Georgia, serif;
+      --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06), 0 2px 12px rgba(0, 0, 0, 0.04);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.07), 0 8px 32px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08), 0 24px 64px rgba(0, 0, 0, 0.06);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--white);
+      color: var(--1d);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background: rgba(0, 113, 227, 0.15);
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--d2);
+      border-radius: 2px;
+    }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 52px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 0.5px solid var(--e8);
+      display: flex;
+      align-items: center;
+      padding: 0 44px;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--1d);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0;
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--6e);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover {
+      color: var(--1d);
+      background: var(--f5);
+    }
+
+    .nav-tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--f5);
+      border: 0.5px solid var(--e8);
+      color: var(--6e);
+      letter-spacing: 0.02em;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
+    /* ── HERO ─────────────────────────────────────── */
+    .hero {
+      padding: 132px 44px 80px;
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.1s ease-out forwards;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 6.5vw, 68px);
+      font-weight: 700;
+      letter-spacing: -2.5px;
+      line-height: 1.04;
+      color: var(--1d);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.22s ease-out forwards;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--blue);
+    }
+
+    .hero-sub {
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 300;
+      color: var(--6e);
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto 48px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.34s ease-out forwards;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.46s ease-out forwards;
+    }
+
+    .pkg-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid;
+      font-family: var(--mono);
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .pkg-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pkg-badge.aug {
+      color: var(--aug);
+      border-color: rgba(14, 165, 233, 0.25);
+      background: var(--aug-bg);
+    }
+
+    .pkg-badge.wf {
+      color: var(--wf);
+      border-color: rgba(5, 150, 105, 0.22);
+      background: var(--wf-bg);
+    }
+
+    .pkg-badge.agt {
+      color: var(--agt);
+      border-color: rgba(231, 109, 54, 0.22);
+      background: var(--agt-bg);
+    }
+
+    .pkg-badge.react {
+      color: var(--react);
+      border-color: rgba(124, 58, 237, 0.22);
+      background: var(--react-bg);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── CONTENT WRAPPER ─────────────────────────── */
+    .content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 44px;
+    }
+
+    .section {
+      padding: 80px 0;
+    }
+
+    .section+.section {
+      border-top: 0.5px solid var(--e8);
+    }
+
+    .sec-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+
+    .sec-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      color: var(--1d);
+    }
+
+    .sec-sub {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--6e);
+      line-height: 1.6;
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    /* ── PYRAMID / LAYER STACK ───────────────────── */
+    .pyramid-wrap {
+      margin-bottom: 48px;
+    }
+
+    .py-layer {
+      display: grid;
+      grid-template-columns: 200px 1fr 170px;
+      gap: 0;
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      background: var(--white);
+      margin-bottom: 4px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .py-layer:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .py-name {
+      padding: 18px 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-right: 0.5px solid var(--e8);
+    }
+
+    .py-desc {
+      padding: 18px 24px;
+      font-size: 13px;
+      color: var(--6e);
+      line-height: 1.55;
+      border-right: 0.5px solid var(--e8);
+    }
+
+    .py-role {
+      padding: 18px 16px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--6e);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    .py-layer.l-agt .py-name {
+      background: var(--agt-bg);
+      color: var(--agt);
+    }
+
+    .py-layer.l-wf .py-name {
+      background: var(--wf-bg);
+      color: var(--wf);
+    }
+
+    .py-layer.l-aug .py-name {
+      background: var(--aug-bg);
+      color: var(--aug);
+    }
+
+    .py-layer.l-sys .py-name {
+      background: var(--f5);
+      color: var(--6e);
+      font-style: italic;
+    }
+
+    .py-layer.l-sys {
+      border-style: dashed;
+    }
+
+    /* ── DETAIL CARDS ────────────────────── */
+    .pkg-detail {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .pkg-detail-header {
+      padding: 28px 32px 24px;
+      border-bottom: 0.5px solid var(--e8);
+      position: relative;
+    }
+
+    .pkg-accent-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .pkg-detail-name {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      margin-top: 16px;
+    }
+
+    .pkg-detail-tagline {
+      font-size: 14px;
+      color: var(--6e);
+      font-family: var(--serif);
+      font-weight: 300;
+    }
+
+    .pkg-ver {
+      position: absolute;
+      top: 28px;
+      right: 32px;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      background: var(--f5);
+      border: 0.5px solid var(--e8);
+      border-radius: var(--r-xs);
+      color: var(--6e);
+    }
+
+    .pkg-body-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 0;
+    }
+
+    .pkg-col {
+      padding: 24px 32px;
+    }
+
+    .pkg-col+.pkg-col {
+      border-left: 0.5px solid var(--e8);
+    }
+
+    .col-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--6e);
+      margin-bottom: 14px;
+    }
+
+    .feat-list {
+      list-style: none;
+    }
+
+    .feat-list li {
+      font-size: 13px;
+      color: var(--6e);
+      padding: 7px 0;
+      border-bottom: 0.5px solid var(--f0);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+
+    .feat-list li:last-child {
+      border-bottom: none;
+    }
+
+    .feat-list li::before {
+      content: '›';
+      color: var(--d2);
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-size: 14px;
+    }
+
+    .feat-list li strong {
+      color: var(--1d);
+      font-weight: 500;
+    }
+
+    /* ── WHEN-TO-USE BOX ─────────────────────────── */
+    .when-box {
+      margin: 0 32px 24px;
+      padding: 14px 18px;
+      background: var(--f5);
+      border-radius: var(--r-sm);
+      border: 0.5px solid var(--e8);
+      font-size: 13px;
+      color: var(--6e);
+      line-height: 1.65;
+    }
+
+    .when-box strong {
+      color: var(--1d);
+    }
+
+    .when-box .wlabel {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--6e);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* ── DIAGRAM: linear flow ─────────────────────── */
+    .flow-wrap {
+      margin: 0 32px 28px;
+      padding: 28px 24px;
+      background: var(--f7);
+      border: 0.5px solid var(--e8);
+      border-radius: var(--r-sm);
+      overflow-x: auto;
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      min-width: max-content;
+    }
+
+    .flow-node {
+      background: #fff;
+      border: 1.5px solid var(--e8);
+      border-radius: var(--r-sm);
+      padding: 12px 18px;
+      font-size: 12.5px;
+      font-weight: 500;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      min-width: 92px;
+      color: var(--1d);
+      line-height: 1.4;
+    }
+
+    .flow-node small {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 400;
+      color: var(--6e);
+      margin-top: 2px;
+    }
+
+    .flow-node.accent {
+      border-color: var(--blue-bd);
+      background: var(--blue-bg);
+      color: var(--blue);
+    }
+
+    .flow-arrow {
+      color: var(--d2);
+      font-size: 18px;
+      padding: 0 10px;
+      flex-shrink: 0;
+    }
+
+    .flow-caption {
+      text-align: center;
+      font-size: 11px;
+      color: var(--6e);
+      margin-top: 14px;
+      font-family: var(--mono);
+    }
+
+    /* branching */
+    .branch-diagram {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .branch-pre {
+      display: flex;
+      align-items: center;
+    }
+
+    .branch-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-left: 1.5px solid var(--e8);
+      padding-left: 18px;
+      margin-left: 10px;
+    }
+
+    .branch-item {
+      background: #fff;
+      border: 1px solid var(--e8);
+      border-radius: var(--r-xs);
+      padding: 8px 14px;
+      font-size: 11.5px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* fan-out / fan-in (parallel) */
+    .fan-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fan-row {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 6px 0;
+    }
+
+    /* loop note */
+    .loop-note {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--6e);
+    }
+
+    .loop-note .lbl {
+      font-family: var(--mono);
+      background: #fff;
+      border: 1px dashed var(--d2);
+      border-radius: var(--r-xs);
+      padding: 4px 10px;
+      color: var(--orange);
+    }
+
+    /* ── TRAINER/CARD GRID (reused for variations) ── */
+    .trainer-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .tc {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .tc:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .tc-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+
+    .tc-name {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      margin-top: 6px;
+    }
+
+    .tc-use {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .tc-desc {
+      font-size: 12px;
+      color: var(--6e);
+      line-height: 1.6;
+    }
+
+    .tc-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-family: var(--mono);
+    }
+
+    /* ── CODE BLOCK ──────────────────────────────── */
+    .code-win {
+      background: #1e1e2e;
+      border-radius: var(--r);
+      overflow: hidden;
+      margin: 24px 0;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .code-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 12px 20px;
+      background: #2a2a3e;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .cdot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .cdot-r {
+      background: #ff5f57;
+    }
+
+    .cdot-y {
+      background: #febc2e;
+    }
+
+    .cdot-g {
+      background: #28c840;
+    }
+
+    .code-filename {
+      margin-left: 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .code-pre {
+      padding: 24px 28px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 2.0;
+      overflow-x: auto;
+      color: #cdd6f4;
+      tab-size: 4;
+      white-space: pre;
+    }
+
+    .t-kw {
+      color: #cba6f7;
+    }
+
+    .t-fn {
+      color: #89b4fa;
+    }
+
+    .t-cls {
+      color: #f9e2af;
+    }
+
+    .t-str {
+      color: #a6e3a1;
+    }
+
+    .t-num {
+      color: #fab387;
+    }
+
+    .t-cm {
+      color: #585b70;
+      font-style: italic;
+    }
+
+    .t-pn {
+      color: #89dceb;
+    }
+
+    .t-op {
+      color: #94e2d5;
+    }
+
+    .t-deco {
+      color: #f38ba8;
+    }
+
+    .t-sec {
+      color: #6c7086;
+      font-style: italic;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── CALLOUT ─────────────────────────────────── */
+    .callout {
+      display: flex;
+      gap: 14px;
+      padding: 16px 20px;
+      border-radius: var(--r-sm);
+      margin: 20px 0;
+      font-size: 13px;
+      line-height: 1.65;
+      border-left: 3px solid;
+    }
+
+    .callout-icon {
+      flex-shrink: 0;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .callout.info {
+      background: var(--blue-bg);
+      border-color: var(--blue);
+      color: #1a4b8a;
+    }
+
+    .callout.warn {
+      background: var(--orange-bg);
+      border-color: var(--orange);
+      color: #7c4b0a;
+    }
+
+    .callout.good {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: #145228;
+    }
+
+    .callout.pur {
+      background: var(--purple-bg);
+      border-color: var(--purple);
+      color: #4c1d95;
+    }
+
+    .callout strong {
+      font-weight: 600;
+    }
+
+    .callout code {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: rgba(0, 0, 0, 0.07);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* ── PIPELINE FLOW (vertical steps) ───────────── */
+    .pipeline {
+      margin: 32px 0;
+    }
+
+    .pipeline-step {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding-bottom: 28px;
+      position: relative;
+    }
+
+    .pipeline-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 42px;
+      bottom: 0;
+      width: 1px;
+      background: var(--e8);
+    }
+
+    .pipeline-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+      border: 1.5px solid var(--e8);
+      background: var(--white);
+      color: var(--6e);
+      position: relative;
+      z-index: 1;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pipeline-dot.blue {
+      background: var(--blue-bg);
+      border-color: var(--blue-bd);
+      color: var(--blue);
+    }
+
+    .pipeline-dot.green {
+      background: var(--green-bg);
+      border-color: rgba(28, 138, 62, 0.2);
+      color: var(--green);
+    }
+
+    .pipeline-dot.agt {
+      background: var(--agt-bg);
+      border-color: rgba(231, 109, 54, 0.2);
+      color: var(--agt);
+    }
+
+    .pipeline-dot.wf {
+      background: var(--wf-bg);
+      border-color: rgba(5, 150, 105, 0.2);
+      color: var(--wf);
+    }
+
+    .pipeline-dot.react {
+      background: var(--react-bg);
+      border-color: rgba(124, 58, 237, 0.2);
+      color: var(--react);
+    }
+
+    .pipeline-content {
+      padding-top: 8px;
+      flex: 1;
+    }
+
+    .pipeline-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+      color: var(--1d);
+    }
+
+    .pipeline-content p {
+      font-size: 14px;
+      color: var(--6e);
+      line-height: 1.6;
+    }
+
+    .pipeline-content p code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--f5);
+      border: 0.5px solid var(--e8);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--1d);
+    }
+
+    /* ── MATRIX ─────────────────────── */
+    .matrix-wrap {
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin: 32px 0;
+      overflow-x: auto;
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .matrix-table th {
+      padding: 14px 16px;
+      background: var(--f5);
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--6e);
+      border-bottom: 1px solid var(--e8);
+      white-space: nowrap;
+    }
+
+    .matrix-table td {
+      padding: 14px 16px;
+      border-bottom: 0.5px solid var(--f0);
+      vertical-align: middle;
+      color: var(--6e);
+      font-size: 13px;
+    }
+
+    .matrix-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .matrix-table tr:hover td {
+      background: var(--f7);
+    }
+
+    .uc-name {
+      font-weight: 600;
+      color: var(--1d);
+      white-space: nowrap;
+      font-size: 14px;
+    }
+
+    .chk {
+      color: var(--green);
+      font-size: 16px;
+    }
+
+    .dash {
+      color: var(--d2);
+      font-size: 16px;
+    }
+
+    .primary-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--r-xs);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .pp-agt {
+      background: var(--agt-bg);
+      color: var(--agt);
+    }
+
+    .pp-wf {
+      background: var(--wf-bg);
+      color: var(--wf);
+    }
+
+    .pp-aug {
+      background: var(--aug-bg);
+      color: var(--aug);
+    }
+
+    /* ── PARAM TABLE (also used for ReAct mapping) ── */
+    .param-wrap {
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .param-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--6e);
+      background: var(--f5);
+      border-bottom: 1px solid var(--e8);
+    }
+
+    .param-table td {
+      padding: 12px 16px;
+      border-bottom: 0.5px solid var(--f0);
+      vertical-align: top;
+      color: var(--6e);
+      line-height: 1.5;
+    }
+
+    .param-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .param-table tr:hover td {
+      background: var(--f7);
+    }
+
+    .param-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--1d);
+      font-weight: 500;
+    }
+
+    .param-type {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--react);
+    }
+
+    /* ── DECISION TREE ───────────────────────────── */
+    .dt-box {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-sm);
+      padding: 32px;
+    }
+
+    .dt-q {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--1d);
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dt-q::before {
+      content: '?';
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--blue-bg);
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .dt-branch {
+      margin-left: 34px;
+      padding-left: 20px;
+      border-left: 1.5px solid var(--e8);
+      margin-bottom: 24px;
+    }
+
+    .dt-row {
+      padding: 10px 14px;
+      border-radius: var(--r-xs);
+      font-size: 13px;
+      color: var(--6e);
+      line-height: 1.6;
+      margin-bottom: 6px;
+      background: var(--f5);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .dt-arrow {
+      color: var(--d2);
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+
+    .dt-row strong {
+      color: var(--1d);
+      font-weight: 600;
+    }
+
+    .dt-row code {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    .hdivider {
+      border: none;
+      height: 0.5px;
+      background: var(--e8);
+      margin: 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 56px 44px;
+      border-top: 0.5px solid var(--e8);
+      color: var(--6e);
+      font-size: 13px;
+    }
+
+    footer a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    footer p.refs {
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .reveal.vis {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        padding: 0 20px;
+      }
+
+      .nav-links,
+      .nav-tag {
+        display: none;
+      }
+
+      .content {
+        padding: 0 20px;
+      }
+
+      .hero {
+        padding: 100px 20px 60px;
+      }
+
+      .py-layer {
+        grid-template-columns: 1fr;
+      }
+
+      .py-desc,
+      .py-role {
+        border-left: none;
+        border-top: 0.5px solid var(--e8);
+      }
+
+      .pkg-body-2col {
+        grid-template-columns: 1fr;
+      }
+
+      .pkg-col+.pkg-col {
+        border-left: none;
+        border-top: 0.5px solid var(--e8);
+      }
+
+      .trainer-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .matrix-table {
+        font-size: 12px;
+      }
+
+      .flow-row {
+        flex-direction: column;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+        padding: 6px 0;
+      }
+
+      .branch-diagram {
+        flex-direction: column;
+      }
+
+      .branch-pre {
+        flex-direction: column;
+      }
+    }
+
+    .itag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 500;
+      vertical-align: baseline;
+    }
+
+    .itag.aug {
+      background: var(--aug-bg);
+      color: var(--aug);
+    }
+
+    .itag.wf {
+      background: var(--wf-bg);
+      color: var(--wf);
+    }
+
+    .itag.agt {
+      background: var(--agt-bg);
+      color: var(--agt);
+    }
+
+    .itag.react {
+      background: var(--react-bg);
+      color: var(--react);
+    }
+
+    /* Specific styles for the teardown guide (Light Theme) */
+    body {
+      padding-top: 64px;
+      /* Space for fixed nav */
+    }
+
+    .guide-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 60px 44px 60px;
+    }
+
+    .teardown-section {
+      background: var(--white);
+      border: 1px solid var(--e8);
+      border-radius: var(--r);
+      padding: 40px;
+      margin-bottom: 40px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .teardown-section:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .teardown-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--e8);
+      padding-bottom: 16px;
+    }
+
+    .teardown-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--1d);
+      letter-spacing: -0.02em;
+    }
+
+    .snapshot-badge {
+      display: inline-block;
+      background: var(--blue-bg);
+      color: var(--blue);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--blue-bd);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .snapshot-text {
+      font-size: 1.1rem;
+      color: var(--6e);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .attr-box {
+      background: var(--f5);
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      padding: 24px;
+    }
+
+    .attr-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--1d);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .attr-value {
+      font-size: 0.95rem;
+      color: var(--6e);
+      line-height: 1.6;
+    }
+
+    .diagram-container {
+      background: var(--f7);
+      border: 1px solid var(--e8);
+      border-radius: var(--r-sm);
+      padding: 32px;
+      margin: 32px 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+
+    .arch-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 32px 0;
+    }
+
+    .arch-list li {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 12px;
+      color: var(--6e);
+      line-height: 1.6;
+    }
+
+    .arch-list li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--blue);
+      font-size: 1.4rem;
+      line-height: 1.0;
+    }
+
+    .arch-list strong {
+      color: var(--1d);
+    }
+
+    .pro-con-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .pro-box,
+    .con-box {
+      padding: 20px;
+      border-radius: var(--r-sm);
+      border: 1px solid;
+    }
+
+    .pro-box {
+      background: var(--green-bg);
+      border-color: rgba(28, 138, 62, 0.2);
+    }
+
+    .con-box {
+      background: var(--red-bg);
+      border-color: rgba(192, 57, 43, 0.2);
+    }
+
+    .pc-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .pro-box .pc-label {
+      color: var(--green);
+    }
+
+    .con-box .pc-label {
+      color: var(--red);
+    }
+
+    .pc-text {
+      font-size: 0.95rem;
+      color: var(--6e);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ambient"></div>
+
+  <!-- ── NAV ───────────────────────────────────── -->
+  <nav class="nav">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="index.html"
+        style="font-size:12px;color:var(--d2);text-decoration:none;display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1px solid var(--e8);transition:all 0.2s;"
+        onmouseover="this.style.color='var(--blue)';this.style.borderColor='rgba(0,113,227,0.3)'"
+        onmouseout="this.style.color='var(--d2)';this.style.borderColor='var(--e8)'">← Guides</a>
+      <div class="nav-brand">Agentic Systems Teardown</div>
+    </div>
+    <div class="nav-links">
+      <a class="nav-link" href="#">Taxonomy</a>
+      <a class="nav-link" href="#">Data Agents</a>
+      <a class="nav-link" href="#">Frameworks</a>
+      <a class="nav-link" href="#">Compare</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ──────────────────────────────────── -->
+  <div class="hero">
+    <div class="hero-eyebrow">COMPLETE TEARDOWN</div>
+    <h1>Seven architectures.<br><span style="color: var(--blue);">One agentic spectrum.</span></h1>
+    <p class="hero-sub">Data Agents, Execution Backbones, and Substrate Governance - each tackles agentic workflows from
+      a distinct angle. Understand the patterns once, and the confusion disappears.</p>
+    <div class="badge-row" style="margin-bottom: 24px;">
+      <span class="pkg-badge aug">🤖 Oracle DS</span>
+      <span class="pkg-badge aug">📊 Julius AI</span>
+      <span class="pkg-badge aug">🔍 DeepAnalyze</span>
+      <span class="pkg-badge wf">⚡ Agno</span>
+      <span class="pkg-badge wf">⚙️ Airflow</span>
+      <span class="pkg-badge agt">🚀 Hermes</span>
+      <span class="pkg-badge react">🛡️ Omnigent</span>
+    </div>
+  </div>
+
+  <div class="content" style="max-width: 1000px; margin: 0 auto; padding: 0 44px;">
+    <section class="section" id="taxonomy" style="padding: 40px 0 20px;">
+      <div class="reveal vis" style="opacity: 1; transform: none;">
+        <div class="sec-label">THE TAXONOMY</div>
+        <h2 class="sec-title" style="font-size: 28px;">How these systems differ</h2>
+        <p class="sec-sub">Think of it as a spectrum. At one end, you have conversational data agents that orchestrate
+          classical ML. In the middle, frameworks that compile LLM plans into deterministic execution DAGs. At the far
+          end, governance layers that police the boundaries of fully autonomous sub-agents.</p>
+      </div>
+    </section>
+  </div>
+
+
+
+
+  <div class="guide-container">
+
+    <!-- 1. Oracle -->
+    <div class="teardown-section">
+      <div class="teardown-header">
+        <h2 class="teardown-title">1. Oracle Data Science Agent</h2>
+      </div>
+      <div class="snapshot-badge">Tier A: Data Agent</div>
+      <p class="snapshot-text">Conversational, in-database data-science agent inside <strong>Oracle Autonomous AI
+          Database 26ai</strong> (Oracle Machine Learning). Covers the full lifecycle - profile → feature-engineer →
+        train → validate → explain - <em>without moving data out of the database</em>.</p>
+
+      <span class="attr-label">Architecture & Components</span>
+      <ul class="arch-list">
+        <li><strong>Data Science Agent (OML)</strong> - the conversational lifecycle agent, launched from the Oracle
+          Machine Learning UI console.</li>
+        <li><strong>Select AI</strong> (<code>DBMS_CLOUD_AI</code>) - the underlying mechanism: you define LLM settings
+          in an AI profile and store credentials.</li>
+        <li><strong>In-DB algorithms</strong> - classification & regression including XGBoost (in 26ai), SVM, GLM;
+          classical ML where data lives.</li>
+        <li><strong>Conversation Objects Catalog</strong> - register specific tables/views to scope access and improve
+          precision (governance).</li>
+      </ul>
+
+      <span class="attr-label">Workflow Diagram</span>
+      <div class="diagram-container">
+        <div class="mermaid">
+          flowchart LR
+          U(["User query"]) --> UND["Understand + clarify<br />(LLM)"]
+          UND --> PLAN["Plan lifecycle<br />(LLM)"]
+          PLAN --> EXEC["In-DB: profile → engineer → train<br />(no-LLM, classical ML)"]
+          EXEC --> EXP["Explain results<br />(LLM)"]
+          EXP -->|refine| UND
+          EXP --> OUT(["Insights"])
+
+          classDef llm fill:#f0f6ff,stroke:#0071e3,color:#0071e3
+          classDef det fill:#f5f5f7,stroke:#e8e8ed,color:#6e6e73
+          classDef io fill:#ffffff,stroke:#e8e8ed,color:#1d1d1f
+          class U,OUT io
+          class UND,PLAN,EXP llm
+          class EXEC det
+        </div>
+      </div>
+
+      <div class="grid-2col">
+        <div class="attr-box">
+          <span class="attr-label">Decomposition (Q1)</span>
+          <div class="attr-value">Lifecycle decomposition - the fixed DS skeleton (profile → features → train → evaluate
+            → explain) is broken into steps; interactive mode externalizes the plan for the user to validate.</div>
+        </div>
+        <div class="attr-box">
+          <span class="attr-label">Ordering (Q2)</span>
+          <div class="attr-value">Determined by the lifecycle order plus the Conversation Objects Catalog scope. The
+            user can validate interactively, then hand the remaining steps to autonomous execution.</div>
+        </div>
+        <div class="attr-box">
+          <span class="attr-label">State / Memory</span>
+          <div class="attr-value">Persistent conversation history, logs, and SQL snippets for reproducibility, audit,
+            onboarding, and resuming a project later.</div>
+        </div>
+        <div class="attr-box">
+          <span class="attr-label">Where AI/LLM is used</span>
+          <div class="attr-value">The LLM drives the conversational interface, intent parsing, planning, in-DB SQL/code
+            generation, and result explanation. <strong>Model training itself is classical in-DB ML, not an
+              LLM.</strong></div>
+        </div>
+      </div>
+
+      <div class="attr-box" style="margin-bottom: 0;">
+        <span class="attr-label" style="color: var(--blue);">Fitment</span>
+        <div class="attr-value">If your "execute the plan" must include model training, this is the strongest commercial
+          proof a conversational planner→executor can own training end-to-end. Copy the <strong>interactive→autonomous
+            escalation</strong> for your ambiguity stage.</div>
+      </div>
+
+      <div class="pro-con-grid">
+        <div class="pro-box">
+          <div class="pc-label">Pros</div>
+          <div class="pc-text">Genuinely trains+validates models conversationally; data never leaves the DB (governance,
+            security); interactive↔autonomous toggle is a clean ambiguity-resolution pattern.</div>
+        </div>
+        <div class="con-box">
+          <div class="pc-label">Cons</div>
+          <div class="pc-text">Oracle-DB-bound; very new; algorithm set limited to in-DB options; closed/managed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Julius -->
+    <div class="teardown-section">
+      <div class="teardown-header">
+        <h2 class="teardown-title">2. Julius AI</h2>
+      </div>
+      <div class="snapshot-badge">Tier A: Data Agent</div>
+      <p class="snapshot-text">Standalone "AI data scientist" chat + notebook product. Writes and runs Python/R, pulls
+        external data, <strong>calls external APIs</strong>, runs full EDA, and trains ML (PyTorch/TensorFlow) inside
+        one session.</p>
+
+      <span class="attr-label">Architecture & Components</span>
+      <ul class="arch-list">
+        <li><strong>Chat + notebooks</strong> - reusable, parameterized workflow templates.</li>
+        <li><strong>Custom Agents</strong> - bind data, tools, and a knowledge base; set per-agent output preferences.
+        </li>
+        <li><strong>Scheduled Runs</strong>, <strong>Slack agent</strong>, <strong>warehouse connectors</strong>
+          (Snowflake, BigQuery, Postgres).</li>
+        <li><strong>Execution</strong> - per-user sandboxed Python/R; handles large datasets.</li>
+      </ul>
+
+      <span class="attr-label">Workflow Diagram</span>
+      <div class="diagram-container">
+        <div class="mermaid">
+          flowchart LR
+          U(["Prompt + data"]) --> PLAN["Plan / choose action<br />(LLM)"]
+          PLAN --> GEN["Generate code<br />(LLM)"]
+          GEN --> EXEC["Execute in sandbox<br />(no-LLM)"]
+          EXEC --> CHK{"Done?"}
+          CHK -->|"error / more"| GEN
+          CHK -->|done| INT["Interpret + visualize<br />(LLM)"]
+          INT --> SAVE{"Reuse?"}
+          SAVE -->|"save as Notebook"| REUSE["Persist reusable workflow<br />(no-LLM)"]
+          SAVE -->|one-off| OUT(["Answer"])
+          REUSE --> OUT
+
+          classDef llm fill:#f0f6ff,stroke:#0071e3,color:#0071e3
+          classDef det fill:#f5f5f7,stroke:#e8e8ed,color:#6e6e73
+          classDef io fill:#ffffff,stroke:#e8e8ed,color:#1d1d1f
+          class U,OUT io
+          class PLAN,GEN,INT llm
+          class EXEC,CHK,SAVE,REUSE det
+        </div>
+      </div>
+
+      <div class="grid-2col">
+        <div class="attr-box">
+          <span class="attr-label">Decomposition (Q1)</span>
+          <div class="attr-value">User- or agent-defined step plans / notebook cells. More a <em>guided plan
+              executor</em> than an autonomous decomposer.</div>
+        </div>
+        <div class="attr-box">
+          <span class="attr-label">Ordering (Q2)</span>
+          <div class="attr-value">Plan/notebook order, or the agent follows a custom step plan.</div>
+        </div>
+        <div class="attr-box">
+          <span class="attr-label">State / Memory</span>
+          <div class="attr-value">Notebooks persist; Custom Agents carry a knowledge base; Scheduled Runs persist
+            analyses; per-user sandboxed storage.</div>
+        </div>
+        <div class="attr-box">
+          <span class="attr-label">Where AI/LLM is used</span>
+          <div class="attr-value">LLM plans steps, writes Python/R, and interprets results. <strong>Code execution is
+              deterministic; ML training uses libraries (PyTorch/TF), not the LLM.</strong></div>
+        </div>
+      </div>
+
+      <div class="attr-box" style="margin-bottom: 0;">
+        <span class="attr-label" style="color: var(--blue);">Fitment</span>
+        <div class="attr-value">Study <strong>Custom Agents + Scheduled Runs</strong> as the product shape for "save a
+          plan, parameterize it, re-run it" - i.e. turning a one-off plan into a reusable, schedulable workflow.</div>
+      </div>
+
+      <div class="pro-con-grid">
+        <div class="pro-box">
+          <div class="pc-label">Pros</div>
+          <div class="pc-text">Explicitly covering external APIs + ML training + EDA in one session; R support.</div>
+        </div>
+        <div class="con-box">
+          <div class="pc-label">Cons</div>
+          <div class="pc-text">Chat-first (reasoning can be opaque); credit pricing; not built for hardened multi-agent
+            orchestration.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. DeepAnalyze-8B -->
+    <div class="teardown-section">
+      <div class="teardown-header">
+        <h2 class="teardown-title">3. DeepAnalyze-8B</h2>
+      </div>
+      <div class="snapshot-badge">Tier A: Data Agent</div>
+      <p class="snapshot-text">Open-source research system from Renmin University - the self-described <em>first agentic
+          LLM for autonomous data science</em>. The architectural opposite of the others: there's <strong>no external
+          workflow</strong> - the model itself is trained to plan, act, observe, and iterate.</p>
+
+      <span class="attr-label">Architecture & Components</span>
+      <ul class="arch-list">
+        <li><strong>Five action tokens</strong> - <code>&lt;Analyze&gt;</code>, <code>&lt;Understand&gt;</code>,
+          <code>&lt;Code&gt;</code>, <code>&lt;Execute&gt;</code>, <code>&lt;Answer&gt;</code> to run its own loop.
+        </li>
+        <li><strong>Curriculum-based agentic training</strong> - single-ability fine-tuning + multi-ability agentic RL
+          (GRPO).</li>
+        <li><strong>Data-grounded trajectory synthesis</strong> - multi-agent protocol generates high-fidelity training
+          trajectories.</li>
+        <li><strong>Datasets/benchmarks</strong> - DataScience-Instruct-500K; supports up to ~30 reasoning rounds.</li>
+      </ul>
+
+      <span class="attr-label">Workflow Diagram</span>
+      <div class="diagram-container">
+        <div class="mermaid">
+          flowchart TD
+          U["Instruction Q + data environment<br />(input)"] --> GEN["Model generates next action token<br />(LLM)"]
+          GEN --> SW{"Which action?<br />(LLM)"}
+          SW -->|Analyze| AN["Plan, reason, reflect, self-verify<br />(LLM)"]
+          SW -->|Understand| UN["Inspect data sources<br />(LLM)"]
+          SW -->|Code| CD["Generate Python code<br />(LLM)"]
+          SW -->|Answer| ANS["Produce final analyst-grade report<br />(LLM)"]
+          AN --> GEN
+          UN --> GEN
+          CD --> EXq["Execute code in environment<br />(no-LLM)"]
+          EXq --> FB["Collect feedback, append to trajectory<br />(no-LLM)"]
+          FB --> GEN
+          ANS --> OUT["Output A with full interaction process<br />(output)"]
+
+          classDef llm fill:#f0f6ff,stroke:#0071e3,color:#0071e3
+          classDef det fill:#f5f5f7,stroke:#e8e8ed,color:#6e6e73
+          classDef io fill:#ffffff,stroke:#e8e8ed,color:#1d1d1f
+          class U,OUT io
+          class GEN,SW,AN,UN,CD,ANS llm
+          class EXq,FB det
+        </div>
+      </div>
+
+      <div class="grid-2col">
+        <div class="attr-box">
+          <span class="attr-label">Decomposition (Q1)</span>
+          <div class="attr-value">Fully autonomous planning done directly by the LLM using the
+            <code>&lt;Analyze&gt;</code> token.
+          </div>
+        </div>
+        <div class="attr-box">
+          <span class="attr-label">Ordering (Q2)</span>
+          <div class="attr-value">Dynamic runtime ordering decided solely by the model's next generated token.</div>
+        </div>
+        <div class="attr-box">
+          <span class="attr-label">State / Memory</span>
+          <div class="attr-value">In-context memory within the prompt window, storing execution feedback and
+            intermediate steps across ~30 reasoning rounds.</div>
+        </div>
+        <div class="attr-box">
+          <span class="attr-label">Where AI/LLM is used</span>
+          <div class="attr-value">Everywhere except the pure Python execution block. The LLM controls the entire loop
+            autonomously via extended vocabulary tokens.</div>
+        </div>
+      </div>
+
+      <div class="pro-con-grid">
+        <div class="pro-box">
+          <div class="pc-label">Pros</div>
+          <div class="pc-text">Truly autonomous workflow built into the model weights; no complex external orchestration
+            code needed. Open-source.</div>
+        </div>
+        <div class="con-box">
+          <div class="pc-label">Cons</div>
+          <div class="pc-text">Highly dependent on context window limits; harder to govern or inject deterministic
+            guardrails into the loop.</div>
+        </div>
+      </div>
+      <!-- 4. Agno Dash -->
+      <div class="teardown-section">
+        <div class="teardown-header">
+          <h2 class="teardown-title">4. Agno Dash</h2>
+        </div>
+        <div class="snapshot-badge">Tier A: Data Agent</div>
+        <p class="snapshot-text">Open-source (built on the <strong>Agno</strong> framework) self-learning data agent,
+          explicitly modeled on OpenAI's internal data agent. The cleanest open codebase that separates
+          <em>planning</em> (a Leader) from <em>execution</em> (Analyst/Engineer specialists) and persists corrections
+          as reusable learnings. Runs in Slack, terminal, or the AgentOS web UI over PostgreSQL.
+        </p>
+
+        <span class="attr-label">Architecture & Components</span>
+        <ul class="arch-list">
+          <li><strong>Team (coordinate mode):</strong> <strong>Leader</strong> coordinates + answers;
+            <strong>Analyst</strong> introspects schema and writes <strong>read-only</strong> SQL on the
+            <code>public</code> (company) schema; <strong>Engineer</strong> builds reusable views in the agent-managed
+            <code>dash</code> schema.
+          </li>
+          <li><strong>6 layers of context:</strong> (1) schema/relationships, (2) human annotations, (3) proven SQL
+            patterns, (4) institutional knowledge, (5) machine-discovered error patterns, (6) live runtime
+            introspection. Retrieved via <strong>PgVector hybrid search</strong>.</li>
+          <li><strong>Self-learning:</strong> success &rarr; save validated query as <strong>Knowledge</strong>; failure
+            &rarr; <strong>Agno Learning Machine</strong> diagnoses, fixes, and saves a <strong>Learning</strong> so the
+            mistake isn't repeated.</li>
+          <li><strong>Guardrails (infrastructure, not prompts):</strong> Analyst connects with
+            <code>default_transaction_read_only=on</code>; Engineer writes scoped to <code>dash</code> schema.
+          </li>
+        </ul>
+
+        <span class="attr-label">Workflow Diagram</span>
+        <div class="diagram-container">
+          <div class="mermaid">
+            flowchart LR
+            U(["Question"]) --> LEAD["Leader routes<br />(LLM)"]
+            LEAD -->|"data question (default)"| ANA["Retrieve context + Analyst SQL<br />(mixed)"]
+            LEAD -->|"explicit: create a view"| ENG["Engineer builds dash view<br />(LLM)"]
+            ANA --> RUN["Execute SQL<br />(no-LLM)"]
+            RUN -->|"error: learn + retry"| ANA
+            RUN --> INT["Synthesize insight<br />(LLM)"]
+            ENG --> INT
+            INT --> OUT(["Insight"])
+            ANA -.->|"repeated pattern, user-approved"| ENG
+            ENG -.->|"reused next time"| ANA
+
+            classDef llm fill:#f0f6ff,stroke:#0071e3,color:#0071e3
+            classDef det fill:#f5f5f7,stroke:#e8e8ed,color:#6e6e73
+            classDef mixed fill:#f5f3ff,stroke:#6d28d9,color:#6d28d9
+            classDef io fill:#ffffff,stroke:#e8e8ed,color:#1d1d1f
+            class U,OUT io
+            class LEAD,INT,ENG llm
+            class RUN det
+            class ANA mixed
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <div class="attr-box">
+            <span class="attr-label">Decomposition (Q1)</span>
+            <div class="attr-value">The Leader routes each question to the Analyst by default, and <em>separately</em>
+              triggers the Engineer to build a reusable asset when it detects a recurring pattern across queries.</div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label">Ordering (Q2)</span>
+            <div class="attr-value">The Leader sequences; the standout is the <strong>self-learning loop</strong>
+              &mdash; failed steps become permanent learnings (replanning memory that compounds over time).</div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label">State / Memory</span>
+            <div class="attr-value">PostgreSQL holds <strong>Knowledge</strong> (curated/validated) and
+              <strong>Learnings</strong> (discovered); sessions/traces live in AgentOS. Memory is the context layer, not
+              model weights.
+            </div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label">Where AI/LLM is used</span>
+            <div class="attr-value">LLM reasons about intent, generates grounded SQL, and diagnoses/fixes errors. SQL
+              execution, read-only enforcement, and schema isolation are deterministic infrastructure.</div>
+          </div>
+        </div>
+
+        <div class="attr-box" style="margin-bottom: 0;">
+          <span class="attr-label" style="color: var(--blue);">Fitment</span>
+          <div class="attr-value">Read this to copy two things directly: <strong>planner/executor separation</strong>
+            and a <strong>replanning loop that persists corrections</strong> as reusable learnings. Plus the idea that
+            data-access guardrails belong in infrastructure, not in prompts.</div>
+        </div>
+
+        <div class="pro-con-grid">
+          <div class="pro-box">
+            <div class="pc-label">Pros</div>
+            <div class="pc-text">Clear planner/executor separation; concrete replanning-as-memory pattern; DB-level
+              guardrails.</div>
+          </div>
+          <div class="con-box">
+            <div class="pc-label">Cons</div>
+            <div class="pc-text">Postgres-centric; tightly coupled to Agno; steep context-curation setup.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Airflow 3 + Astronomer Otto -->
+      <div class="teardown-section">
+        <div class="teardown-header">
+          <h2 class="teardown-title">5. Airflow 3 + Astronomer Otto</h2>
+        </div>
+        <div class="snapshot-badge">Tier B: Execution Backbone</div>
+        <p class="snapshot-text">The <strong>execution backbone</strong>, not a data planner. Apache Airflow 3 is the
+          deterministic orchestrator (DAGs, scheduling, retries, HITL); the <strong>Common AI Provider</strong> lets you
+          put LLM and agent calls <em>inside</em> DAGs as named, logged, retryable tasks; <strong>Astronomer
+            Otto</strong> is a data-engineering agent that authors DAGs.</p>
+
+        <span class="attr-label">Architecture & Components</span>
+        <ul class="arch-list">
+          <li><strong>Airflow 3 engine</strong> &mdash; DAG versioning, <strong>event-driven scheduling</strong>,
+            <strong>human-in-the-loop operators</strong>, remote execution.
+          </li>
+          <li><strong>Common AI Provider</strong> &mdash; built on <strong>Pydantic AI</strong>; decorators
+            <code>@task.llm</code>, <code>@task.agent</code>, <code>@task.llm_branch</code>; <strong>AIBudget</strong>
+            cost caps per task/DAG/team.
+          </li>
+          <li><strong>Astronomer Otto</strong> &mdash; reads task logs, traces dependency chains, checks run history;
+            returns root cause + proposed fix; produces fleet-wide upgrade plans.</li>
+          <li><strong><code>astronomer/agents</code> plugin</strong> &mdash; Airflow <strong>MCP server</strong> +
+            installable skills for coding agents.</li>
+        </ul>
+
+        <span class="attr-label">Workflow Diagram</span>
+        <div class="diagram-container">
+          <div class="mermaid">
+            flowchart LR
+            NL(["NL request"]) --> AUTH["Author: Otto / human writes DAG<br />(LLM, build-time)"]
+            AUTH --> DAG["DAG: tasks + dependencies<br />(no-LLM)"]
+            DAG --> RUN["Scheduler runs tasks; retries + HITL<br />(no-LLM)"]
+            RUN -.->|"@task.llm / @task.agent"| AI["LLM task<br />(LLM)"]
+            RUN --> OUT(["Outputs + logs"])
+
+            classDef llm fill:#f0f6ff,stroke:#0071e3,color:#0071e3
+            classDef det fill:#f5f5f7,stroke:#e8e8ed,color:#6e6e73
+            classDef mixed fill:#f5f3ff,stroke:#6d28d9,color:#6d28d9
+            classDef io fill:#ffffff,stroke:#e8e8ed,color:#1d1d1f
+            class NL,OUT io
+            class AUTH,AI llm
+            class DAG,RUN det
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <div class="attr-box">
+            <span class="attr-label">Decomposition (Q1)</span>
+            <div class="attr-value">Not an autonomous NL decomposer at the engine level &mdash; <em>you</em> or an
+              authoring agent (Otto) define tasks. Within a DAG, <code>@task.agent</code> can decompose its own
+              sub-steps over tools.</div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label">Ordering (Q2)</span>
+            <div class="attr-value"><strong>The DAG <em>is</em> the ordering</strong> &mdash; explicit dependencies,
+              retries, event triggers, parallelism. This is the deterministic ordering layer your emergent LLM plan
+              should compile down to.</div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label">State / Memory</span>
+            <div class="attr-value">XComs + metadata DB for run state and full agent/LLM logs; <strong>Otto Memory in
+                git</strong> for team conventions and corrections.</div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label">Where AI/LLM is used</span>
+            <div class="attr-value">The <strong>core engine has no LLM</strong>. LLMs enter only through AI-SDK tasks
+              you add, and Otto (DAG authoring, failure diagnosis). Scheduling and retries are deterministic.</div>
+          </div>
+        </div>
+
+        <div class="attr-box" style="margin-bottom: 0;">
+          <span class="attr-label" style="color: var(--blue);">Fitment</span>
+          <div class="attr-value">Strong candidate for the layer that <strong>runs your generated plan</strong>. The
+            pattern: planner LLM emits a plan &rarr; <strong>materialize it as an Airflow DAG</strong> &rarr; inherit
+            retries, observability, HITL, and per-task cost caps.</div>
+        </div>
+
+        <div class="pro-con-grid">
+          <div class="pro-box">
+            <div class="pc-label">Pros</div>
+            <div class="pc-text">Mature, deterministic ordering + retries + observability + HITL; AI now native (typed
+              outputs, cost caps, per-task logging).</div>
+          </div>
+          <div class="con-box">
+            <div class="pc-label">Cons</div>
+            <div class="pc-text">Heavy if self-hosted; not designed to <em>decompose</em> NL on its own; Otto is
+              Astro-tied.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Hermes Agent (Nous Research) -->
+      <div class="teardown-section">
+        <div class="teardown-header">
+          <h2 class="teardown-title">6. Hermes Agent (Nous Research)</h2>
+        </div>
+        <div class="snapshot-badge">Tier C: Substrate Governance</div>
+        <p class="snapshot-text">Open-source (MIT) <strong>general-purpose</strong> personal agent by Nous Research. Not
+          a data-analytics product, but its <em>substrate</em> mechanisms (subagent delegation, persistent skill-memory,
+          multi-backend sandboxing, multi-model routing) are exactly the pieces your build needs underneath the data
+          layer.</p>
+
+        <span class="attr-label">Architecture & Components</span>
+        <ul class="arch-list">
+          <li><strong>Multi-surface, one memory</strong> &mdash; Telegram, Discord, Slack, CLI; a single agent + shared
+            memory across every surface.</li>
+          <li><strong>Persistent memory + auto-generated skills</strong> &mdash; learns your projects, auto-generates
+            reusable skills.</li>
+          <li><strong>Subagent delegation</strong> &mdash; isolated subagents, each with its own conversation, terminal,
+            and Python RPC scripts.</li>
+          <li><strong>Isolated sandboxing</strong> &mdash; five backends (local, Docker, SSH, Singularity, Modal) with
+            container hardening + namespace isolation.</li>
+        </ul>
+
+        <span class="attr-label">Workflow Diagram</span>
+        <div class="diagram-container">
+          <div class="mermaid">
+            flowchart LR
+            U(["Message"]) --> CORE["Reason + plan<br />(LLM)"]
+            CORE --> ACT["Tools / subagents<br />(mixed)"]
+            ACT --> SBX["Execute in sandbox<br />(no-LLM)"]
+            SBX -->|loop| CORE
+            CORE -->|done| MEM["Update memory + respond<br />(mixed)"]
+            MEM --> OUT(["Reply"])
+
+            classDef llm fill:#f0f6ff,stroke:#0071e3,color:#0071e3
+            classDef det fill:#f5f5f7,stroke:#e8e8ed,color:#6e6e73
+            classDef mixed fill:#f5f3ff,stroke:#6d28d9,color:#6d28d9
+            classDef io fill:#ffffff,stroke:#e8e8ed,color:#1d1d1f
+            class U,OUT io
+            class CORE llm
+            class SBX det
+            class ACT,MEM mixed
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <div class="attr-box">
+            <span class="attr-label">Decomposition (Q1)</span>
+            <div class="attr-value">Subagent delegation &mdash; the parent decomposes work and spawns isolated children
+              (supervisor-style), each with its own context/terminal/RPC.</div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label">Ordering (Q2)</span>
+            <div class="attr-value">LLM-driven within a session; NL scheduling sequences unattended runs. No
+              deterministic/symbolic planner.</div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label">State / Memory</span>
+            <div class="attr-value">The standout &mdash; <strong>persistent cross-surface memory</strong> plus
+              <strong>auto-generated skills</strong> that accumulate as reusable capabilities.
+            </div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label">Where AI/LLM is used</span>
+            <div class="attr-value">LLM-driven throughout (planning, subagent reasoning, tool/browser use, skill
+              generation), with <strong>multi-model routing</strong> across many models.</div>
+          </div>
+        </div>
+
+        <div class="attr-box" style="margin-bottom: 0;">
+          <span class="attr-label" style="color: var(--blue);">Fitment</span>
+          <div class="attr-value">Not your data planner, but a useful <strong>reference (possibly a base) for the
+              execution substrate</strong> &mdash; specifically its <em>subagent-with-own-terminal-and-RPC</em>
+            delegation, its <em>auto-generated skills</em> memory, and its <em>five-backend sandboxing</em>.</div>
+        </div>
+
+        <div class="pro-con-grid">
+          <div class="pro-box">
+            <div class="pc-label">Pros</div>
+            <div class="pc-text">Open MIT; strong on the substrate concerns you'll hit anyway &mdash; subagent
+              isolation, multi-backend sandboxing, multi-model routing.</div>
+          </div>
+          <div class="con-box">
+            <div class="pc-label">Cons</div>
+            <div class="pc-text">General-purpose &mdash; no data semantic layer, no warehouse-native governance, no EDA
+              specialization; planning is LLM-emergent.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Omnigent (Databricks) -->
+      <div class="teardown-section">
+        <div class="teardown-header">
+          <h2 class="teardown-title">7. Omnigent (Databricks)</h2>
+        </div>
+        <div class="snapshot-badge">Tier C: Substrate Governance</div>
+        <p class="snapshot-text">Open-source (Apache 2.0), <strong>alpha</strong> <strong>meta-harness</strong> from
+          Databricks &mdash; a layer <em>above</em> coding agents (Claude Code, Cursor, custom) for composition,
+          control, and collaboration. <strong>Not a data agent</strong>: it doesn't decompose or order data tasks; it
+          governs the agents that do.</p>
+
+        <span class="attr-label">Architecture & Components</span>
+        <ul class="arch-list">
+          <li><strong>Runner + server split</strong> &mdash; a <em>runner</em> wraps any agent in a sandboxed session; a
+            <em>server</em> provides policies + sharing.
+          </li>
+          <li><strong>Uniform API</strong> &mdash; swap Claude Code &harr; Codex &harr; Cursor &harr; Pi with one-line
+            changes; compose multiple harnesses via YAML.</li>
+          <li><strong>Stateful contextual policies</strong> &mdash; enforce cost budgets and permissions at the
+            meta-harness layer (not via prompts).</li>
+          <li><strong>Omnibox OS sandbox</strong> &mdash; locks down filesystem access and intercepts/transforms network
+            requests with kernel-level enforcement.</li>
+          <li><strong>Live collaboration</strong> &mdash; share a running session via URL; teammates see messages,
+            subagents, terminals, and files in sync.</li>
+        </ul>
+
+        <span class="attr-label">Workflow Diagram</span>
+        <div class="diagram-container">
+          <div class="mermaid">
+            flowchart LR
+            U(["Task"]) --> HARNESS["Select harness + policies<br />(no-LLM)"]
+            HARNESS --> SBX["Omnibox sandbox<br />(no-LLM)"]
+            SBX --> AGENT["Wrapped agent runs<br />(LLM)"]
+            AGENT --> CHK{"Policy OK?"}
+            CHK -->|violation| HARNESS
+            CHK -->|ok| OUT(["Result"])
+
+            classDef llm fill:#f0f6ff,stroke:#0071e3,color:#0071e3
+            classDef det fill:#f5f5f7,stroke:#e8e8ed,color:#6e6e73
+            classDef mixed fill:#f5f3ff,stroke:#6d28d9,color:#6d28d9
+            classDef io fill:#ffffff,stroke:#e8e8ed,color:#1d1d1f
+            class U,OUT io
+            class AGENT llm
+            class HARNESS,SBX,CHK det
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <div class="attr-box">
+            <span class="attr-label">Decomposition (Q1) / Ordering (Q2)</span>
+            <div class="attr-value">Neither &mdash; it composes and governs sub-agents; the wrapped agents do any
+              decomposition/ordering.</div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label">State / Memory</span>
+            <div class="attr-value">Per-session sandbox state; policy state is stateful/contextual across the session.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <div class="attr-box">
+            <span class="attr-label">Where AI/LLM is used</span>
+            <div class="attr-value">Omnigent itself calls <strong>no LLM for data work</strong> &mdash; it wraps agents
+              that bring their own models. Its policy/budget/sandbox logic is deterministic infrastructure.</div>
+          </div>
+          <div class="attr-box">
+            <span class="attr-label" style="color: var(--blue);">Fitment</span>
+            <div class="attr-value">Only relevant <strong>if your executor spawns multiple specialized
+                sub-agents</strong> and you need cost/permission guardrails + sandboxing + collaboration across them.
+              Conceptual peers: LangGraph supervisor graphs, CrewAI, AutoGen.</div>
+          </div>
+        </div>
+
+        <div class="pro-con-grid">
+          <div class="pro-box">
+            <div class="pc-label">Pros</div>
+            <div class="pc-text">Clean control plane &mdash; swap models/harnesses, enforce cost/permission limits,
+              sandbox OS access, collaborate live; open Apache 2.0.</div>
+          </div>
+          <div class="con-box">
+            <div class="pc-label">Cons</div>
+            <div class="pc-text">Alpha &mdash; enterprise RBAC/identity are on the roadmap; irrelevant unless you're
+              running multiple agents; not a data tool.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Side-by-side -->
+      <div class="teardown-section">
+        <div class="teardown-header">
+          <h2 class="teardown-title">8. Side-by-side & What to borrow</h2>
+        </div>
+
+        <div style="overflow-x: auto; margin-bottom: 32px;">
+          <table style="width: 100%; border-collapse: collapse; color: var(--6e); font-size: 0.95rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--e8); text-align: left;">
+                <th style="padding: 12px; color: var(--1d);">System</th>
+                <th style="padding: 12px; color: var(--1d);">Tier</th>
+                <th style="padding: 12px; color: var(--1d);">Decomposition (Q1)</th>
+                <th style="padding: 12px; color: var(--1d);">Ordering (Q2)</th>
+                <th style="padding: 12px; color: var(--1d);">Trains models?</th>
+                <th style="padding: 12px; color: var(--1d);">Standout to steal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--e8);">
+                <td style="padding: 12px; font-weight: 600; color: var(--1d);">Oracle DS Agent</td>
+                <td style="padding: 12px;">A</td>
+                <td style="padding: 12px;">Lifecycle skeleton</td>
+                <td style="padding: 12px;">Lifecycle + scope catalog</td>
+                <td style="padding: 12px;"><strong>Yes (classical, in-DB)</strong></td>
+                <td style="padding: 12px;">Interactive&rarr;autonomous escalation</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--e8);">
+                <td style="padding: 12px; font-weight: 600; color: var(--1d);">Julius AI</td>
+                <td style="padding: 12px;">A</td>
+                <td style="padding: 12px;">Notebook/agent step plan</td>
+                <td style="padding: 12px;">Plan/notebook order</td>
+                <td style="padding: 12px;">Yes (PyTorch/TF)</td>
+                <td style="padding: 12px;">Save-plan-as-reusable-workflow</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--e8);">
+                <td style="padding: 12px; font-weight: 600; color: var(--1d);">DeepAnalyze-8B</td>
+                <td style="padding: 12px;">A</td>
+                <td style="padding: 12px;">In-model <code>&lt;Analyze&gt;</code></td>
+                <td style="padding: 12px;">Autoregressive act&rarr;observe</td>
+                <td style="padding: 12px;">Yes (end-to-end)</td>
+                <td style="padding: 12px;">Forced execute-after-code; trainable planner</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--e8);">
+                <td style="padding: 12px; font-weight: 600; color: var(--1d);">Agno Dash</td>
+                <td style="padding: 12px;">A</td>
+                <td style="padding: 12px;">Leader delegates</td>
+                <td style="padding: 12px;">Leader + self-learning loop</td>
+                <td style="padding: 12px;">No (SQL)</td>
+                <td style="padding: 12px;">Planner/executor split + learnings-as-memory</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--e8);">
+                <td style="padding: 12px; font-weight: 600; color: var(--1d);">Airflow 3 / Otto</td>
+                <td style="padding: 12px;">B</td>
+                <td style="padding: 12px;">DAG / <code>@task.agent</code></td>
+                <td style="padding: 12px;"><strong>DAG dependency graph</strong></td>
+                <td style="padding: 12px;">Orchestrates</td>
+                <td style="padding: 12px;">Compile the plan to a DAG; per-task cost caps</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--e8);">
+                <td style="padding: 12px; font-weight: 600; color: var(--1d);">Hermes Agent</td>
+                <td style="padding: 12px;">C</td>
+                <td style="padding: 12px;">Subagent delegation</td>
+                <td style="padding: 12px;">LLM-driven + scheduling</td>
+                <td style="padding: 12px;">No (general)</td>
+                <td style="padding: 12px;">Subagent-with-RPC isolation; auto-generated skills</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--e8);">
+                <td style="padding: 12px; font-weight: 600; color: var(--1d);">Omnigent</td>
+                <td style="padding: 12px;">C</td>
+                <td style="padding: 12px;">n/a (governs)</td>
+                <td style="padding: 12px;">n/a (policies)</td>
+                <td style="padding: 12px;">n/a</td>
+                <td style="padding: 12px;">Cost/permission policies + OS sandbox over multiple agents</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <span class="attr-label">The composite blueprint these seven imply for your build:</span>
+        <ul class="arch-list" style="margin-top: 16px;">
+          <li><strong>Planner/executor separation</strong> with the planner emitting typed subtasks &mdash; <em>Agno
+              Leader, Genie supervisor</em>.</li>
+          <li><strong>Interactive&rarr;autonomous</strong> intent/ambiguity handling &mdash; <em>Oracle</em>.</li>
+          <li><strong>Reusable, parameterized, schedulable plans</strong> &mdash; <em>Julius notebooks, Airflow
+              DAGs</em>.</li>
+          <li><strong>Forced act&rarr;observe + reflection loops</strong> for reliability &mdash; <em>DeepAnalyze,
+              Agno</em>.</li>
+          <li><strong>Compile the emergent LLM plan to a deterministic DAG</strong> for ordering, retries, HITL, and
+            per-task cost caps &mdash; <em>Airflow 3</em>.</li>
+          <li><strong>Persist corrections as first-class, versioned memory</strong> (learnings/skills) so the system
+            improves without retraining &mdash; <em>Agno, Otto, Hermes</em>.</li>
+          <li><strong>Reserve the LLM for reasoning/codegen; keep execution, model-training, scheduling, and guardrails
+              deterministic</strong> &mdash; <em>every system here draws this boundary</em>.</li>
+          <li><strong>Add a meta-harness only if you go multi-agent</strong> &mdash; <em>Omnigent / LangGraph</em>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container footer-inner" style="border-top: 1px solid var(--e8); padding: 28px 0; text-align: center;">
+        <p style="font-size: .85rem; color: var(--6e); margin: 0;">© <span id="year"></span> Tanishq Gupta</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
