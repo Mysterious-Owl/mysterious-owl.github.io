@@ -19,17 +19,13 @@
 - **AI/ML:** RAG, LangChain, Llama 3, Gemini, Qwen, PyTorch, FAISS, vLLM, LoRA, GRPO
 - **Data/Cloud:** GCP (Vertex AI), Azure Data Factory, MySQL, Docker, Flask
 
-### 📊 GitHub Stats
-<p align="center">
-  <a href="https://github.com/Mysterious-Owl">
-    <img src="https://github-readme-stats.vercel.app/api?username=mysterious-owl&show_icons=true&theme=buefy&count_private=true" alt="Tanishq's GitHub Stats" />
-  </a>
-  <a href="https://github.com/Mysterious-Owl">
-    <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=mysterious-owl&layout=compact&theme=buefy" alt="Top Languages" />
-  </a>
-</p>
 
 ### 📫 Let's Connect
 - **Portfolio:** [Check out my interactive portfolio and visual guides!](https://github.com/Mysterious-Owl) <!-- Add your hosted link here -->
 - **LinkedIn:** [Tanishq Gupta](https://www.linkedin.com/in/tanishq25gupta/)
 - **Email:** tanishq25gupta@gmail.com
+
+
+#### Some past works
+- Added as a contributor on [PySimpleGUI](https://github.com/PySimpleGUI/PySimpleGUI/issues/142#issuecomment-894722347)
+- Read my [conversation with PySimpleGUI](https://github.com/Mysterious-Owl/color-identification/issues/2) and see if it gives you motivation 
