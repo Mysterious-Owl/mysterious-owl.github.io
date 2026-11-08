@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     crossorigin="anonymous">
   <link rel="stylesheet" href="/css/stylesheet.css">
+  <script>try{var t=localStorage.getItem("portfolio-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head>
 
 <body>
@@ -39,6 +40,7 @@
       <ul class="nav-links">
         <li><a href="#about-philosophy">About</a></li>
         <li><a href="#work">Work</a></li>
+        <li><a href="/projects/">Projects</a></li>
         <li><a href="#experience">Experience</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#visual-guides">Visual Guides</a></li>
@@ -250,68 +252,79 @@
       <span class="section-label">Personal Projects</span>
       <h2 class="section-title">Open Source & Tools</h2>
       <div class="cards-grid">
-        
         <article class="card reveal">
-          <span class="card-tag">RAG & AI</span>
-          <h3 class="card-title">sql-agent</h3>
-          <p class="card-desc">Premium Multi-Agent Vendor RAG System. A high-performance, observable RAG system designed for complex vendor data analysis, built in Python.</p>
+          <span class="card-tag">Computer Vision</span>
+          <h3 class="card-title">FaceGroup</h3>
+          <p class="card-desc">Local-first face grouping and search for a personal photo library using InsightFace, plus text-in-image search, duplicate detection and an events timeline. Photos never leave your computer.</p>
           <div class="tech-pills">
             <span class="pill">Python</span>
-            <span class="pill">Multi-Agent</span>
-            <span class="pill">RAG</span>
+            <span class="pill">InsightFace</span>
+            <span class="pill">OCR</span>
           </div>
-          <a href="https://github.com/Mysterious-Owl/sql-agent" target="_blank" class="guide-link" style="margin-top:16px;">View on GitHub</a>
+          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;">
+            <a href="https://github.com/Mysterious-Owl/PhotosApp" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+          </div>
         </article>
 
         <article class="card reveal">
-          <span class="card-tag">Finance & Web</span>
-          <h3 class="card-title">FundMatrix</h3>
-          <p class="card-desc">A local-first personal portfolio dashboard for Indian investments. It parses CAMS Consolidated Account Statement (CAS) PDFs and rebuilds mutual-fund lot history with FIFO matching.</p>
-          <div class="tech-pills">
-            <span class="pill">JavaScript</span>
-            <span class="pill">PDF Parsing</span>
-            <span class="pill">Finance</span>
-          </div>
-          <a href="https://github.com/Mysterious-Owl/FundMatrix" target="_blank" class="guide-link" style="margin-top:16px;">View on GitHub</a>
-        </article>
-        
-        <article class="card reveal">
-          <span class="card-tag">Data Visualization</span>
-          <h3 class="card-title">college-data</h3>
-          <p class="card-desc">Interactive data visualization and processing tool for analyzing and structuring college metrics and datasets.</p>
-          <div class="tech-pills">
-            <span class="pill">HTML</span>
-            <span class="pill">JavaScript</span>
-          </div>
-          <a href="https://github.com/Mysterious-Owl/college-data" target="_blank" class="guide-link" style="margin-top:16px;">View on GitHub</a>
-        </article>
-        
-        <article class="card reveal">
-          <span class="card-tag">Web Apps</span>
-          <h3 class="card-title">my-life-helpers</h3>
-          <p class="card-desc">A suite of lightweight, frontend-only web applications powered by Firebase, including a Debt Tracker for managing personal debts and credit card bills.</p>
-          <div class="tech-pills">
-            <span class="pill">JavaScript</span>
-            <span class="pill">Firebase</span>
-          </div>
-          <a href="https://github.com/Mysterious-Owl/my-life-helpers" target="_blank" class="guide-link" style="margin-top:16px;">View on GitHub</a>
-        </article>
-        
-        <article class="card reveal">
-          <span class="card-tag">Python Scripting</span>
-          <h3 class="card-title">CAMS_mf_parser</h3>
-          <p class="card-desc">CAS - CAMS+KFintech Parser. A utility designed to reliably parse and extract investment data from complex mutual fund CAS statements.</p>
+          <span class="card-tag">RAG &amp; Agents</span>
+          <h3 class="card-title">sql-agent</h3>
+          <p class="card-desc">Multi-agent RAG system for vendor data analysis. A ReAct SQL agent writes and runs SQL over SQLite with a self-correcting retry loop, across NVIDIA NIM, Azure OpenAI and OpenAI.</p>
           <div class="tech-pills">
             <span class="pill">Python</span>
-            <span class="pill">Data Extraction</span>
+            <span class="pill">ReAct</span>
+            <span class="pill">SQLite</span>
           </div>
-          <a href="https://github.com/Mysterious-Owl/CAMS_mf_parser" target="_blank" class="guide-link" style="margin-top:16px;">View on GitHub</a>
+          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;">
+            <a href="https://github.com/Mysterious-Owl/sql-agent" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+          </div>
         </article>
-        
-        <article class="card reveal" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border: 1px dashed var(--border); background: transparent;">
-          <h3 class="card-title" style="margin-bottom: 12px;">Archived Projects</h3>
-          <p class="card-desc" style="margin-bottom: 24px;">View 13+ older hardware, python, and web projects from my archives.</p>
-          <a href="archived_projects.html" class="guide-link" style="width: 100%; display: block;">View Archives</a>
+
+        <article class="card reveal">
+          <span class="card-tag">Research</span>
+          <h3 class="card-title">Agentic Systems Deep Dive</h3>
+          <p class="card-desc">Teardown of seven agentic systems, from Julius AI to Airflow + Astronomer Otto: architecture, workflow diagrams, how each plans and orders tasks, and trade-offs.</p>
+          <div class="tech-pills">
+            <span class="pill">Agents</span>
+            <span class="pill">Architecture</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;">
+            <a href="https://github.com/Mysterious-Owl/agentic-systems-deep-dive" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+          </div>
+        </article>
+
+        <article class="card reveal">
+          <span class="card-tag">Personal Finance</span>
+          <h3 class="card-title">FundMatrix</h3>
+          <p class="card-desc">Local-first dashboard for Indian mutual fund portfolios. Parses CAMS CAS PDFs, rebuilds lot history with FIFO matching and marks it to market against live NAVs.</p>
+          <div class="tech-pills">
+            <span class="pill">Python</span>
+            <span class="pill">Flask</span>
+            <span class="pill">PDF Parsing</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;">
+            <a href="https://github.com/Mysterious-Owl/FundMatrix" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+          </div>
+        </article>
+
+        <article class="card reveal">
+          <span class="card-tag">Data Pipeline</span>
+          <h3 class="card-title">Bank Statement Analytics</h3>
+          <p class="card-desc">Cleans and merges statements from multiple Indian banks (XLS, XLSX, CSV, password-protected) into one deduplicated ledger with a dashboard on top.</p>
+          <div class="tech-pills">
+            <span class="pill">Python</span>
+            <span class="pill">Pandas</span>
+            <span class="pill">FastAPI</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;">
+            <a href="https://github.com/Mysterious-Owl/bankStatement" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+          </div>
+        </article>
+
+        <article class="card reveal" style="justify-content:center;align-items:center;text-align:center;border-style:dashed;background:transparent;">
+          <h3 class="card-title" style="margin-bottom:12px;">All Projects</h3>
+          <p class="card-desc" style="flex-grow:0;margin-bottom:24px;">15 projects across AI, personal finance, desktop and Android tools, and browser extensions, plus the archive.</p>
+          <a href="/projects/" class="btn-primary">View all projects &rarr;</a>
         </article>
 
       </div>
@@ -644,6 +657,7 @@
         <a href="https://github.com/Mysterious-Owl" target="_blank" rel="noopener">GitHub</a>
         <a href="https://www.linkedin.com/in/tanishq25gupta/" target="_blank" rel="noopener">LinkedIn</a>
         <a href="#work">Work</a>
+        <a href="/projects/">Projects</a>
         <a href="#experience">Experience</a>
         <a href="/visual_guide/index.html">Visual Guides</a>
         <a href="#contact">Contact</a>
@@ -653,6 +667,8 @@
 
   <!-- Interactivity Script -->
   <script src="/js/script.js"></script>
+  <!-- Firebase Analytics -->
+  <script type="module" src="/js/firebase.js"></script>
 </body>
 
 </html>

@@ -21,7 +21,7 @@
 
 
 ### 📫 Let's Connect
-- **Portfolio:** [Check out my interactive portfolio and visual guides!](https://github.com/Mysterious-Owl) <!-- Add your hosted link here -->
+- **Portfolio:** [Check out my interactive portfolio and visual guides!](https://mysterious-owl.github.io/)
 - **LinkedIn:** [Tanishq Gupta](https://www.linkedin.com/in/tanishq25gupta/)
 - **Email:** tanishq25gupta@gmail.com
 

@@ -1,43 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="author" content="Mysterious Owl">
-    <meta name="description" content="Mysterious Owl&#39;s Personal Website">
-    <meta name="keywords" content="blog,developer,personal">
-    <meta property="og:title" content="Mysterious Owl" />
-    <meta property="og:description" content="Mysterious Owl&#39;s Personal Website" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://mysterious-owl.github.io/projects" />
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects - Tanishq Gupta</title>
+  <meta name="description"
+    content="Personal projects by Tanishq Gupta: AI and data tools, personal finance apps, desktop and mobile utilities, and browser extensions.">
+  <meta property="og:title" content="Projects - Tanishq Gupta">
+  <meta property="og:description"
+    content="AI and data tools, personal finance apps, desktop and mobile utilities, and browser extensions.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mysterious-owl.github.io/projects/">
+  <link rel="canonical" href="https://mysterious-owl.github.io/projects/">
 
-    <link rel="FaviconIcon" href="favicon.ico" type="image/x-icon">
-    <link rel="shortcut" href="favicon.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,300&family=Lato:wght@100;300&family=DotGothic16&family=Truculenta:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
-    <link rel="stylesheet" href="/css/stylesheet.css">
-    <title>Mysterious Owl</title>
-  </head>
-  <body>
-    <div class="header">
-      <span class="header-text">
-        <a href="https://mysterious-owl.github.io">Mysterious Owl</a>
-      </span>
-      <div id="btn-out" class="header-btn" onclick="changecolor()">
-        <div class="header-btn-out">
-          <div id="btn-in" class="header-btn-in">
-          </div>
-        </div>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/stylesheet.css">
+  <style>
+    .proj-jump {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .proj-jump a {
+      font-size: 0.85rem;
+      padding: 6px 14px;
+    }
+    .proj-group {
+      padding-top: 24px;
+      scroll-margin-top: 80px;
+    }
+    .proj-group + .proj-group {
+      margin-top: 48px;
+    }
+    .proj-group h3 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--t1);
+      letter-spacing: -0.02em;
+    }
+    .proj-group > p {
+      color: var(--t2);
+      margin-top: 6px;
+      max-width: 680px;
+    }
+    .proj-group .cards-grid {
+      margin-top: 20px;
+    }
+    .card-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    @media (max-width: 400px) {
+      .proj-group .cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <script>try{var t=localStorage.getItem("portfolio-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+
+<body>
+  <div class="ambient"></div>
+  <div class="stripe"></div>
+
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">
+        Tanishq Gupta
+        <span class="badge-role">Sr Data Scientist – AI</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/#about-philosophy">About</a></li>
+        <li><a href="/#work">Work</a></li>
+        <li><a href="/projects/">Projects</a></li>
+        <li><a href="/#experience">Experience</a></li>
+        <li><a href="/visual_guide/index.html">Visual Guides</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+      <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">🌙 Dark Mode</button>
+    </div>
+  </nav>
+
+  <header class="hero" style="padding-bottom:16px;">
+    <div class="container">
+      <span class="eyebrow">Personal Projects</span>
+      <h1>Things I've <span class="grad">built</span></h1>
+      <p class="hero-subtitle">
+        Side projects outside my day job. Most of them are local-first tools I built for problems of my own:
+        my photos, my investments, my laptop, my browser.
+      </p>
+      <div class="proj-jump">
+        <a href="#ai-data" class="btn-secondary">AI &amp; Data</a>
+        <a href="#finance" class="btn-secondary">Personal Finance</a>
+        <a href="#tools" class="btn-secondary">Desktop &amp; Mobile</a>
+        <a href="#extensions" class="btn-secondary">Browser Extensions</a>
+        <a href="/archived_projects.html" class="btn-secondary">Archive</a>
       </div>
     </div>
-    <div class="content projects proj">
-        <table class="row" id="table">
-        </table>
-        <footer class="footerproj">
-            <a href="/sitemap">© 2020</a>
-        </footer>
+  </header>
+
+  <main class="sec" style="padding-top:24px;">
+    <div class="container">
+
+      <!-- AI & Data -->
+      <section id="ai-data" class="proj-group">
+        <span class="section-label">AI &amp; Data</span>
+        <h3>Agents, computer vision and analysis</h3>
+        <div class="cards-grid">
+
+          <article class="card reveal">
+            <span class="card-tag">Computer Vision</span>
+            <h3 class="card-title">FaceGroup</h3>
+            <p class="card-desc">Local-first face grouping and search for a personal photo library, using InsightFace. Also finds text
+              in images, sorts photos into categories, spots duplicates and bursts, and builds a timeline with events and
+              "On this day". Your photos never leave your computer.</p>
+            <div class="tech-pills">
+              <span class="pill">Python</span>
+              <span class="pill">InsightFace</span>
+              <span class="pill">OCR</span>
+              <span class="pill">Clustering</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/PhotosApp" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">RAG &amp; Agents</span>
+            <h3 class="card-title">sql-agent</h3>
+            <p class="card-desc">Multi-agent RAG system for vendor data analysis. A ReAct SQL agent writes and runs SQL over SQLite,
+              with a self-correcting retry loop. Switches between NVIDIA NIM, Azure OpenAI and OpenAI.</p>
+            <div class="tech-pills">
+              <span class="pill">Python</span>
+              <span class="pill">ReAct</span>
+              <span class="pill">SQLite</span>
+              <span class="pill">Multi-Agent</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/sql-agent" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">Research</span>
+            <h3 class="card-title">Agentic Systems Deep Dive</h3>
+            <p class="card-desc">Teardown of seven agentic systems: Oracle Data Science Agent, Julius AI, DeepAnalyze-8B, Agno Dash,
+              Airflow 3 + Astronomer Otto, Hermes Agent and Omnigent. Each covers architecture, a workflow diagram, how it
+              plans and orders tasks, memory, and trade-offs.</p>
+            <div class="tech-pills">
+              <span class="pill">Agents</span>
+              <span class="pill">Architecture</span>
+              <span class="pill">Mermaid</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/agentic-systems-deep-dive" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+              <a href="/visual_guide/agentic_systems_teardown.html" class="guide-link"><i class="fa fa-book"></i> Visual guide</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">Data Analysis</span>
+            <h3 class="card-title">Understanding Our Learners</h3>
+            <p class="card-desc">Analysis of a 325-response student survey, cleaned and turned into learner personas, engagement tiers
+              and teaching strategies, published as an interactive report.</p>
+            <div class="tech-pills">
+              <span class="pill">Data Cleaning</span>
+              <span class="pill">Personas</span>
+              <span class="pill">HTML</span>
+            </div>
+            <div class="card-links">
+              <a href="https://mysterious-owl.github.io/college-data/" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-external-link"></i> Live report</a>
+              <a href="https://github.com/Mysterious-Owl/college-data" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- Personal Finance -->
+      <section id="finance" class="proj-group">
+        <span class="section-label">Personal Finance</span>
+        <h3>Making sense of my own money</h3>
+        <div class="cards-grid">
+
+          <article class="card reveal">
+            <span class="card-tag">Dashboard</span>
+            <h3 class="card-title">FundMatrix</h3>
+            <p class="card-desc">Local-first dashboard for Indian mutual fund portfolios. Parses a password-protected CAMS CAS PDF,
+              rebuilds lot history with FIFO matching and marks it to market against live NAVs.</p>
+            <div class="tech-pills">
+              <span class="pill">Python</span>
+              <span class="pill">Flask</span>
+              <span class="pill">PDF Parsing</span>
+              <span class="pill">FIFO</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/FundMatrix" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">Data Pipeline</span>
+            <h3 class="card-title">Bank Statement Analytics</h3>
+            <p class="card-desc">Cleans and merges bank statements from HDFC, SBI, IDFC, ICICI and others (XLS, XLSX, CSV, including
+              password-protected files) into one deduplicated ledger, with a dashboard on top.</p>
+            <div class="tech-pills">
+              <span class="pill">Python</span>
+              <span class="pill">Pandas</span>
+              <span class="pill">FastAPI</span>
+              <span class="pill">Chart.js</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/bankStatement" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">Parser</span>
+            <h3 class="card-title">CAMS_mf_parser</h3>
+            <p class="card-desc">Parser for CAMS + KFintech Consolidated Account Statement (CAS) PDFs that extracts mutual fund
+              transactions.</p>
+            <div class="tech-pills">
+              <span class="pill">Python</span>
+              <span class="pill">Data Extraction</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/CAMS_mf_parser" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- Desktop & Mobile -->
+      <section id="tools" class="proj-group">
+        <span class="section-label">Desktop &amp; Mobile</span>
+        <h3>Utilities for my laptop and phone</h3>
+        <div class="cards-grid">
+
+          <article class="card reveal">
+            <span class="card-tag">Windows</span>
+            <h3 class="card-title">Storage Explorer</h3>
+            <p class="card-desc">Shows where disk space goes with a clickable treemap and plain-English advice on common folders, then
+              finds byte-identical duplicate files left behind by backups and moves the extra copies.</p>
+            <div class="tech-pills">
+              <span class="pill">Python</span>
+              <span class="pill">Hashing</span>
+              <span class="pill">Windows</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/StorageAnalyser" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">Windows</span>
+            <h3 class="card-title">Thermal Monitor</h3>
+            <p class="card-desc">Reads every temperature sensor on a Windows laptop (CPU, Intel iGPU, NVMe SSD, battery) plus power, load
+              and clock speed. Logs everything to CSV and shows live graphs.</p>
+            <div class="tech-pills">
+              <span class="pill">C#</span>
+              <span class="pill">Hardware Sensors</span>
+              <span class="pill">Live Graphs</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/thermal-monitor" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">Android</span>
+            <h3 class="card-title">Glint</h3>
+            <p class="card-desc">Always-on display for the Galaxy S25 that shows notifications as small coloured icons per app and per
+              person, like the old notification LED. Needs no Accessibility service, so banking apps keep working.</p>
+            <div class="tech-pills">
+              <span class="pill">Kotlin</span>
+              <span class="pill">Android</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/Glint" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">Web App</span>
+            <h3 class="card-title">my-life-helpers</h3>
+            <p class="card-desc">Lightweight vanilla JS web apps backed by Firebase, starting with a tracker for credit card bills and
+              personal debts.</p>
+            <div class="tech-pills">
+              <span class="pill">JavaScript</span>
+              <span class="pill">Firebase</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/my-life-helpers" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- Browser Extensions -->
+      <section id="extensions" class="proj-group">
+        <span class="section-label">Browser Extensions</span>
+        <h3>Chrome and Edge extensions</h3>
+        <div class="cards-grid">
+
+          <article class="card reveal">
+            <span class="card-tag">Chrome Web Store</span>
+            <h3 class="card-title">Video Speed Control</h3>
+            <p class="card-desc">Control the playback speed of any video on any website with the backtick key. Works with embedded
+              players, iframes and shadow DOM. Originally published as YouTube Speed Controls.</p>
+            <div class="tech-pills">
+              <span class="pill">JavaScript</span>
+              <span class="pill">Chrome Extension</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/video-speed-control" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+              <a href="https://chrome.google.com/webstore/detail/youtube-speed-controls/naalfmaaomhjpbndelnlijacdniggpjn" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-chrome"></i> Web Store</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">Extension</span>
+            <h3 class="card-title">DarkMode</h3>
+            <p class="card-desc">Dark mode for any website in Chrome and Edge, including the built-in PDF viewer. Two modes: smart invert
+              that keeps images natural, and a classic overlay.</p>
+            <div class="tech-pills">
+              <span class="pill">JavaScript</span>
+              <span class="pill">Chrome Extension</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/DarkMode" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">Extension</span>
+            <h3 class="card-title">Advanced Regex Search</h3>
+            <p class="card-desc">Regex find-in-page with up to 8 searches at once, each in its own colour. Uses the CSS Custom Highlight
+              API, so the page's DOM is never modified.</p>
+            <div class="tech-pills">
+              <span class="pill">JavaScript</span>
+              <span class="pill">Regex</span>
+              <span class="pill">Chrome Extension</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/advanced-regex-search" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-tag">Extension</span>
+            <h3 class="card-title">TabOpen</h3>
+            <p class="card-desc">Opens a list of links or search terms in new tabs in one click.</p>
+            <div class="tech-pills">
+              <span class="pill">JavaScript</span>
+              <span class="pill">Chrome Extension</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/Mysterious-Owl/TabOpen" target="_blank" rel="noopener" class="guide-link"><i class="fa fa-github"></i> GitHub</a>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- Archive -->
+      <section class="proj-group">
+        <article class="card reveal" style="align-items:center;text-align:center;border-style:dashed;background:transparent;">
+          <h3 class="card-title">Older projects</h3>
+          <p class="card-desc" style="flex-grow:0;">Hardware, Python and web projects from my college years, including the Moodle
+            attendance bot and the colour identifier.</p>
+          <a href="/archived_projects.html" class="btn-secondary">View the archive &rarr;</a>
+        </article>
+      </section>
+
     </div>
-  </body>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> Tanishq Gupta. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="https://github.com/Mysterious-Owl" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/tanishq25gupta/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="/">Home</a>
+        <a href="/visual_guide/index.html">Visual Guides</a>
+        <a href="/#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
   <script src="/js/script.js"></script>
+  <!-- Firebase Analytics -->
+  <script type="module" src="/js/firebase.js"></script>
+</body>
+
 </html>

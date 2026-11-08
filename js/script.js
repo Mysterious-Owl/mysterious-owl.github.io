@@ -6,12 +6,21 @@ document.addEventListener('DOMContentLoaded', () => {
   initYear();
 });
 
+// ── Safe localStorage (can throw in some private-browsing modes) ──
+function readStoredTheme() {
+  try { return localStorage.getItem('portfolio-theme'); } catch (e) { return null; }
+}
+
+function storeTheme(theme) {
+  try { localStorage.setItem('portfolio-theme', theme); } catch (e) { /* ignore */ }
+}
+
 // ── Theme Management (Light / Dark mode) ──
+// The initial theme is set by an inline script in <head> to avoid a flash;
+// this only syncs the button and handles toggling.
 function initTheme() {
-  const savedTheme = localStorage.getItem('portfolio-theme');
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+  const initialTheme = readStoredTheme() || (prefersDark ? 'dark' : 'light');
   applyTheme(initialTheme);
 
   const themeBtn = document.getElementById('theme-toggle');
@@ -20,19 +29,17 @@ function initTheme() {
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
       applyTheme(newTheme);
+      storeTheme(newTheme); // persist only explicit user choices
     });
   }
 }
 
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('portfolio-theme', theme);
-  
+
   const themeBtn = document.getElementById('theme-toggle');
   if (themeBtn) {
-    themeBtn.innerHTML = theme === 'dark'
-      ? '☀️ Light Mode'
-      : '🌙 Dark Mode';
+    themeBtn.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
   }
 }
 
@@ -59,17 +66,4 @@ function initYear() {
   if (yearEl) {
     yearEl.textContent = new Date().getFullYear();
   }
-}
-
-// ── Contact Form Handler (Client-side feedback) ──
-function handleContactSubmit(event) {
-  event.preventDefault();
-  const form = event.target;
-  const statusEl = document.getElementById('form-status');
-  if (statusEl) {
-    statusEl.style.display = 'block';
-    statusEl.innerHTML = '<span style="color:var(--green);font-weight:600;">✓ Message sent successfully! Thank you for getting in touch.</span>';
-  }
-  form.reset();
-  return false;
 }

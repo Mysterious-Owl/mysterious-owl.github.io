@@ -494,7 +494,7 @@ nav {
 }
 
 .timeline-bullets li::before {
-  content: "â€¢";
+  content: "\2022";
   position: absolute;
   left: 0;
   color: var(--acc);
